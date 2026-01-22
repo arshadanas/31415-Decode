@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
 import static org.firstinspires.ftc.teamcode.TestMotorsCRServos.TestMech.ROTOR;
@@ -8,6 +9,7 @@ import static org.firstinspires.ftc.teamcode.Wrap.wrap;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp(group = "Single mechanism test")
@@ -30,6 +32,7 @@ public final class TestMotorsCRServos extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        // pos = CCW
         CRServo[] rotorServos = {
                 hardwareMap.get(CRServo.class, "rotor 1"),
                 hardwareMap.get(CRServo.class, "rotor 2")
@@ -39,17 +42,24 @@ public final class TestMotorsCRServos extends LinearOpMode {
                 hardwareMap.get(CRServo.class, "feeder R"),
                 hardwareMap.get(CRServo.class, "feeder L")
         };
-        feederServos[1].setDirection(REVERSE);
+        feederServos[0].setDirection(REVERSE);
 
         DcMotorEx[] shooterMotors = {
                 hardwareMap.get(DcMotorEx.class, "shooter R"),
                 hardwareMap.get(DcMotorEx.class, "shooter L")
         };
         shooterMotors[1].setDirection(REVERSE);
+        for (DcMotorEx motor : shooterMotors) {
+            motor.setZeroPowerBehavior(FLOAT);
+        }
 
+        // pos = CCW
         DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
+        turret.setDirection(REVERSE);
 
         DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
+        intake.setDirection(REVERSE);
+        intake.setZeroPowerBehavior(FLOAT);
 
         TestMech testMech = ROTOR;
 
