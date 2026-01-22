@@ -1,0 +1,93 @@
+package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
+
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+
+import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TestMotorsCRServos.TestMech.ROTOR;
+import static org.firstinspires.ftc.teamcode.subsystem.utility.Wrap.wrap;
+
+import com.arcrobotics.ftclib.hardware.motors.Motor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
+
+@TeleOp(group = "Single mechanism test")
+public final class TestMotorsCRServos extends LinearOpMode {
+
+    enum TestMech {
+        ROTOR, FEEDER, SHOOTER, TURRET, INTAKE;
+
+        private final static TestMech[] values = values();
+
+        public TestMech plus(int n) {
+            return values[wrap(ordinal() + n, 0, values.length)];
+        }
+
+        public String markIf(TestMech s) {
+            return this == s ? " <" : "";
+        }
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        CRServo[] rotorServos = {
+                hardwareMap.get(CRServo.class, "rotor 1"),
+                hardwareMap.get(CRServo.class, "rotor 2")
+        };
+
+        CRServo[] feederServos = {
+                hardwareMap.get(CRServo.class, "feeder R"),
+                hardwareMap.get(CRServo.class, "feeder L")
+        };
+        feederServos[1].setDirection(REVERSE);
+
+        CachedMotorEx[] shooterMotors = {
+                new CachedMotorEx(hardwareMap, "shooter R", Motor.GoBILDA.BARE),
+                new CachedMotorEx(hardwareMap, "shooter R", Motor.GoBILDA.BARE)
+        };
+        shooterMotors[1].setInverted(true);
+
+        CachedMotorEx turret = new CachedMotorEx(hardwareMap, "turret", Motor.GoBILDA.RPM_1150);
+
+        CachedMotorEx intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
+
+        TestMech testMech = ROTOR;
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+
+            if (gamepad1.dpadUpWasPressed()) testMech = testMech.plus(-1);
+            if (gamepad1.dpadDownWasPressed()) testMech = testMech.plus(1);
+
+            float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
+
+            switch (testMech) {
+                case ROTOR:
+                    for (CRServo servo : rotorServos)
+                        servo.setPower(triggersSum);
+                    break;
+                case FEEDER:
+                    for (CRServo feederServo : feederServos)
+                        feederServo.setPower(triggersSum);
+                    break;
+                case SHOOTER:
+                    for (CachedMotorEx shooterMotor : shooterMotors)
+                        shooterMotor.set(triggersSum);
+                    break;
+                case TURRET:
+                    turret.set(triggersSum);
+                    break;
+                case INTAKE:
+                    intake.set(triggersSum);
+                    break;
+            }
+
+            for (TestMech mech : TestMech.values)
+                telemetry.addLine(mech.name() + testMech.markIf(mech));
+            telemetry.update();
+        }
+    }
+}
