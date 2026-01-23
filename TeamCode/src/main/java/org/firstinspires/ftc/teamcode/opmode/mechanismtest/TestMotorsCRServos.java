@@ -1,10 +1,10 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 
-import static org.firstinspires.ftc.teamcode.TestMotorsCRServos.TestMech.ROTOR;
-import static org.firstinspires.ftc.teamcode.Wrap.wrap;
+import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TestMotorsCRServos.TestMech.ROTOR;
+import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
