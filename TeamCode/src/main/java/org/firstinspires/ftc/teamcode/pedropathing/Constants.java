@@ -21,8 +21,8 @@ public class Constants {
             .distanceUnit(DistanceUnit.INCH)
             .hardwareMapName("pinpoint")
             .encoderResolution(goBILDA_4_BAR_POD)
-            .forwardEncoderDirection(FORWARD)
-            .strafeEncoderDirection(REVERSED);
+            .forwardEncoderDirection(REVERSED)
+            .strafeEncoderDirection(FORWARD);
 
     public static FollowerConstants followerConstants = new FollowerConstants();
 

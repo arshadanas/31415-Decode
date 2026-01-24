@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 
+import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.divider;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
@@ -32,6 +33,8 @@ public final class TestSensors extends LinearOpMode {
                 liftEncoder = new CachedMotorEx(hardwareMap, "BR", Motor.GoBILDA.RPM_435).encoder,
                 shooterEncoder = new CachedMotorEx(hardwareMap, "FR", Motor.GoBILDA.BARE).encoder,
                 turretQuadrature = new CachedMotorEx(hardwareMap, "BL", Motor.GoBILDA.RPM_1150).encoder;
+        liftEncoder.setDirection(REVERSE);
+        turretQuadrature.setDirection(REVERSE);
 
         liftEncoder.reset();
         shooterEncoder.reset();
@@ -39,12 +42,12 @@ public final class TestSensors extends LinearOpMode {
 
         AnalogSensor
                 rotorEncoder = new AnalogSensor(hardwareMap, "rotor", 3 * 2 * PI),
-                turretAbsolute = new AnalogSensor(hardwareMap, "elc", 2 * PI),
-                frontDistance1 = new AnalogSensor(hardwareMap, "front 1", 1300),
-                backDistance1 = new AnalogSensor(hardwareMap, "back 1", 1300);
+                turretAbsolute = new AnalogSensor(hardwareMap, "elc", 2 * PI), // TODO FIX
+                frontDistance1 = new AnalogSensor(hardwareMap, "front 1", 1300), // TODO CONFIGURE
+                backDistance1 = new AnalogSensor(hardwareMap, "back 1", 1000);
 
-        ArtifactColorSensor color1 = new ArtifactColorSensor(hardwareMap, "color 1a", "color 1b");
-        ArtifactColorSensor color2 = new ArtifactColorSensor(hardwareMap, "color 2a", "color 2b");
+        ArtifactColorSensor color1 = new ArtifactColorSensor(hardwareMap, "color 1a", "color 1b"); // TODO CONFIGURE
+        ArtifactColorSensor color2 = new ArtifactColorSensor(hardwareMap, "color 2a", "color 2b"); // TODO CONFIGURE
 
         PinpointLocalizer pinpoint = new PinpointLocalizer(hardwareMap, localizerConstants);
         pinpoint.resetIMU();
