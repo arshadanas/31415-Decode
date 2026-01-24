@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
+package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_312;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;

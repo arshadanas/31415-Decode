@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
+package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
 import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
+package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;

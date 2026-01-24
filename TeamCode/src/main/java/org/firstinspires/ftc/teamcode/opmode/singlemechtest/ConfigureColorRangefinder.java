@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
+package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
