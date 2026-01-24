@@ -8,6 +8,8 @@ import static org.firstinspires.ftc.teamcode.pedropathing.Constants.localizerCon
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.pedropathing.ftc.localization.localizers.PinpointLocalizer;
@@ -21,14 +23,17 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
+@Config
 @TeleOp(group = "Multiple mechanism test")
 public final class TestSensors extends LinearOpMode {
+
+    public static double turretAbsoluteOffset = 0;
 
     @Override
     public void runOpMode() {
 
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
-        mTelemetry = telemetry;
+        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());;
         
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
@@ -69,7 +74,7 @@ public final class TestSensors extends LinearOpMode {
 
             double rotorRad = normalizeRadians(rotorEncoder.getReading());
 
-            double turretRadAbs = normalizeRadians(turretAbsolute.getReading());
+            double turretRadAbs = normalizeRadians(-turretAbsolute.getReading() + turretAbsoluteOffset);
 
             Pose pose = pinpoint.getPose();
 
