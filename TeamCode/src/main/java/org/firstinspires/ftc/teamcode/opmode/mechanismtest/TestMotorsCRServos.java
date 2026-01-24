@@ -1,15 +1,16 @@
 package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
 
-import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.FLOAT;
+import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
-
-import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TestMotorsCRServos.TestMech.ROTOR;
 import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
+import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TestMotorsCRServos.TestMech.ROTOR;
 
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 
 @TeleOp(group = "Single mechanism test")
 public final class TestMotorsCRServos extends LinearOpMode {
@@ -43,21 +44,21 @@ public final class TestMotorsCRServos extends LinearOpMode {
         };
         feederServos[0].setDirection(REVERSE);
 
-        DcMotorEx[] shooterMotors = {
-                hardwareMap.get(DcMotorEx.class, "shooter R"),
-                hardwareMap.get(DcMotorEx.class, "shooter L")
+        CachedMotorEx[] shooterMotors = {
+                new CachedMotorEx(hardwareMap, "shooter R", Motor.GoBILDA.BARE),
+                new CachedMotorEx(hardwareMap, "shooter L", Motor.GoBILDA.BARE)
         };
-        shooterMotors[1].setDirection(REVERSE);
-        for (DcMotorEx motor : shooterMotors) {
+        shooterMotors[1].setInverted(true);
+        for (CachedMotorEx motor : shooterMotors) {
             motor.setZeroPowerBehavior(FLOAT);
         }
 
         // pos = CCW
-        DcMotorEx turret = hardwareMap.get(DcMotorEx.class, "turret");
-        turret.setDirection(REVERSE);
+        CachedMotorEx turret = new CachedMotorEx(hardwareMap,  "turret", Motor.GoBILDA.RPM_1150);
+        turret.setInverted(true);
 
-        DcMotorEx intake = hardwareMap.get(DcMotorEx.class, "intake");
-        intake.setDirection(REVERSE);
+        CachedMotorEx intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
+        intake.setInverted(true);
         intake.setZeroPowerBehavior(FLOAT);
 
         TestMech testMech = ROTOR;
@@ -81,14 +82,14 @@ public final class TestMotorsCRServos extends LinearOpMode {
                         feederServo.setPower(triggersSum);
                     break;
                 case SHOOTER:
-                    for (DcMotorEx shooterMotor : shooterMotors)
-                        shooterMotor.setPower(triggersSum);
+                    for (CachedMotorEx shooterMotor : shooterMotors)
+                        shooterMotor.set(triggersSum);
                     break;
                 case TURRET:
-                    turret.setPower(triggersSum);
+                    turret.set(triggersSum);
                     break;
                 case INTAKE:
-                    intake.setPower(triggersSum);
+                    intake.set(triggersSum);
                     break;
             }
 
