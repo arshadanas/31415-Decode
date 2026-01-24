@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 
-@TeleOp(group = "Single mechanism test")
+@TeleOp(group = "Multiple mechanism test")
 public final class TestMotorsCRServos extends LinearOpMode {
 
     enum TestMech {

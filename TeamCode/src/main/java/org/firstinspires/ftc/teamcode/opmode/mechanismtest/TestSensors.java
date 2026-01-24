@@ -19,7 +19,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
-@TeleOp(group = "Single mechanism test")
+@TeleOp(group = "Multiple mechanism test")
 public final class TestSensors extends LinearOpMode {
 
     @Override

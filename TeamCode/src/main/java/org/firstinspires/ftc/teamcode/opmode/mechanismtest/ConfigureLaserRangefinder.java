@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.LaserRangefinder;
 
-@TeleOp
+@TeleOp(group = "Brushland")
 public class ConfigureLaserRangefinder extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

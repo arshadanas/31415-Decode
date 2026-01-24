@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 @Configurable
-@TeleOp(group = "Single mechanism test")
+@TeleOp(group = "Multiple mechanism test")
 public final class TuneServos extends LinearOpMode {
 
     public static double
