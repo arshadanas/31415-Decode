@@ -72,7 +72,7 @@ public final class TuneServos extends LinearOpMode {
             if (gamepad1.dpadUpWasPressed()) selected = selected.plus(-1);
             if (gamepad1.dpadDownWasPressed()) selected = selected.plus(1);
 
-            if (gamepad1.square) {
+            if (gamepad1.squareWasPressed()) {
                 switch (selected) {
                     case HOOD:
                         hoodMax = !hoodMax;
