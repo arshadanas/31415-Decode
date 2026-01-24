@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
-import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogEncoder;
+import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
 @Config
 public final class SwerveModule {
@@ -83,7 +83,7 @@ public final class SwerveModule {
 
     private final PIDController thetaController = new PIDController();
 
-    private final AnalogEncoder thetaEncoder;
+    private final AnalogSensor thetaEncoder;
 
     public SwerveModule(HardwareMap hardwareMap, SwerveModuleID id) {
 
@@ -93,7 +93,7 @@ public final class SwerveModule {
         setZeroPowerBehavior(BRAKE);
 
         this.servo = new CRServo(hardwareMap, id.servoName);
-        this.thetaEncoder = new AnalogEncoder(hardwareMap, id.encoderName, 2 * PI);
+        this.thetaEncoder = new AnalogSensor(hardwareMap, id.encoderName, 2 * PI);
 
         this.batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
@@ -105,7 +105,7 @@ public final class SwerveModule {
     }
 
     public void readSensors() {
-        current.theta = normalizeRadians(thetaEncoder.getPosition() - id.offset());
+        current.theta = normalizeRadians(thetaEncoder.getReading() - id.offset());
         thetaController.setGains(thetaGains);
     }
 
