@@ -96,7 +96,7 @@ public final class TestMotorsCRServos extends LinearOpMode {
             }
 
             for (TestMech mech : TestMech.values)
-                telemetry.addLine(mech.markIf(selected) + mech.name() + (gamepad1.square ? " [EDITING]" : ""));
+                telemetry.addLine(mech.markIf(selected) + mech.name() + (mech != selected ? "" : gamepad1.square ? " [EDITING]" : "[Hold square to edit]"));
             telemetry.update();
         }
     }
