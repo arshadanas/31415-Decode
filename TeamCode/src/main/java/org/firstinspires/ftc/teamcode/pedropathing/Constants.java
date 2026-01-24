@@ -1,12 +1,29 @@
 package org.firstinspires.ftc.teamcode.pedropathing;
 
+import static com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.EncoderDirection.FORWARD;
+import static com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.EncoderDirection.REVERSED;
+import static com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
+import com.pedropathing.ftc.localization.constants.PinpointConstants;
 import com.pedropathing.paths.PathConstraints;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 public class Constants {
+
+    public static PinpointConstants localizerConstants = new PinpointConstants()
+            .forwardPodY(110.5/25.4)
+            .strafePodX(-108.53456/25.4)
+            .distanceUnit(DistanceUnit.INCH)
+            .hardwareMapName("pinpoint")
+            .encoderResolution(goBILDA_4_BAR_POD)
+            .forwardEncoderDirection(FORWARD)
+            .strafeEncoderDirection(REVERSED);
+
     public static FollowerConstants followerConstants = new FollowerConstants();
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
