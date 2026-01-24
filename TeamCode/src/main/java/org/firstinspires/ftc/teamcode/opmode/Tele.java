@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.motion.PIDDriver;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
@@ -60,6 +61,7 @@ public final class Tele extends LinearOpMode {
         double TELE = 120; // seconds
         double CLIMB_TIME = TELE - 15; // 15 seconds for climb
 
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         mTelemetry = telemetry;
 //                new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 

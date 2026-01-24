@@ -15,6 +15,7 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.ArtifactColorSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
@@ -26,7 +27,9 @@ public final class TestSensors extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        mTelemetry = new MultipleTelemetry(telemetry);
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
+        mTelemetry = telemetry;
+        
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
         Motor.Encoder

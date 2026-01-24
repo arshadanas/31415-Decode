@@ -11,6 +11,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 @Configurable
@@ -49,6 +50,8 @@ public final class TuneServos extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
 
         CachedSimpleServo hood = new CachedSimpleServo(hardwareMap, "hood", 0, 360);
         CachedSimpleServo gateR = new CachedSimpleServo(hardwareMap, "gate R", 0, 300);

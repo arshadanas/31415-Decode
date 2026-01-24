@@ -216,7 +216,9 @@ public final class Auto extends LinearOpMode {
         specIntaking3.heading = specIntaking3.angleTo(specSpike3);
 
         // Initialize multiple telemetry outputs:
-        mTelemetry = new MultipleTelemetry(telemetry);
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
+        mTelemetry = telemetry;
+//                new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot:
         Robot robot = new Robot(hardwareMap, pose);

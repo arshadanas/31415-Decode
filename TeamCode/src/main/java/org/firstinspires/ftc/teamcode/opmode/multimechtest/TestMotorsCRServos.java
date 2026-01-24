@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 
 @TeleOp(group = "Multiple mechanism test")
@@ -31,6 +32,8 @@ public final class TestMotorsCRServos extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
+        telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
 
         // pos = CCW
         CRServo[] rotorServos = {
@@ -96,7 +99,7 @@ public final class TestMotorsCRServos extends LinearOpMode {
             }
 
             for (TestMech mech : TestMech.values)
-                telemetry.addLine(mech.markIf(selected) + mech.name() + (mech != selected ? "" : gamepad1.square ? " [EDITING]" : "[Hold square to edit]"));
+                telemetry.addLine(mech.markIf(selected) + mech.name() + (mech != selected ? "" : gamepad1.square ? " [EDITING]" : " [Hold square to edit]"));
             telemetry.update();
         }
     }
