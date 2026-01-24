@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
+package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 
 import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
-import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TuneServos.TestServo.GATE_L;
-import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TuneServos.TestServo.GATE_R;
-import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TuneServos.TestServo.GEAR_L;
-import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TuneServos.TestServo.GEAR_R;
-import static org.firstinspires.ftc.teamcode.opmode.mechanismtest.TuneServos.TestServo.HOOD;
+import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_L;
+import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_R;
+import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_L;
+import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_R;
+import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.HOOD;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
