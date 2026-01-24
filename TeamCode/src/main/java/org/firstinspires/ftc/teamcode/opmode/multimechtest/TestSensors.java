@@ -23,6 +23,8 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
+import java.util.ArrayList;
+
 @Config
 @TeleOp(group = "Multiple mechanism test")
 public final class TestSensors extends LinearOpMode {
@@ -60,6 +62,8 @@ public final class TestSensors extends LinearOpMode {
         PinpointLocalizer pinpoint = new PinpointLocalizer(hardwareMap, localizerConstants);
         pinpoint.resetIMU();
 
+        ArrayList<Double> absReadings = new ArrayList<>();
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -69,12 +73,23 @@ public final class TestSensors extends LinearOpMode {
 
             double shooterRevPerSec = shooterEncoder.getCorrectedVelocity() / 28.0;
 
-            double turretRadQuad = normalizeRadians((turretQuadrature.getPosition() / (4 * 145.090909091)) * 2 * PI);
-            double turretRadPerSec = turretQuadrature.getCorrectedVelocity() / (4 * 145.090909091) * 2 * PI;
+            double turretRadPerTick = 2 * PI / (4 * 145.090909091);
+            double turretRadQuad = normalizeRadians(turretQuadrature.getPosition() * turretRadPerTick);
+            double turretRadPerSec = turretQuadrature.getCorrectedVelocity() * turretRadPerTick;
 
             double rotorRad = normalizeRadians(rotorEncoder.getReading());
 
-            double turretRadAbs = normalizeRadians(-turretAbsolute.getReading() + turretAbsoluteOffset);
+            double turretRadAbsRaw = -turretAbsolute.getReading();
+            double turretRadAbs = normalizeRadians(turretRadAbsRaw + turretAbsoluteOffset);
+
+            if (gamepad1.square)
+                absReadings.add(turretRadAbsRaw);
+            if (gamepad1.circleWasPressed()) {
+                double sum = 0;
+                for (double read : absReadings)
+                    sum += read;
+                turretAbsoluteOffset = -sum / absReadings.size();
+            }
 
             Pose pose = pinpoint.getPose();
 
