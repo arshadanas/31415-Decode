@@ -25,7 +25,7 @@ public final class TestMotorsCRServos extends LinearOpMode {
         }
 
         public String markIf(TestMech s) {
-            return this == s ? " <" : "";
+            return this == s ? "> " : "  ";
         }
     }
 
@@ -61,40 +61,42 @@ public final class TestMotorsCRServos extends LinearOpMode {
         intake.setInverted(true);
         intake.setZeroPowerBehavior(FLOAT);
 
-        TestMech testMech = ROTOR;
+        TestMech selected = ROTOR;
 
         waitForStart();
 
         while (opModeIsActive()) {
 
-            if (gamepad1.dpadUpWasPressed()) testMech = testMech.plus(-1);
-            if (gamepad1.dpadDownWasPressed()) testMech = testMech.plus(1);
+            if (gamepad1.dpadUpWasPressed()) selected = selected.plus(-1);
+            if (gamepad1.dpadDownWasPressed()) selected = selected.plus(1);
 
-            float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
+            if (gamepad1.square) {
+                float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
 
-            switch (testMech) {
-                case ROTOR:
-                    for (CRServo servo : rotorServos)
-                        servo.setPower(triggersSum);
-                    break;
-                case FEEDER:
-                    for (CRServo feederServo : feederServos)
-                        feederServo.setPower(triggersSum);
-                    break;
-                case SHOOTER:
-                    for (CachedMotorEx shooterMotor : shooterMotors)
-                        shooterMotor.set(triggersSum);
-                    break;
-                case TURRET:
-                    turret.set(triggersSum);
-                    break;
-                case INTAKE:
-                    intake.set(triggersSum);
-                    break;
+                switch (selected) {
+                    case ROTOR:
+                        for (CRServo servo : rotorServos)
+                            servo.setPower(triggersSum);
+                        break;
+                    case FEEDER:
+                        for (CRServo feederServo : feederServos)
+                            feederServo.setPower(triggersSum);
+                        break;
+                    case SHOOTER:
+                        for (CachedMotorEx shooterMotor : shooterMotors)
+                            shooterMotor.set(triggersSum);
+                        break;
+                    case TURRET:
+                        turret.set(triggersSum);
+                        break;
+                    case INTAKE:
+                        intake.set(triggersSum);
+                        break;
+                }
             }
 
             for (TestMech mech : TestMech.values)
-                telemetry.addLine(mech.name() + testMech.markIf(mech));
+                telemetry.addLine(mech.markIf(selected) + mech.name() + (gamepad1.square ? " [EDITING]" : ""));
             telemetry.update();
         }
     }
