@@ -4,14 +4,13 @@ import static java.lang.Math.max;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 
 
-@TeleOp(group = "Single mechanism test")
+//@TeleOp(group = "Single mechanism test")
 public final class TestTank extends LinearOpMode {
 
     @Override

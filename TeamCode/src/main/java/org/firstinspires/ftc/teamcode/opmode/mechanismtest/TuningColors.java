@@ -5,9 +5,8 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@TeleOp(group = "Single mechanism test")
+//@TeleOp(group = "Single mechanism test")
 public final class TuningColors extends LinearOpMode {
 
     @Override

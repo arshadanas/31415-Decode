@@ -2,18 +2,16 @@ package org.firstinspires.ftc.teamcode.opmode.mechanismtest;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_312;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
-//import static org.firstinspires.ftc.teamcode.subsystem.Lift.INCHES_PER_TICK;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 
-@TeleOp(group = "Single mechanism test")
+//@TeleOp(group = "Single mechanism test")
 public final class TestLiftEncoders extends LinearOpMode {
 
     @Override

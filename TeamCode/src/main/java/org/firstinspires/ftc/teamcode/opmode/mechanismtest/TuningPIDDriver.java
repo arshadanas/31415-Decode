@@ -4,18 +4,16 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.norm
 import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.control.motion.PIDDriver;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 
 
-@TeleOp(group = "Single mechanism test")
-@Config
+//@TeleOp(group = "Single mechanism test")
+//@Config
 public final class TuningPIDDriver extends LinearOpMode {
 
     public static EditablePose target = new EditablePose(0, 0, 0);

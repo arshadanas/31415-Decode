@@ -26,12 +26,11 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.vision.detector.AprilTagDetector;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@TeleOp(group = "Single mechanism test")
+//@TeleOp(group = "Single mechanism test")
 public final class TestAprilTagDetector extends LinearOpMode {
 
     @Override
