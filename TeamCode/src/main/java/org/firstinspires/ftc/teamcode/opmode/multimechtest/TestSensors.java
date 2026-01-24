@@ -27,7 +27,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 @TeleOp(group = "Multiple mechanism test")
 public final class TestSensors extends LinearOpMode {
 
-    public static double turretAbsoluteOffset = 0;
+    public static double turretAbsoluteOffset = 1.8659156366775742;
 
     @Override
     public void runOpMode() {
