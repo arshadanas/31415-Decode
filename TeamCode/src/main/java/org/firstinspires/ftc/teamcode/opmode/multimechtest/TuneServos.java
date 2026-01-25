@@ -21,8 +21,8 @@ public final class TuneServos extends LinearOpMode {
 
     public static double
 
-            HOOD_DEG_SHALLOWEST = 30, // TODO MEASURE PHYSICALLY
-            HOOD_DEG_STEEPEST = 61.7419355,
+            LAUNCH_DEG_SHALLOWEST = 31.901328,
+            LAUNCH_DEG_STEEPEST = 61.7419355,
 
             ANGLE_HOOD_SERVO_MAX = 360,
             ANGLE_HOOD_SERVO_MIN = 10,
@@ -35,8 +35,8 @@ public final class TuneServos extends LinearOpMode {
             ANGLE_SWITCH_ENGAGED = 67,
             ANGLE_SWITCH_L_OFFSET = 4;
 
-    public static double launchAngleToServoAngle(double launchAngle) {
-        return lerp(launchAngle, HOOD_DEG_SHALLOWEST, HOOD_DEG_STEEPEST, ANGLE_HOOD_SERVO_MAX, ANGLE_HOOD_SERVO_MIN);
+    public static double launchDegToServoDeg(double launchDegrees) {
+        return lerp(launchDegrees, LAUNCH_DEG_SHALLOWEST, LAUNCH_DEG_STEEPEST, ANGLE_HOOD_SERVO_MAX, ANGLE_HOOD_SERVO_MIN);
     }
 
     enum TestServo {
