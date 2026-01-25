@@ -27,7 +27,7 @@ public final class Tele extends LinearOpMode {
             return selections[((ordinal() + i) % max + max) % max];
         }
         public String markIf(TeleOpConfig s) {
-            return this == s ? " <" : "";
+            return this == s ? "> " : "  ";
         }
     }
 
