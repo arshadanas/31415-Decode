@@ -7,32 +7,28 @@ import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.Tes
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_R;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.HOOD;
 
-import com.bylazar.configurables.annotations.Configurable;
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
-@Configurable
+@Config
 @TeleOp(group = "Multiple mechanism test")
 public final class TuneServos extends LinearOpMode {
 
     public static double
-            ANGLE_HOOD_MIN = 0,
-            ANGLE_HOOD_MAX = 360,
+            ANGLE_HOOD_MIN = 120,
+            ANGLE_HOOD_MAX = 240,
 
-            ANGLE_GATE_R_MIN = 0,
-            ANGLE_GATE_R_MAX = 300,
+            ANGLE_PRESSER_RETRACTED = 87,
+            ANGLE_PRESSER_EXTENDED = 211,
+            ANGLE_PRESSER_L_OFFSET = -37,
 
-            ANGLE_GATE_L_MIN = 0,
-            ANGLE_GATE_L_MAX = 300,
-
-            ANGLE_GEAR_R_MIN = 0,
-            ANGLE_GEAR_R_MAX = 1800 / 28.0,
-
-            ANGLE_GEAR_L_MIN = 0,
-            ANGLE_GEAR_L_MAX = 1800 / 28.0;
+            ANGLE_SWITCH_INACTIVE = 36,
+            ANGLE_SWITCH_ENGAGED = 67,
+            ANGLE_SWITCH_L_OFFSET = 4;
 
     enum TestServo {
         HOOD, GATE_R, GATE_L, GEAR_R, GEAR_L;
@@ -53,10 +49,10 @@ public final class TuneServos extends LinearOpMode {
 
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
 
-        CachedSimpleServo hood = new CachedSimpleServo(hardwareMap, "hood", 0, 360);
+        CachedSimpleServo hood = new CachedSimpleServo(hardwareMap, "hood", 0, 360).reversed();
         CachedSimpleServo gateR = new CachedSimpleServo(hardwareMap, "gate R", 0, 300);
-        CachedSimpleServo gateL = new CachedSimpleServo(hardwareMap, "gate L", 0, 300);
-        CachedSimpleServo gearR = new CachedSimpleServo(hardwareMap, "gear R", 0, 1800 / 28.0);
+        CachedSimpleServo gateL = new CachedSimpleServo(hardwareMap, "gate L", 0, 300).reversed();
+        CachedSimpleServo gearR = new CachedSimpleServo(hardwareMap, "gear R", 0, 1800 / 28.0); // 64.28571428571429
         CachedSimpleServo gearL = new CachedSimpleServo(hardwareMap, "gear L", 0, 1800 / 28.0);
 
         boolean
@@ -101,10 +97,14 @@ public final class TuneServos extends LinearOpMode {
             }
 
             hood.turnToAngle(hoodMax ? ANGLE_HOOD_MAX : ANGLE_HOOD_MIN);
-            gateR.turnToAngle(gateRMax ? ANGLE_GATE_R_MAX : ANGLE_GATE_R_MIN);
-            gateL.turnToAngle(gateLMax ? ANGLE_GATE_L_MAX : ANGLE_GATE_L_MIN);
-            gearR.turnToAngle(gearRMax ? ANGLE_GEAR_R_MAX : ANGLE_GEAR_R_MIN);
-            gearL.turnToAngle(gearLMax ? ANGLE_GEAR_L_MAX : ANGLE_GEAR_L_MIN);
+
+            gateR.turnToAngle(gateRMax ? ANGLE_PRESSER_EXTENDED : ANGLE_PRESSER_RETRACTED);
+            gearL.offset = ANGLE_SWITCH_L_OFFSET;
+            gateL.turnToAngle(gateLMax ? ANGLE_PRESSER_EXTENDED : ANGLE_PRESSER_RETRACTED);
+
+            gearR.turnToAngle(gearRMax ? ANGLE_SWITCH_ENGAGED : ANGLE_SWITCH_INACTIVE);
+            gateL.offset = ANGLE_PRESSER_L_OFFSET;
+            gearL.turnToAngle(gearLMax ? ANGLE_SWITCH_ENGAGED : ANGLE_SWITCH_INACTIVE);
 
             telemetry.addLine(HOOD.markIf(selected) + HOOD.name() + " at " + (hoodMax ? "max" : "min"));
             telemetry.addLine(GATE_R.markIf(selected) + GATE_R.name() + " at " + (gateRMax ? "max" : "min"));
