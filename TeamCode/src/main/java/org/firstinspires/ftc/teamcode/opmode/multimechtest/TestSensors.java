@@ -119,6 +119,7 @@ public final class TestSensors extends LinearOpMode {
             mTelemetry.addData("Rotor position (deg)", toDegrees(rotorRad));
             mTelemetry.addLine();
             mTelemetry.addData("Turret abs offset (rad)", turretAbsoluteOffset);
+            mTelemetry.addData("Num of offset samples", absReadings.size());
             mTelemetry.addData("Turret abs position (rad)", turretRadAbs);
             mTelemetry.addData("Turret abs position (deg)", toDegrees(turretRadAbs));
             mTelemetry.addLine();
