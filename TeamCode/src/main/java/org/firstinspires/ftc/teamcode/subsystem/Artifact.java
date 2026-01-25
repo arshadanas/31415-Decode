@@ -15,6 +15,13 @@ public enum Artifact {
         return artifacts[wrap(ordinal() + n, 0, artifacts.length)];
     }
 
+    public Artifact or(Artifact other) {
+        return
+                this == other ? this :
+                this == EMPTY ? other :
+                                this;
+    }
+
     public LEDIndicator.LEDColor toLEDColor() {
         switch (this) {
             case PURPLE:    return LEDIndicator.LEDColor.RED;

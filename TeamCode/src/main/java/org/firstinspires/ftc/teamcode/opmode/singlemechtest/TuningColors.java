@@ -24,7 +24,7 @@ public final class TuningColors extends LinearOpMode {
     public static HSV
             minPurple = new HSV(
                     175,
-                    0, // 0.4
+                    0.4,
                     0
             ),
             maxPurple = new HSV(
@@ -35,7 +35,7 @@ public final class TuningColors extends LinearOpMode {
 
             minGreen = new HSV(
                     60,
-                    0, // 0.65
+                    0.65,
                     0
             ),
             maxGreen = new HSV(
@@ -44,7 +44,7 @@ public final class TuningColors extends LinearOpMode {
                     1
             );
 
-    public static Artifact fromHSV(HSV hsv) {
+    public static Artifact hsvToArtifact(HSV hsv) {
         return
                 hsv.between(minPurple, maxPurple) ? PURPLE :
                 hsv.between(minGreen, maxGreen) ?   GREEN :
@@ -73,11 +73,16 @@ public final class TuningColors extends LinearOpMode {
             HSV hsv1 = color1.getHSV();
             HSV hsv2 = color2.getHSV();
 
-            mTelemetry.addData("Color 1", fromHSV(hsv1));
+            Artifact a1 = hsvToArtifact(hsv1);
+            Artifact a2 = hsvToArtifact(hsv2);
+            
+            mTelemetry.addData("OUTPUT", a1.or(a2));
+            mTelemetry.addLine();
+            mTelemetry.addData("Color 1", a1);
             mTelemetry.addData("Distance 1", distance1.getDistance(DistanceUnit.MM));
             hsv1.toTelemetry();
             mTelemetry.addLine();
-            mTelemetry.addData("Color 2", fromHSV(hsv2));
+            mTelemetry.addData("Color 2", a2);
             mTelemetry.addData("Distance 2", distance2.getDistance(DistanceUnit.MM));
             hsv2.toTelemetry();
             mTelemetry.update();

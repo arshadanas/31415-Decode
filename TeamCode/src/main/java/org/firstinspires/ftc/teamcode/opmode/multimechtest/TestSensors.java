@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystem.ArtifactColorSensor;
+import org.firstinspires.ftc.teamcode.subsystem.DigitalArtifactColor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
@@ -57,8 +57,8 @@ public final class TestSensors extends LinearOpMode {
                 frontDistance1 = new AnalogSensor(hardwareMap, "front 1", 1300),
                 backDistance1 = new AnalogSensor(hardwareMap, "back 1", 1000);
 
-        ArtifactColorSensor color1 = new ArtifactColorSensor(hardwareMap, "color 1a", "color 1b"); // TODO CONFIGURE
-        ArtifactColorSensor color2 = new ArtifactColorSensor(hardwareMap, "color 2a", "color 2b"); // TODO CONFIGURE
+        DigitalArtifactColor color1 = new DigitalArtifactColor(hardwareMap, "color 1a", "color 1b"); // TODO CONFIGURE
+        DigitalArtifactColor color2 = new DigitalArtifactColor(hardwareMap, "color 2a", "color 2b"); // TODO CONFIGURE
 
         DigitalChannel color1a = hardwareMap.digitalChannel.get("color 1a");
         DigitalChannel color1b = hardwareMap.digitalChannel.get("color 1b");
