@@ -72,6 +72,8 @@ public final class TestMotorsCRServos extends LinearOpMode {
 
         FL.setInverted(true);
         BL.setInverted(true);
+        BR.setRunMode(Motor.RunMode.RawPower);
+        BR.setZeroPowerBehavior(FLOAT);
 
         TestMech selected = ROTOR;
 
