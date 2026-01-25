@@ -28,13 +28,13 @@ public final class TuningColors extends LinearOpMode {
                     0
             ),
             maxPurple = new HSV(
-                    223,
+                    350,
                     1,
                     1
             ),
 
             minGreen = new HSV(
-                    140,
+                    60,
                     0, // 0.65
                     0
             ),

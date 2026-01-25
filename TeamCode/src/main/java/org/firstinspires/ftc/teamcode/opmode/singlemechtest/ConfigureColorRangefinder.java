@@ -1,10 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
-import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.maxGreen;
-import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.maxPurple;
-import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.minGreen;
-import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.minPurple;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -19,25 +14,27 @@ public class ConfigureColorRangefinder extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         ColorRangefinder[] crfs = {
                 new ColorRangefinder(hardwareMap.get(RevColorSensorV3.class, "color 1")),
-                new ColorRangefinder(hardwareMap.get(RevColorSensorV3.class, "color 2")),
+//                new ColorRangefinder(hardwareMap.get(RevColorSensorV3.class, "color 2")),
         };
         waitForStart();
         /* Using this example configuration, you can detect both artifact colors based on which pin is reading true:
             pin0 --> purple
             pin1 --> green */
-        double scale = 255 / 360.0;
-        for (ColorRangefinder crf : crfs) {
-            crf.setPin0Digital(ColorRangefinder.DigitalMode.HSV,
-                    minPurple.hue * scale,
-                    maxPurple.hue * scale
-            ); // purple
-            crf.setPin0DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 20); // 20mm or closer
-
-            crf.setPin1Digital(ColorRangefinder.DigitalMode.HSV,
-                    minGreen.hue * scale,
-                    maxGreen.hue * scale
+//        double scale = 255 / 360.0;
+        for (int x = 0; x < crfs.length; x++) {
+            crfs[x].setPin0Digital(ColorRangefinder.DigitalMode.HSV,
+                    60 / 360.0 * 255,
+                    160 / 360.0 * 255
             ); // green
-            crf.setPin1DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 20); // 20mm or closer requirement
+            crfs[x].setPin0DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 85); // 20mm or closer requirement
+            Thread.sleep(3000);
+
+            crfs[x].setPin1Digital(ColorRangefinder.DigitalMode.HSV,
+                    175 / 360.0 * 255,
+                    350 / 360.0 * 255
+            ); // purple
+            crfs[x].setPin1DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 85); // 20mm or closer
+            Thread.sleep(3000);
         }
     }
 }

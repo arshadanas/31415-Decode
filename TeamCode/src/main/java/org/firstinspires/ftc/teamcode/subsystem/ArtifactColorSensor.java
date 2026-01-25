@@ -14,8 +14,8 @@ public final class ArtifactColorSensor {
 
     public Artifact getArtifact() {
         return
-                pin0.getState() ?   Artifact.PURPLE :
-                pin1.getState() ?   Artifact.GREEN :
+                pin0.getState() ?   Artifact.GREEN :
+                pin1.getState() ?   Artifact.PURPLE :
                                     Artifact.EMPTY;
     }
 }

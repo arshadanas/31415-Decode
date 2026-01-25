@@ -16,6 +16,7 @@ import com.pedropathing.ftc.localization.localizers.PinpointLocalizer;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.ArtifactColorSensor;
@@ -58,6 +59,11 @@ public final class TestSensors extends LinearOpMode {
 
         ArtifactColorSensor color1 = new ArtifactColorSensor(hardwareMap, "color 1a", "color 1b"); // TODO CONFIGURE
         ArtifactColorSensor color2 = new ArtifactColorSensor(hardwareMap, "color 2a", "color 2b"); // TODO CONFIGURE
+
+        DigitalChannel color1a = hardwareMap.digitalChannel.get("color 1a");
+        DigitalChannel color1b = hardwareMap.digitalChannel.get("color 1b");
+        DigitalChannel color2a = hardwareMap.digitalChannel.get("color 2a");
+        DigitalChannel color2b = hardwareMap.digitalChannel.get("color 2b");
 
         PinpointLocalizer pinpoint = new PinpointLocalizer(hardwareMap, localizerConstants);
         pinpoint.resetIMU();
@@ -124,7 +130,12 @@ public final class TestSensors extends LinearOpMode {
             mTelemetry.addLine("DIGITAL SENSORS");
             mTelemetry.addLine();
             mTelemetry.addData("Color 1", color1.getArtifact());
+            mTelemetry.addData("Color 1a", color1a.getState());
+            mTelemetry.addData("Color 1b", color1b.getState());
+            mTelemetry.addLine();
             mTelemetry.addData("Color 2", color2.getArtifact());
+            mTelemetry.addData("Color 2a", color2a.getState());
+            mTelemetry.addData("Color 2b", color2b.getState());
 
             divider();
 
