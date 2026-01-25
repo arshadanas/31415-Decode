@@ -20,6 +20,10 @@ public class ConfigureLaserRangefinder extends LinearOpMode {
         telemetry.update();
         waitForStart();
         /* <configuration code> */
+        lrf.setDistanceMode(LaserRangefinder.DistanceMode.SHORT);
+        lrf.setTiming(10, 0);
+        lrf.setPin0Analog(0, 1300);
+        lrf.setPin1Analog(0, 1300);
     }
 }
 
