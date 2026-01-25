@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 
+import static com.acmerobotics.roadrunner.Math.lerp;
 import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_L;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_R;
@@ -19,11 +20,12 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 public final class TuneServos extends LinearOpMode {
 
     public static double
-            ANGLE_HOOD_SERVO_MIN = 11,
-            ANGLE_HOOD_SERVO_MAX = 360,
 
-            HOOD_DEG_STEEPEST = 61.742,
             HOOD_DEG_SHALLOWEST = 30, // TODO MEASURE PHYSICALLY
+            HOOD_DEG_STEEPEST = 61.7419355,
+
+            ANGLE_HOOD_SERVO_MAX = 360,
+            ANGLE_HOOD_SERVO_MIN = 10,
 
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
@@ -32,6 +34,10 @@ public final class TuneServos extends LinearOpMode {
             ANGLE_SWITCH_INACTIVE = 36,
             ANGLE_SWITCH_ENGAGED = 67,
             ANGLE_SWITCH_L_OFFSET = 4;
+
+    public static double launchAngleToServoAngle(double launchAngle) {
+        return lerp(launchAngle, HOOD_DEG_SHALLOWEST, HOOD_DEG_STEEPEST, ANGLE_HOOD_SERVO_MAX, ANGLE_HOOD_SERVO_MIN);
+    }
 
     enum TestServo {
         HOOD, GATE_R, GATE_L, GEAR_R, GEAR_L;
