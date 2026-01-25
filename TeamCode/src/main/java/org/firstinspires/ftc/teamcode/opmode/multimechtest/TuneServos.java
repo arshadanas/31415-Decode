@@ -19,8 +19,11 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 public final class TuneServos extends LinearOpMode {
 
     public static double
-            ANGLE_HOOD_MIN = 120,
-            ANGLE_HOOD_MAX = 240,
+            ANGLE_HOOD_SERVO_MIN = 11,
+            ANGLE_HOOD_SERVO_MAX = 360,
+
+            HOOD_DEG_STEEPEST = 61.742,
+            HOOD_DEG_SHALLOWEST = 30, // TODO MEASURE PHYSICALLY
 
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
@@ -96,7 +99,7 @@ public final class TuneServos extends LinearOpMode {
                 }
             }
 
-            hood.turnToAngle(hoodMax ? ANGLE_HOOD_MAX : ANGLE_HOOD_MIN);
+            hood.turnToAngle(hoodMax ? ANGLE_HOOD_SERVO_MAX : ANGLE_HOOD_SERVO_MIN);
 
             gateR.turnToAngle(gateRMax ? ANGLE_PRESSER_EXTENDED : ANGLE_PRESSER_RETRACTED);
             gearL.offset = ANGLE_SWITCH_L_OFFSET;
