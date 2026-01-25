@@ -4,8 +4,8 @@ import static java.lang.Math.atan2;
 import static java.lang.Math.hypot;
 import static java.lang.Math.toDegrees;
 
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Vector2d;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 
 public final class EditablePose {
 
@@ -17,20 +17,20 @@ public final class EditablePose {
         this.heading = heading;
     }
 
-    public EditablePose(Pose2d pose) {
-        this(pose.position.x, pose.position.y, pose.heading.log());
+    public EditablePose(Pose pose) {
+        this(pose.getX(), pose.getY(), pose.getHeading());
     }
 
     public EditablePose clone() {
         return new EditablePose(x, y, heading);
     }
 
-    public Pose2d toPose2d() {
-        return new Pose2d(x, y, heading);
+    public Pose toPose() {
+        return new Pose(x, y, heading);
     }
 
-    public Vector2d toVector2d() {
-        return new Vector2d(x, y);
+    public Vector toVector() {
+        return new Vector(toPose());
     }
 
     public double angleTo(EditablePose target) {

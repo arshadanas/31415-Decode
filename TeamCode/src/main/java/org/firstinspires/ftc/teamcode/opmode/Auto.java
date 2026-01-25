@@ -29,6 +29,9 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.pedropathing.ftc.FTCCoordinates;
+import com.pedropathing.geometry.CoordinateSystem;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -183,7 +186,7 @@ public final class Auto extends LinearOpMode {
 
             intakingSpec = new EditablePose(36, -60, PI / 2);
 
-    static Pose2d pose = new Pose2d(0,0, 0.5 * PI);
+    static Pose pose = new Pose(72,72, PI / 2);
     static boolean isRedAlliance = false;
 
     enum AutonConfig {
@@ -295,7 +298,7 @@ public final class Auto extends LinearOpMode {
 
 //            robot.deposit.preloadSpecimen();
 
-            pose = new Pose2d(chamberRight.x, 0.5 * LENGTH_ROBOT - SIZE_HALF_FIELD, PI / 2);
+            pose = new Pose(chamberRight.x, 0.5 * LENGTH_ROBOT - SIZE_HALF_FIELD, PI / 2, FTCCoordinates.INSTANCE);
 
 //            Action scorePreload = robot.drivetrain.actionBuilder(pose)
 //                    .strafeTo(chamberRight.toVector2d())
