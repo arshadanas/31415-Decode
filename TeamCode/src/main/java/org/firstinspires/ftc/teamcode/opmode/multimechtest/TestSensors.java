@@ -40,8 +40,8 @@ public final class TestSensors extends LinearOpMode {
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
         Motor.Encoder
-                liftEncoder = new CachedMotorEx(hardwareMap, "BR", Motor.GoBILDA.RPM_435).encoder,
-                shooterEncoder = new CachedMotorEx(hardwareMap, "FR", Motor.GoBILDA.BARE).encoder,
+                liftEncoder = new CachedMotorEx(hardwareMap, "FR", Motor.GoBILDA.RPM_435).encoder,
+                shooterEncoder = new CachedMotorEx(hardwareMap, "BR", Motor.GoBILDA.BARE).encoder,
                 turretQuadrature = new CachedMotorEx(hardwareMap, "BL", Motor.GoBILDA.RPM_1150).encoder;
         liftEncoder.setDirection(REVERSE);
         turretQuadrature.setDirection(REVERSE);
