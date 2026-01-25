@@ -102,7 +102,7 @@ public final class Tele extends LinearOpMode {
             }
 
             if (doTelemetry) {
-                robot.printTelemetry(telemetry);
+                robot.print(telemetry);
                 telemetry.update();
             }
 

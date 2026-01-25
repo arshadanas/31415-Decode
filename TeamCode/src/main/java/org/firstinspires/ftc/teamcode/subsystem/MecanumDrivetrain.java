@@ -55,7 +55,7 @@ public final class MecanumDrivetrain {
         );
     }
 
-    public void printTelemetry(Telemetry telemetry) {
+    public void print(Telemetry telemetry) {
         Pose pose = drivetrain.getPose();
         double heading = pose.getHeading();
         telemetry.addLine("DRIVETRAIN:");

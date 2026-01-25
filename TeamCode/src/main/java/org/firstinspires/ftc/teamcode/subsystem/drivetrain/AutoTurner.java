@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem.drivetrain;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -9,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
 import org.firstinspires.ftc.teamcode.control.filter.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.LowPassGains;
@@ -94,15 +94,12 @@ public class AutoTurner {
         useAutoTurn = !useAutoTurn;
     }
 
-    public void printTelemetry() {
-        mTelemetry.addData("Auto turn ", useAutoTurn ? "active" : "INACTIVE");
-    }
-
-    public void printNumericalTelemetry() {
-        mTelemetry.addLine();
-        mTelemetry.addData("Target heading (radians)", targetHeading);
-        mTelemetry.addData("Target heading (degrees)", toDegrees(targetHeading));
-        mTelemetry.addLine();
-        mTelemetry.addData("Heading error derivative (radians/s)", headingController.getFilteredErrorDerivative());
+    public void print(Telemetry telemetry) {
+        telemetry.addData("Auto turn ", useAutoTurn ? "active" : "INACTIVE");
+        telemetry.addLine();
+        telemetry.addData("Target heading (radians)", targetHeading);
+        telemetry.addData("Target heading (degrees)", toDegrees(targetHeading));
+        telemetry.addLine();
+        telemetry.addData("Heading error derivative (radians/s)", headingController.getFilteredErrorDerivative());
     }
 }

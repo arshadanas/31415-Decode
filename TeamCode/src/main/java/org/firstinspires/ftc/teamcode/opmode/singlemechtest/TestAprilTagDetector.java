@@ -22,8 +22,6 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
-
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
@@ -36,7 +34,7 @@ public final class TestAprilTagDetector extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        mTelemetry = new MultipleTelemetry(telemetry);
+        telemetry = new MultipleTelemetry(telemetry);
         AprilTagDetector camera = new AprilTagDetector(
                 hardwareMap,
                 OpenCvCameraRotation.UPRIGHT,
@@ -47,14 +45,14 @@ public final class TestAprilTagDetector extends LinearOpMode {
 
         while (opModeInInit()) {
             camera.run();
-            camera.printTagIsVisible();
-            camera.printDetections();
-            mTelemetry.update();
+            camera.printTagIsVisible(telemetry);
+            camera.printDetections(telemetry);
+            telemetry.update();
         }
 
         //START IS HERE//
 
         camera.stop();
-        mTelemetry.update();
+        telemetry.update();
     }
 }

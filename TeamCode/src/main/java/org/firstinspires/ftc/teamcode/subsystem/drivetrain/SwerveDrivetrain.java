@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem.drivetrain;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystem.drivetrain.SwerveModule.SwerveModuleID.BL;
 import static org.firstinspires.ftc.teamcode.subsystem.drivetrain.SwerveModule.SwerveModuleID.BR;
 import static org.firstinspires.ftc.teamcode.subsystem.drivetrain.SwerveModule.SwerveModuleID.FL;
@@ -18,6 +17,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.filter.SlewRateLimiter;
 import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.HeadingIMU;
@@ -181,9 +181,9 @@ public final class SwerveDrivetrain {
         this.slowModeLocked = true;
     }
 
-    public void printNumericalTelemetry() {
-        mTelemetry.addData("Current heading (radians)", getHeading());
-        mTelemetry.addData("Current heading (degrees)", toDegrees(getHeading()));
+    public void print(Telemetry telemetry) {
+        telemetry.addData("Current heading (radians)", getHeading());
+        telemetry.addData("Current heading (degrees)", toDegrees(getHeading()));
     }
 
     @Config

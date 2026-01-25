@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.gainmatrix
 
-import org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry
+import org.firstinspires.ftc.robotcore.external.Telemetry
 import kotlin.math.max
 import kotlin.math.min
 
@@ -29,11 +29,10 @@ constructor(
         return redInRange && greenInRange && blueInRange
     }
 
-    fun toTelemetry(title: String) {
-        mTelemetry.addLine("$title:")
-        mTelemetry.addData("Red", red)
-        mTelemetry.addData("Green", green)
-        mTelemetry.addData("Blue", blue)
+    fun print(telemetry: Telemetry) {
+        telemetry.addData("Red", red)
+        telemetry.addData("Green", green)
+        telemetry.addData("Blue", blue)
     }
 
     override fun toString(): String {

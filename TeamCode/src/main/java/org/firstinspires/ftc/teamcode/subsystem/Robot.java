@@ -33,10 +33,10 @@ public final class Robot {
 
     }
 
-    public void printTelemetry(Telemetry telemetry) {
+    public void print(Telemetry telemetry) {
         telemetry.addData("LOOP TIME", loopTimer.seconds());
         loopTimer.reset();
         telemetry.addLine();
-        drivetrain.printTelemetry(telemetry);
+        drivetrain.print(telemetry);
     }
 }

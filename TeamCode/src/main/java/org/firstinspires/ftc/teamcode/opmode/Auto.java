@@ -20,17 +20,17 @@ import static java.lang.Math.toRadians;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.pedropathing.ftc.FTCCoordinates;
-import com.pedropathing.geometry.CoordinateSystem;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -60,14 +60,6 @@ public final class Auto extends LinearOpMode {
         TAKING_PICTURE,
         SUB_INTAKING,
         PARKING
-    }
-
-    public static Telemetry mTelemetry;
-
-    public static void divider() {
-        mTelemetry.addLine();
-        mTelemetry.addLine("--------------------------------------");
-        mTelemetry.addLine();
     }
 
     public static double
@@ -219,8 +211,7 @@ public final class Auto extends LinearOpMode {
 
         // Initialize multiple telemetry outputs:
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
-        mTelemetry = telemetry;
-//                new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot:
         Robot robot = new Robot(hardwareMap, pose);
@@ -270,7 +261,7 @@ public final class Auto extends LinearOpMode {
                     break;
             }
 
-            printConfig(false, timer.seconds(), selection, specimenSide, cycles);
+            printConfig(telemetry, false, timer.seconds(), selection, specimenSide, cycles);
         }
 
         SampleDetector sampleDetector = new SampleDetector(hardwareMap);
@@ -1058,8 +1049,8 @@ public final class Auto extends LinearOpMode {
                 }
         );
 
-        printConfig(true, 0, selection, specimenSide, cycles);
-        mTelemetry.update();
+        printConfig(telemetry, true, 0, selection, specimenSide, cycles);
+        telemetry.update();
 
         waitForStart(); //--------------------------------------------------------------------------------------------------------------------------
 
@@ -1072,23 +1063,23 @@ public final class Auto extends LinearOpMode {
         Thread.sleep((long) (DEAD_TIME * 1000));
     }
 
-    private static void printConfig(boolean confirmed, double t, AutonConfig selection, boolean specimenSide, int cycles) {
-        mTelemetry.addLine(confirmed ?
+    private static void printConfig(Telemetry telemetry, boolean confirmed, double t, AutonConfig selection, boolean specimenSide, int cycles) {
+        telemetry.addLine(confirmed ?
                 "AUTONOMOUS READY" :
                 "Confirm configuration (confirming in " + (int) ceil(5 - t) + " seconds)" + selection.markIf(CONFIRMING)
         );
-        mTelemetry.addLine();
-        mTelemetry.addLine();
-        mTelemetry.addLine((isRedAlliance ? "RED" : "BLUE") + " alliance" + selection.markIf(EDITING_ALLIANCE));
-        mTelemetry.addLine();
+        telemetry.addLine();
+        telemetry.addLine();
+        telemetry.addLine((isRedAlliance ? "RED" : "BLUE") + " alliance" + selection.markIf(EDITING_ALLIANCE));
+        telemetry.addLine();
         if (specimenSide) {
-            mTelemetry.addLine("RIGHT (observation-side)" + selection.markIf(EDITING_SIDE));
-            mTelemetry.addLine();
-            mTelemetry.addLine((cycles + 1) + "+0 (" + cycles + " from observation zone)" + selection.markIf(EDITING_CYCLES));
+            telemetry.addLine("RIGHT (observation-side)" + selection.markIf(EDITING_SIDE));
+            telemetry.addLine();
+            telemetry.addLine((cycles + 1) + "+0 (" + cycles + " from observation zone)" + selection.markIf(EDITING_CYCLES));
 
-        } else mTelemetry.addLine("LEFT (basket-side)" + selection.markIf(EDITING_SIDE));
+        } else telemetry.addLine("LEFT (basket-side)" + selection.markIf(EDITING_SIDE));
 
-        mTelemetry.update();
+        telemetry.update();
     }
 
     private static Action scoreSpecimen(Robot robot) {

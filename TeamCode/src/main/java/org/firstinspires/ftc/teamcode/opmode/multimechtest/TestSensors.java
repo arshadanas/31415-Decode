@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.divider;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 import static org.firstinspires.ftc.teamcode.pedropathing.Constants.pinpointConstants;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
@@ -36,7 +34,7 @@ public final class TestSensors extends LinearOpMode {
     public void runOpMode() {
 
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
-        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());;
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());;
         
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
@@ -99,56 +97,55 @@ public final class TestSensors extends LinearOpMode {
 
             Pose pose = pinpoint.getPose();
 
-            mTelemetry.addLine("QUADRATURE ENCODERS");
-            mTelemetry.addLine();
-            mTelemetry.addData("Lift position (ticks)", liftEncoder.getPosition());
-            mTelemetry.addLine();
-            mTelemetry.addData("Shooter velocity (rpm)", shooterRevPerSec * 60);
-            mTelemetry.addData("Shooter velocity (rad/s)", shooterRevPerSec * 2 * PI);
-            mTelemetry.addLine();
-            mTelemetry.addData("Turret quad position (rad)", turretRadQuad);
-            mTelemetry.addData("Turret quad position (deg)", toDegrees(turretRadQuad));
-            mTelemetry.addData("Turret velocity (rad/s)", turretRadPerSec);
-            mTelemetry.addData("Turret velocity (deg/s)", toDegrees(turretRadPerSec));
+            telemetry.addLine("QUADRATURE ENCODERS");
+            telemetry.addLine();
+            telemetry.addData("Lift position (ticks)", liftEncoder.getPosition());
+            telemetry.addLine();
+            telemetry.addData("Shooter velocity (rpm)", shooterRevPerSec * 60);
+            telemetry.addData("Shooter velocity (rad/s)", shooterRevPerSec * 2 * PI);
+            telemetry.addLine();
+            telemetry.addData("Turret quad position (rad)", turretRadQuad);
+            telemetry.addData("Turret quad position (deg)", toDegrees(turretRadQuad));
+            telemetry.addData("Turret velocity (rad/s)", turretRadPerSec);
+            telemetry.addData("Turret velocity (deg/s)", toDegrees(turretRadPerSec));
+            telemetry.addLine();
+            telemetry.addLine("--------------------------------------");
+            telemetry.addLine();
+            telemetry.addLine("ANALOG SENSORS");
+            telemetry.addLine();
+            telemetry.addData("Rotor position (rad)", rotorRad);
+            telemetry.addData("Rotor position (deg)", toDegrees(rotorRad));
+            telemetry.addLine();
+            telemetry.addData("Turret abs offset (rad)", turretAbsoluteOffset);
+            telemetry.addData("Num of offset samples", absReadings.size());
+            telemetry.addData("Turret abs position (rad)", turretRadAbs);
+            telemetry.addData("Turret abs position (deg)", toDegrees(turretRadAbs));
+            telemetry.addLine();
+            telemetry.addData("Front distance (mm)", frontDistance1.getReading());
+            telemetry.addData("Back distance (mm)", backDistance1.getReading());
+            telemetry.addLine();
+            telemetry.addLine("--------------------------------------");
+            telemetry.addLine();
+            telemetry.addLine("DIGITAL SENSORS");
+            telemetry.addLine();
+            telemetry.addData("Color 1", color1.getArtifact());
+            telemetry.addData("Color 1a", color1a.getState());
+            telemetry.addData("Color 1b", color1b.getState());
+            telemetry.addLine();
+            telemetry.addData("Color 2", color2.getArtifact());
+            telemetry.addData("Color 2a", color2a.getState());
+            telemetry.addData("Color 2b", color2b.getState());
+            telemetry.addLine();
+            telemetry.addLine("--------------------------------------");
+            telemetry.addLine();
+            telemetry.addLine("DRIVETRAIN:");
+            telemetry.addLine();
+            telemetry.addData("X", pose.getX());
+            telemetry.addData("Y", pose.getY());
+            telemetry.addData("Heading (rad)", pose.getHeading());
+            telemetry.addData("Heading (deg)", toDegrees(pose.getHeading()));
 
-            divider();
-
-            mTelemetry.addLine("ANALOG SENSORS");
-            mTelemetry.addLine();
-            mTelemetry.addData("Rotor position (rad)", rotorRad);
-            mTelemetry.addData("Rotor position (deg)", toDegrees(rotorRad));
-            mTelemetry.addLine();
-            mTelemetry.addData("Turret abs offset (rad)", turretAbsoluteOffset);
-            mTelemetry.addData("Num of offset samples", absReadings.size());
-            mTelemetry.addData("Turret abs position (rad)", turretRadAbs);
-            mTelemetry.addData("Turret abs position (deg)", toDegrees(turretRadAbs));
-            mTelemetry.addLine();
-            mTelemetry.addData("Front distance (mm)", frontDistance1.getReading());
-            mTelemetry.addData("Back distance (mm)", backDistance1.getReading());
-
-            divider();
-
-            mTelemetry.addLine("DIGITAL SENSORS");
-            mTelemetry.addLine();
-            mTelemetry.addData("Color 1", color1.getArtifact());
-            mTelemetry.addData("Color 1a", color1a.getState());
-            mTelemetry.addData("Color 1b", color1b.getState());
-            mTelemetry.addLine();
-            mTelemetry.addData("Color 2", color2.getArtifact());
-            mTelemetry.addData("Color 2a", color2a.getState());
-            mTelemetry.addData("Color 2b", color2b.getState());
-
-            divider();
-
-            mTelemetry.addLine("DRIVETRAIN:");
-            mTelemetry.addLine();
-            mTelemetry.addData("X", pose.getX());
-            mTelemetry.addData("Y", pose.getY());
-            mTelemetry.addData("Heading (rad)", pose.getHeading());
-            mTelemetry.addData("Heading (deg)", toDegrees(pose.getHeading()));
-
-
-            mTelemetry.update();
+            telemetry.update();
         }
     }
 }

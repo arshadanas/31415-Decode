@@ -21,10 +21,6 @@
 
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
-
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
-
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.control.vision.detector.TeamPropDetector;
@@ -35,16 +31,15 @@ public final class TestTeamPropDetector extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        mTelemetry = new MultipleTelemetry(telemetry);
-        TeamPropDetector detector = new TeamPropDetector(hardwareMap);
+        TeamPropDetector detector = new TeamPropDetector(hardwareMap, telemetry);
 
         while (opModeInInit()) {
 
             if (gamepad1.x) detector.pipeline.isRedAlliance = false;
             if (gamepad1.b) detector.pipeline.isRedAlliance = true;
 
-            detector.printTelemetry();
-            mTelemetry.update();
+            detector.print();
+            telemetry.update();
         }
     }
 }

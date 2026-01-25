@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.GoBILDA.RPM_312;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -18,7 +17,7 @@ public final class TestLiftEncoders extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         // Initialize multiple telemetry outputs:
-        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         BulkReader bulkReader = new BulkReader(hardwareMap);
 
@@ -33,8 +32,8 @@ public final class TestLiftEncoders extends LinearOpMode {
 
 //            double position = INCHES_PER_TICK * 0.5 * (encoder0.getPosition() + encoder1.getPosition());
 
-//            mTelemetry.addData("Position (in)", position);
-            mTelemetry.update();
+//            telemetry.addData("Position (in)", position);
+            telemetry.update();
         }
     }
 

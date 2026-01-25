@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.gainmatrix
 
-import org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry
+import org.firstinspires.ftc.robotcore.external.Telemetry
 import org.opencv.core.Scalar
 
 data class HSV
@@ -28,10 +28,10 @@ constructor(
         return hueInRange && saturationInRange && valueInRange
     }
 
-    fun toTelemetry() {
-        mTelemetry.addData("Hue", hue)
-        mTelemetry.addData("Saturation", saturation)
-        mTelemetry.addData("Value", value)
+    fun print(telemetry: Telemetry) {
+        telemetry.addData("Hue", hue)
+        telemetry.addData("Saturation", saturation)
+        telemetry.addData("Value", value)
     }
 
     override fun toString(): String {

@@ -1,10 +1,9 @@
 package org.firstinspires.ftc.teamcode.control.vision.detector;
 
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.control.vision.pipeline.AprilTagDetectionPipeline;
 import org.openftc.apriltag.AprilTagDetection;
@@ -94,17 +93,17 @@ public class AprilTagDetector {
      * Prints tag visibility to telemetry <p>
      * telemetry.update() should be called after this method
      */
-    public void printTagIsVisible() {
-        mTelemetry.addData("A tag of interest is", (isTagVisible() ? "" : "not ") + "visible");
+    public void printTagIsVisible(Telemetry telemetry) {
+        telemetry.addData("A tag of interest is", (isTagVisible() ? "" : "not ") + "visible");
     }
 
     /**
      * Prints last {@link #detections} to telemetry <p>
      * telemetry.update() should be called after this method
      */
-    public void printDetections() {
+    public void printDetections(Telemetry telemetry) {
         for (AprilTagDetection tag : getDetections()) {
-            mTelemetry.addData("Tag visible:", tag.id);
+            telemetry.addData("Tag visible:", tag.id);
         }
     }
 

@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
@@ -54,7 +53,7 @@ public final class TuningColors extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         ColorSensor color1 = new ColorSensor(hardwareMap, "color 1", 1);
         ColorSensor color2 = new ColorSensor(hardwareMap, "color 2", 1);
@@ -76,16 +75,16 @@ public final class TuningColors extends LinearOpMode {
             Artifact a1 = hsvToArtifact(hsv1);
             Artifact a2 = hsvToArtifact(hsv2);
             
-            mTelemetry.addData("OUTPUT", a1.or(a2));
-            mTelemetry.addLine();
-            mTelemetry.addData("Color 1", a1);
-            mTelemetry.addData("Distance 1", distance1.getDistance(DistanceUnit.MM));
-            hsv1.toTelemetry();
-            mTelemetry.addLine();
-            mTelemetry.addData("Color 2", a2);
-            mTelemetry.addData("Distance 2", distance2.getDistance(DistanceUnit.MM));
-            hsv2.toTelemetry();
-            mTelemetry.update();
+            telemetry.addData("OUTPUT", a1.or(a2));
+            telemetry.addLine();
+            telemetry.addData("Color 1", a1);
+            telemetry.addData("Distance 1", distance1.getDistance(DistanceUnit.MM));
+            hsv1.print(telemetry);
+            telemetry.addLine();
+            telemetry.addData("Color 2", a2);
+            telemetry.addData("Distance 2", distance2.getDistance(DistanceUnit.MM));
+            hsv2.print(telemetry);
+            telemetry.update();
         }
     }
 }

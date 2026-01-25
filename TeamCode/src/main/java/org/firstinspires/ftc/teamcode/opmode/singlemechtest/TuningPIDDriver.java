@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -24,7 +23,7 @@ public final class TuningPIDDriver extends LinearOpMode {
         // Initialize gamepads:
 
         BulkReader bulkReader = new BulkReader(hardwareMap);
-        mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
 //        Drivetrain drivetrain = new MecanumDrivetrain(hardwareMap);
 
@@ -40,17 +39,17 @@ public final class TuningPIDDriver extends LinearOpMode {
             if (gamepad1.x) {
 //                boolean done = driver.driveTo(drivetrain, target.toPose2d());
 
-//                mTelemetry.addLine(done ? "Target reached" : "Moving to target");
-                mTelemetry.addLine();
+//                telemetry.addLine(done ? "Target reached" : "Moving to target");
+                telemetry.addLine();
             }
-//            mTelemetry.addData("Current X", current.getX());
-//            mTelemetry.addData("Current Y", current.getY());
-//            mTelemetry.addData("Current heading", normalizeRadians(current.getHeading()));
-            mTelemetry.addLine();
-            mTelemetry.addData("Target X", target.x);
-            mTelemetry.addData("Target Y", target.y);
-            mTelemetry.addData("Target heading", normalizeRadians(target.heading));
-            mTelemetry.update();
+//            telemetry.addData("Current X", current.getX());
+//            telemetry.addData("Current Y", current.getY());
+//            telemetry.addData("Current heading", normalizeRadians(current.getHeading()));
+            telemetry.addLine();
+            telemetry.addData("Target X", target.x);
+            telemetry.addData("Target Y", target.y);
+            telemetry.addData("Target heading", normalizeRadians(target.heading));
+            telemetry.update();
         }
     }
 }
