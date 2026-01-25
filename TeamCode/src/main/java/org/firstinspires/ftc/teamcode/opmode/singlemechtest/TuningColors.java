@@ -10,7 +10,9 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
@@ -57,6 +59,9 @@ public final class TuningColors extends LinearOpMode {
         ColorSensor color1 = new ColorSensor(hardwareMap, "color 1", 1);
         ColorSensor color2 = new ColorSensor(hardwareMap, "color 2", 1);
 
+        DistanceSensor distance1 = hardwareMap.get(DistanceSensor.class, "color 1");
+        DistanceSensor distance2 = hardwareMap.get(DistanceSensor.class, "color 2");
+
         waitForStart();
 
         // Control loop:
@@ -69,9 +74,11 @@ public final class TuningColors extends LinearOpMode {
             HSV hsv2 = color2.getHSV();
 
             mTelemetry.addData("Color 1", fromHSV(hsv1));
+            mTelemetry.addData("Distance 1", distance1.getDistance(DistanceUnit.MM));
             hsv1.toTelemetry();
             mTelemetry.addLine();
             mTelemetry.addData("Color 2", fromHSV(hsv2));
+            mTelemetry.addData("Distance 2", distance2.getDistance(DistanceUnit.MM));
             hsv2.toTelemetry();
             mTelemetry.update();
         }
