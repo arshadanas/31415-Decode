@@ -21,31 +21,32 @@ public final class TuningColors extends LinearOpMode {
 
     public static HSV
             minPurple = new HSV(
-            0,
-            0,
-            0
-    ),
-            maxPurple = new HSV(
-                    0,
-                    0,
+                    175,
+                    0, // 0.4
                     0
             ),
+            maxPurple = new HSV(
+                    223,
+                    1,
+                    1
+            ),
+
             minGreen = new HSV(
-                    0,
-                    0,
+                    140,
+                    0, // 0.65
                     0
             ),
             maxGreen = new HSV(
-                    0,
-                    0,
-                    0
+                    160,
+                    1,
+                    1
             );
 
     public static Artifact fromHSV(HSV hsv) {
         return
                 hsv.between(minPurple, maxPurple) ? PURPLE :
-                        hsv.between(minGreen, maxGreen) ?   GREEN :
-                                EMPTY;
+                hsv.between(minGreen, maxGreen) ?   GREEN :
+                                                    EMPTY;
     }
 
     @Override
