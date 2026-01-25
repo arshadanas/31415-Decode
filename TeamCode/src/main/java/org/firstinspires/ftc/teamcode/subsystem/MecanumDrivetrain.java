@@ -22,7 +22,7 @@ public final class MecanumDrivetrain {
     MecanumDrivetrain(HardwareMap hardwareMap, Pose pose) {
         drivetrain = Constants.createFollower(hardwareMap);
         try {
-            drivetrain.poseTracker.resetIMU();
+            drivetrain.getPoseTracker().resetIMU();
         } catch (InterruptedException ignored) {}
 
         drivetrain.setStartingPose(pose);
@@ -49,7 +49,7 @@ public final class MecanumDrivetrain {
         drivetrain.setTeleOpDrive(
                 forwardCommand,
                 strafeCommand,
-                turnCommand,
+                -turnCommand,
                 true,
                 isRedAlliance ? 0 : PI
         );
