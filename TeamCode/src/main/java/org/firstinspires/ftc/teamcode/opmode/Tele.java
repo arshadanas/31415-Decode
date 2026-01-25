@@ -43,6 +43,7 @@ public final class Tele extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         Robot robot = new Robot(hardwareMap, pose);
+        robot.drivetrain.startTeleopDrive();
 
         TeleOpConfig selected = EDITING_ALLIANCE;
 
