@@ -52,7 +52,7 @@ public final class TestSensors extends LinearOpMode {
 
         AnalogSensor
                 rotorEncoder = new AnalogSensor(hardwareMap, "rotor", 3 * 2 * PI),
-                turretAbsolute = new AnalogSensor(hardwareMap, "elc", 2 * PI), // TODO FIX
+                turretAbsolute = new AnalogSensor(hardwareMap, "elc", 2 * PI),
                 frontDistance1 = new AnalogSensor(hardwareMap, "front 1", 1300), // TODO CONFIGURE
                 backDistance1 = new AnalogSensor(hardwareMap, "back 1", 1000);
 
@@ -112,6 +112,7 @@ public final class TestSensors extends LinearOpMode {
             mTelemetry.addData("Rotor position (rad)", rotorRad);
             mTelemetry.addData("Rotor position (deg)", toDegrees(rotorRad));
             mTelemetry.addLine();
+            mTelemetry.addData("Turret abs offset (rad)", turretAbsoluteOffset);
             mTelemetry.addData("Turret abs position (rad)", turretRadAbs);
             mTelemetry.addData("Turret abs position (deg)", toDegrees(turretRadAbs));
             mTelemetry.addLine();
