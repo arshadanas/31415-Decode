@@ -4,7 +4,7 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.divider;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
-import static org.firstinspires.ftc.teamcode.pedropathing.Constants.localizerConstants;
+import static org.firstinspires.ftc.teamcode.pedropathing.Constants.pinpointConstants;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
@@ -65,7 +65,7 @@ public final class TestSensors extends LinearOpMode {
         DigitalChannel color2a = hardwareMap.digitalChannel.get("color 2a");
         DigitalChannel color2b = hardwareMap.digitalChannel.get("color 2b");
 
-        PinpointLocalizer pinpoint = new PinpointLocalizer(hardwareMap, localizerConstants);
+        PinpointLocalizer pinpoint = new PinpointLocalizer(hardwareMap, pinpointConstants);
         pinpoint.resetIMU();
 
         ArrayList<Double> absReadings = new ArrayList<>();

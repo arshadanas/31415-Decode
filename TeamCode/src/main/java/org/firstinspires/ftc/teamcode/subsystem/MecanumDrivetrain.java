@@ -33,29 +33,27 @@ public final class MecanumDrivetrain {
     /**
      * Drive robot with control stick inputs
      *
-     * @param xCommand    positive = strafing right
-     * @param yCommand    positive = forward
+     * @param strafeCommand    positive = strafing right
+     * @param forwardCommand    positive = forward
      * @param turnCommand positive = clockwise
      * @param useSlowMode drives robot at {@link #SLOW_FACTOR} of full speed
      */
-    public void run(double xCommand, double yCommand, double turnCommand, boolean useSlowMode) {
+    public void run(double strafeCommand, double forwardCommand, double turnCommand, boolean useSlowMode, boolean isRedAlliance) {
 
         if (useSlowMode) {
-            yCommand *= SLOW_FACTOR;
-            xCommand *= SLOW_FACTOR;
+            forwardCommand *= SLOW_FACTOR;
+            strafeCommand *= SLOW_FACTOR;
             turnCommand *= SLOW_FACTOR;
         }
 
         drivetrain.setTeleOpDrive(
-                yCommand,
-                xCommand,
+                forwardCommand,
+                strafeCommand,
                 turnCommand,
                 true,
                 isRedAlliance ? 0 : PI
         );
     }
-
-    boolean isRedAlliance = false;
 
     public void printTelemetry(Telemetry telemetry) {
         Pose pose = drivetrain.getPose();
@@ -82,8 +80,8 @@ public final class MecanumDrivetrain {
         drivetrain.update();
     }
 
-    public void setHeadingWithStick(double x, double y) {
+    public void setHeadingWithStick(double x, double y, boolean isRedAlliance) {
         if (x*x + y*y >= 0.64)
-            drivetrain.setHeading(PI / 2 - atan2(y, x));
+            drivetrain.setHeading((isRedAlliance ? -1 : 1) * PI/2 - atan2(y, x));
     }
 }

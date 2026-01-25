@@ -24,7 +24,7 @@ public final class Robot {
     }
 
     public void setAlliance(boolean isRedAlliance) {
-        drivetrain.isRedAlliance = isRedAlliance;
+
     }
 
     public void run() {

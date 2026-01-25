@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.pose;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
 import static java.lang.Math.toDegrees;
@@ -64,15 +63,15 @@ public final class Tele extends LinearOpMode {
                     break;
             }
 
-            robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y);
+            robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
             robot.drivetrain.update();
 
-            mTelemetry.addLine();
-            mTelemetry.addLine( EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
-            mTelemetry.addLine();
-            mTelemetry.addData("Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
+            telemetry.addLine();
+            telemetry.addLine( EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
+            telemetry.addLine();
+            telemetry.addData("Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
 
-            mTelemetry.update();
+            telemetry.update();
         }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,7 +95,8 @@ public final class Tele extends LinearOpMode {
                         gamepad1.left_stick_x,
                         gamepad1.left_stick_y,
                         gamepad1.right_stick_x,
-                        gamepad1.right_bumper // || triggersSum > 0
+                        gamepad1.right_bumper /*|| triggersSum > 0 */,
+                        isRedAlliance
                 );
 
             }
