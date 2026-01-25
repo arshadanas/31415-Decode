@@ -12,8 +12,8 @@ import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_FI
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SLOW_LOCK;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.PRELOAD_SAMPLE;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.PRELOAD_SPECIMEN;
-import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.State.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.State.OFF;
+import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.LEDColor.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.LEDColor.OFF;
 import static java.lang.Math.PI;
 import static java.lang.Math.max;
 import static java.lang.Math.sin;
@@ -231,7 +231,7 @@ public final class Tele extends LinearOpMode {
             }
 
             double t = matchTimer.seconds();
-            indicator.setState(t >= CLIMB_TIME ?
+            indicator.setColor(t >= CLIMB_TIME ?
                     sin(PI * t / TIME_CLIMB_INDICATOR_ON) >= 0 ? GREEN : OFF :
 //                    robot.intake.hasSample() ? GREEN :
                             OFF

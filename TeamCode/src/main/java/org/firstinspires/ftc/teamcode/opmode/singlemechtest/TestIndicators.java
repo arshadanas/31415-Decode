@@ -1,56 +1,56 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.B;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
-import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.State.AMBER;
-import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.State.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.State.OFF;
-import static org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator.State.RED;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import static java.lang.Math.min;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
+import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
 
+import java.util.Arrays;
+import java.util.Comparator;
 
-//@TeleOp(group = "Single mechanism test")
+
+@TeleOp(group = "Single mechanism test")
 public final class TestIndicators extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         // Initialize gamepads:
-        GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
-        BulkReader bulkReader = new BulkReader(hardwareMap);
 
         LEDIndicator[] indicators = {
-                new LEDIndicator(hardwareMap, "led left green", "led left red"),
-                new LEDIndicator(hardwareMap, "led right green", "led right red")
+                new LEDIndicator(hardwareMap, "led 1a", "led 1b"),
+                new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
+                new LEDIndicator(hardwareMap, "led 3a", "led 3b")
         };
+
+        Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+        Artifact[] sorted = new Artifact[artifacts.length];
 
         waitForStart();
 
         while (opModeIsActive()) {
-            // Read stuff
-            bulkReader.bulkRead();
 
-            gamepadEx1.readButtons();
+            if (gamepad1.dpadLeftWasPressed())
+                artifacts[0] = artifacts[0].plus(1);
+            if (gamepad1.dpadUpWasPressed())
+                artifacts[1] = artifacts[1].plus(1);
+            if (gamepad1.dpadRightWasPressed())
+                artifacts[2] = artifacts[2].plus(1);
 
-            if (gamepadEx1.wasJustPressed(B)) {
-                for (LEDIndicator indicator : indicators) indicator.setState(RED);
-            }
-            if (gamepadEx1.wasJustPressed(A)) {
-                for (LEDIndicator indicator : indicators) indicator.setState(GREEN);
-            }
-            if (gamepadEx1.wasJustPressed(X)) {
-                for (LEDIndicator indicator : indicators) indicator.setState(OFF);
-            }
-            if (gamepadEx1.wasJustPressed(Y)) {
-                for (LEDIndicator indicator : indicators) indicator.setState(AMBER);
-            }
+            System.arraycopy(artifacts, 0, sorted, 0, artifacts.length);
+            Arrays.sort(sorted, Comparator.comparingInt(Enum::ordinal));
+            for (int i = 0; i < indicators.length; i++)
+                indicators[i].setColor(sorted[i].toLEDColor());
+
+            telemetry.addData("Slot 0", artifacts[0]);
+            telemetry.addData("Slot 1", artifacts[1]);
+            telemetry.addData("Slot 2", artifacts[2]);
+            telemetry.update();
         }
     }
 }
