@@ -5,8 +5,13 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.mTelemetry;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-//@TeleOp(group = "Single mechanism test")
+import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
+import org.firstinspires.ftc.teamcode.subsystem.Artifact;
+import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
+
+@TeleOp(group = "Single mechanism test")
 public final class TuningColors extends LinearOpMode {
 
     @Override
@@ -14,22 +19,25 @@ public final class TuningColors extends LinearOpMode {
 
         mTelemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-//        ColorSensor bucketColor = new ColorSensor(hardwareMap, "bucket color", (float) Intake.COLOR_SENSOR_GAIN);
+        ColorSensor color1 = new ColorSensor(hardwareMap, "color 1", 1);
+        ColorSensor color2 = new ColorSensor(hardwareMap, "color 2", 1);
 
         waitForStart();
 
         // Control loop:
         while (opModeIsActive()) {
 
-//            bucketColor.update();
+            color1.update();
+            color2.update();
 
-//            HSV bucketHSV = bucketColor.getHSV();
-//            Sample bucketSample = Intake.hsvToSample(bucketHSV);
+            HSV hsv1 = color1.getHSV();
+            HSV hsv2 = color2.getHSV();
 
-            mTelemetry.addLine("BUCKET: ");
+            mTelemetry.addData("Color 1", Artifact.fromHSV(hsv1));
+            hsv1.toTelemetry();
             mTelemetry.addLine();
-//            mTelemetry.addLine(bucketSample != null ? bucketSample + " sample" : "Empty");
-//            bucketHSV.toTelemetry();
+            mTelemetry.addData("Color 2", Artifact.fromHSV(hsv2));
+            hsv2.toTelemetry();
             mTelemetry.update();
         }
     }

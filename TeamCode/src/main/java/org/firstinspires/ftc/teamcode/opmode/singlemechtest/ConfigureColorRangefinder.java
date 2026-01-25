@@ -1,12 +1,20 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
+import static com.acmerobotics.roadrunner.Math.lerp;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.maxGreen;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.maxPurple;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.minGreen;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.minPurple;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorRangefinder;
 
-
+@Config
 @TeleOp(group = "Brushland")
 public class ConfigureColorRangefinder extends LinearOpMode {
     @Override
@@ -19,12 +27,13 @@ public class ConfigureColorRangefinder extends LinearOpMode {
         /* Using this example configuration, you can detect both artifact colors based on which pin is reading true:
             pin0 --> purple
             pin1 --> green */
+        double scale = 255 / 360.0;
         for (ColorRangefinder crf : crfs) {
-            crf.setPin0Digital(ColorRangefinder.DigitalMode.HSV, 160 / 360.0 * 255, 190 / 360.0 * 255); // purple
-            crf.setPin0DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 10); // 10mm or closer
+            crf.setPin0Digital(ColorRangefinder.DigitalMode.HSV, minPurple.hue * scale, maxPurple.hue * scale); // purple
+            crf.setPin0DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 15); // 10mm or closer
 
-            crf.setPin1Digital(ColorRangefinder.DigitalMode.HSV, 110 / 360.0 * 255, 140 / 360.0 * 255); // green
-            crf.setPin1DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 10); // 10mm or closer requirement
+            crf.setPin1Digital(ColorRangefinder.DigitalMode.HSV, minGreen.hue * scale, maxGreen.hue * scale); // green
+            crf.setPin1DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 15); // 10mm or closer requirement
         }
     }
 }
