@@ -1,17 +1,15 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
-import static com.acmerobotics.roadrunner.Math.lerp;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.maxGreen;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.maxPurple;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.minGreen;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.minPurple;
+import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.maxGreen;
+import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.maxPurple;
+import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.minGreen;
+import static org.firstinspires.ftc.teamcode.opmode.singlemechtest.TuningColors.minPurple;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorRangefinder;
 
 @Config
