@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMot
 public final class TestMotorsCRServos extends LinearOpMode {
 
     enum TestMech {
-        ROTOR, FEEDER, SHOOTER, TURRET, INTAKE;
+        ROTOR, FEEDER, SHOOTER, TURRET, INTAKE, FR, FL, BR, BL;
 
         private final static TestMech[] values = values();
 
@@ -64,6 +64,15 @@ public final class TestMotorsCRServos extends LinearOpMode {
         intake.setInverted(true);
         intake.setZeroPowerBehavior(FLOAT);
 
+        CachedMotorEx
+                FR = new CachedMotorEx(hardwareMap, "FR", Motor.GoBILDA.RPM_435),
+                FL = new CachedMotorEx(hardwareMap, "FL", Motor.GoBILDA.RPM_435),
+                BR = new CachedMotorEx(hardwareMap, "BR", Motor.GoBILDA.RPM_435),
+                BL = new CachedMotorEx(hardwareMap, "BL", Motor.GoBILDA.RPM_435);
+
+        FL.setInverted(true);
+        BL.setInverted(true);
+
         TestMech selected = ROTOR;
 
         waitForStart();
@@ -94,6 +103,18 @@ public final class TestMotorsCRServos extends LinearOpMode {
                         break;
                     case INTAKE:
                         intake.set(triggersSum);
+                        break;
+                    case FR:
+                        FR.set(triggersSum);
+                        break;
+                    case FL:
+                        FL.set(triggersSum);
+                        break;
+                    case BR:
+                        BR.set(triggersSum);
+                        break;
+                    case BL:
+                        BL.set(triggersSum);
                         break;
                 }
             }
