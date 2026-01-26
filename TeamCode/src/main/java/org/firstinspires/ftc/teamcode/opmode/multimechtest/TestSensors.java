@@ -4,6 +4,8 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.pedropathing.Constants.pinpointConstants;
 import static org.firstinspires.ftc.teamcode.subsystem.Container.ABS_OFFSET_ROTOR;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.backGains;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.frontGains;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
@@ -18,6 +20,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.control.filter.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.subsystem.DigitalArtifactColor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
@@ -69,12 +72,17 @@ public final class TestSensors extends LinearOpMode {
 
         ArrayList<Double> absReadings = new ArrayList<>();
 
+        FIRLowPassFilter front = new FIRLowPassFilter(frontGains), back = new FIRLowPassFilter(backGains);
+
         waitForStart();
 
         while (opModeIsActive()) {
 
             bulkReader.bulkRead();
             pinpoint.update();
+
+            front.setGains(frontGains);
+            back.setGains(backGains);
 
             double shooterRevPerSec = shooterEncoder.getCorrectedVelocity() / 28.0;
 
@@ -124,6 +132,9 @@ public final class TestSensors extends LinearOpMode {
             telemetry.addLine();
             telemetry.addData("Front distance (mm)", frontDistance1.getReading());
             telemetry.addData("Back distance (mm)", backDistance1.getReading());
+            telemetry.addLine();
+            telemetry.addData("Front filtered (mm)", front.calculate(frontDistance1.getReading()));
+            telemetry.addData("Back filtered (mm)", back.calculate(backDistance1.getReading()));
             telemetry.addLine();
             telemetry.addLine("--------------------------------------");
             telemetry.addLine();

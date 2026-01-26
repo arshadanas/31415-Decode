@@ -154,6 +154,7 @@ public final class Container {
             indicators[n++].setColor(EMPTY.toLEDColor());
 
         // PID
+        controller.setGains(pidGains);
         controller.setTarget(new State(getError(selectedSlot, target)));
         double power = controller.calculate(new State());
         rotorAboveThreshold = power > ROTOR_SPEED_THRESHOLD_INTAKE_SPIN;
@@ -183,6 +184,9 @@ public final class Container {
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", frontDist1.getReading());
         telemetry.addData("Back dist (mm)", backDist1.getReading());
+
+        front.setGains(frontGains);
+        back.setGains(backGains);
         telemetry.addLine();
         telemetry.addData("Front filtered (mm)", front.calculate(frontDist1.getReading()));
         telemetry.addData("Back filtered (mm)", back.calculate(backDist1.getReading()));
