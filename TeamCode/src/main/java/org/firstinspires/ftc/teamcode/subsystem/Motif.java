@@ -47,7 +47,7 @@ public enum Motif {
      * @param spindexerSlots Artifacts available in the spindexer
      * @return The order to score the artifacts in the spindexer
      */
-    public ArrayList<Integer> getScoringOrder(boolean allowOneWrong, int numArtifactsScored, Artifact... spindexerSlots) {
+    public ArrayList<Integer> getScoringOrder(boolean allowOneWrong, byte numArtifactsScored, Artifact... spindexerSlots) {
 
         if (numArtifactsScored == 9)
             return new ArrayList<>();
@@ -124,7 +124,7 @@ public enum Motif {
      * @param spindexerSlots Artifacts available in the spindexer
      * @return The order to score the artifacts in the spindexer, as a {@link String}
      */
-    public String getScoringInstructions(boolean allowOneWrong, int numArtifactsScored, Artifact... spindexerSlots) {
+    public String getScoringInstructions(boolean allowOneWrong, byte numArtifactsScored, Artifact... spindexerSlots) {
         ArrayList<Integer> scoringOrder = getScoringOrder(allowOneWrong, numArtifactsScored, spindexerSlots);
         if (scoringOrder.isEmpty())
             return "Continue intaking";
@@ -157,7 +157,7 @@ public enum Motif {
 
         Artifact[] artifacts = Artifact.values();
 
-        int numArtifactsScored = classifierRamp.replace(" ", "").replace("_", "").length();
+        byte numArtifactsScored = (byte) classifierRamp.replace(" ", "").replace("_", "").length();
 
         for (Motif randomization : Motif.motifs) {
             System.out.printf("Randomization: %s%nEffective: %s%nSpindexer: %n", randomization, randomization.getEffectiveMotif(numArtifactsScored));
