@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystem.Container.SlotTarget.BACK;
@@ -10,6 +11,7 @@ import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -18,6 +20,7 @@ import org.firstinspires.ftc.teamcode.control.controller.PIDController;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
@@ -97,7 +100,13 @@ public final class Container {
                 new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
                 new LEDIndicator(hardwareMap, "led 3a", "led 3b")
         };
+
+        intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
+        intake.setInverted(true);
+        intake.setZeroPowerBehavior(FLOAT);
     }
+
+    private final CachedMotorEx intake;
 
     void run() {
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
@@ -148,6 +157,8 @@ public final class Container {
         rotorAboveThreshold = power > ROTOR_SPEED_THRESHOLD_INTAKE_SPIN;
         for (CRServo servo : servos)
             servo.setPower(power);
+
+        intake.set(getMinIntakeSpeed());
     }
 
     /** //TODO only spin intake if ball near the front
