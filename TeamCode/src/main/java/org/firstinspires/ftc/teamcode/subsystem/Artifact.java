@@ -13,7 +13,7 @@ public enum Artifact {
     GREEN,
     EMPTY;
 
-    public static final HSV
+    public static HSV
             minPurple = new HSV(
                     175,
                     0.4,

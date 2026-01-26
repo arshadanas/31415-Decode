@@ -31,7 +31,7 @@ import java.util.Arrays;
 @Config
 public final class Container {
 
-    public static final PIDGains pidGains = new PIDGains(0, 0, 0);
+    public static PIDGains pidGains = new PIDGains(0, 0, 0);
 
     public static double
             ABS_OFFSET_ROTOR = 0,
@@ -188,7 +188,7 @@ public final class Container {
         telemetry.addData("Back filtered (mm)", back.calculate(backDist1.getReading()));
     }
 
-    public static final LowPassGains frontGains = new LowPassGains(), backGains = new LowPassGains();
+    public static LowPassGains frontGains = new LowPassGains(), backGains = new LowPassGains();
     private final FIRLowPassFilter front = new FIRLowPassFilter(frontGains), back = new FIRLowPassFilter(backGains);
 
 
