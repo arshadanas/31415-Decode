@@ -144,7 +144,18 @@ public final class Container {
             ) {
                 color1.update();
                 color2.update();
-                set(i, hsvToArtifact(color1.getHSV()). or (hsvToArtifact(color2.getHSV())));
+                slots[i] = hsvToArtifact(color1.getHSV()). or (hsvToArtifact(color2.getHSV()));
+
+                if (slots[i] != EMPTY)
+                    break;
+
+                int nextEmptySlot = EMPTY.firstOccurrenceIn(slots);
+
+                if (nextEmptySlot == -1) // no empty slots
+                    moveSlot(getNearestFeedSlot(), BACK); // move artifact to feeder
+                else
+                    moveSlot(nextEmptySlot, FRONT);
+
                 break;
             }
 
@@ -155,7 +166,7 @@ public final class Container {
                     slots[i] != EMPTY &&
                     backDist1.getReading() > THRESHOLD_BACK_MM
             ) {
-                set(i, EMPTY);
+                slots[i] = EMPTY;
                 break;
             }
 
@@ -182,7 +193,7 @@ public final class Container {
 
     private boolean rotorAboveThreshold = false;
 
-    /**
+    /** //TODO only spin intake if ball near the front
      * When we spin the rotor, if an {@link Artifact} is in the front (TBA), the intake omni wheel must spin to contain the {@link Artifact}
      */
     double getMinIntakeSpeed() {
@@ -216,23 +227,6 @@ public final class Container {
             }
         }
         return minInd;
-    }
-
-    /**
-     * Add an {@link Artifact} to the slot currently in the intaking position <br>
-     * Then move the next empty slot to the front for intaking (or nearest feed if no empty slots)
-     */
-    private void set(int slot, Artifact color) {
-
-        slots[slot] = color;
-
-        if (slots[slot] == EMPTY)
-            return;
-
-        int nextEmptySlot = EMPTY.firstOccurrenceIn(slots);
-        boolean hasEmptySlot = nextEmptySlot != -1;
-
-        moveSlot(hasEmptySlot ? nextEmptySlot : getNearestFeedSlot(), hasEmptySlot ? FRONT : BACK);
     }
 
     boolean isFull() {
