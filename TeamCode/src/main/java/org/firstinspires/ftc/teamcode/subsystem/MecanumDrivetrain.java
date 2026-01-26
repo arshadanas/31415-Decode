@@ -50,8 +50,8 @@ public final class MecanumDrivetrain {
                 forwardCommand,
                 strafeCommand,
                 -turnCommand,
-                true,
-                isRedAlliance ? 0 : PI
+                false,
+                isRedAlliance ? PI : 0
         );
     }
 
