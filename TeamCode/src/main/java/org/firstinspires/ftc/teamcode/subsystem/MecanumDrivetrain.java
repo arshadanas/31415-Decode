@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
+import static java.lang.Math.max;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -47,7 +48,7 @@ public final class MecanumDrivetrain {
             turnCommand *= SLOW_FACTOR;
         }
 
-        double maxPower = abs(forwardCommand) + abs(strafeCommand) + abs(turnCommand);
+        double maxPower = max(1, abs(forwardCommand) + abs(strafeCommand) + abs(turnCommand));
 
         drivetrain.setTeleOpDrive(
                 forwardCommand / maxPower,
