@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.subsystem.Container.SlotTarget.BACK;
-import static org.firstinspires.ftc.teamcode.subsystem.Container.SlotTarget.FRONT;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.Position.FEEDING;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.Position.INTAKING;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -31,22 +31,22 @@ public final class TuneContainer extends LinearOpMode {
             container.run();
 
             if (gamepad1.dpadLeftWasPressed())
-                container.moveSlot(0, BACK);
+                container.moveSlot(0, FEEDING);
 
             else if (gamepad1.dpadUpWasPressed())
-                container.moveSlot(1, BACK);
+                container.moveSlot(1, FEEDING);
 
             else if (gamepad1.dpadRightWasPressed())
-                container.moveSlot(2, BACK);
+                container.moveSlot(2, FEEDING);
 
             else if (gamepad1.squareWasPressed())
-                container.moveSlot(0, FRONT);
+                container.moveSlot(0, INTAKING);
 
             else if (gamepad1.triangleWasPressed())
-                container.moveSlot(1, FRONT);
+                container.moveSlot(1, INTAKING);
 
             else if (gamepad1.circleWasPressed())
-                container.moveSlot(2, FRONT);
+                container.moveSlot(2, INTAKING);
 
             container.print(telemetry);
             telemetry.update();

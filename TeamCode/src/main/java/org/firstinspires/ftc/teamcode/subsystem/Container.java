@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystem.Container.SlotTarget.BACK;
-import static org.firstinspires.ftc.teamcode.subsystem.Container.SlotTarget.FRONT;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
@@ -31,13 +29,15 @@ import java.util.Arrays;
 @Config
 public final class Container {
 
-    public static PIDGains pidGains = new PIDGains(0, 0, 0);
+    public static PIDGains
+                            deadbandGains = new PIDGains(0, 0, 0),
+                            mainGains =     new PIDGains(0, 0, 0),
+                            frictionGains = new PIDGains(0, 0, 0);
+
     public static LowPassGains filterGains = new LowPassGains(0.8, 50);
 
     public static double
             ABS_OFFSET_ROTOR = -1.2966209679361516,
-            TOLERANCE_FRONT_RADIANS = toRadians(20),
-            TOLERANCE_BACK_RADIANS = toRadians(20),
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // above rotor = ~75
             INTAKE_SPEED_WHEN_SORTING = 0.5,
@@ -67,19 +67,32 @@ public final class Container {
     private final PIDController controller = new PIDController(filter);
 
     private int selectedSlot = 0;
-    private SlotTarget target = FRONT;
+    private Position target = Position.INTAKING;
 
-    enum SlotTarget {
-        FRONT(0),
-        BACK(PI);
+    enum Position {
+        INTAKING(0),
+        FEEDING(PI),
+        DEADBAND(0),
+        FRICTION(PI);
+
+        public static double
+                TOLERANCE_FRONT = toRadians(20),
+                TOLERANCE_BACK = toRadians(20),
+                TOLERANCE_DEADBAND = toRadians(20),
+                TOLERANCE_FEEDER_FRICTION = toRadians(20);
 
         private final double radians;
-        SlotTarget(double radians) {
+        Position(double radians) {
             this.radians = radians;
         }
 
         private double getTolerance() {
-            return this == SlotTarget.BACK ? TOLERANCE_BACK_RADIANS : TOLERANCE_FRONT_RADIANS;
+            switch (this) {
+                case FEEDING:   return TOLERANCE_BACK;
+                case DEADBAND:  return TOLERANCE_DEADBAND;
+                case FRICTION:  return TOLERANCE_FEEDER_FRICTION;
+                default:        return TOLERANCE_FRONT;
+            }
         }
     }
 
@@ -113,7 +126,7 @@ public final class Container {
     void run() {
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
 
-        int frontSlot = getSlotAt(FRONT);
+        int frontSlot = getSlotAt(Position.INTAKING);
         if (
                 frontSlot != -1 &&
                 slots[frontSlot] == EMPTY &&
@@ -129,14 +142,14 @@ public final class Container {
                 int nextEmptySlot = EMPTY.firstOccurrenceIn(slots);
 
                 if (nextEmptySlot == -1) // no empty slots
-                    moveSlot(getNearestFeedSlot(), BACK); // move artifact to feeder
+                    moveSlot(getNearestFeedSlot(), Position.FEEDING); // move artifact to feeder
                 else
-                    moveSlot(nextEmptySlot, FRONT);
+                    moveSlot(nextEmptySlot, Position.INTAKING);
             }
         }
 
         // check back slot sensors
-        int backSlot = getSlotAt(BACK);
+        int backSlot = getSlotAt(Position.FEEDING);
         if (
                 backSlot != -1 &&
                 slots[backSlot] != EMPTY &&
@@ -154,7 +167,7 @@ public final class Container {
             indicators[n++].setColor(EMPTY.toLEDColor());
 
         // PID
-        controller.setGains(pidGains);
+        controller.setGains(mainGains);
         filter.setGains(filterGains);
         controller.setTarget(new State(getError(selectedSlot, target)));
         double power = controller.calculate(new State());
@@ -197,7 +210,7 @@ public final class Container {
             if (slots[i] == EMPTY)
                 continue;
 
-            double error = getError(i, BACK);
+            double error = getError(i, Position.FEEDING);
             if (error < min){
                 min = error;
                 minInd = i;
@@ -213,7 +226,7 @@ public final class Container {
             if (slots[i] != color)
                 continue;
 
-            double error = getError(i, BACK);
+            double error = getError(i, Position.FEEDING);
             if (error < min){
                 min = error;
                 minInd = i;
@@ -225,7 +238,7 @@ public final class Container {
     /**
      * @return The (index of the) slot currently at the given target, -1 if no slot at that position
      */
-    private int getSlotAt(SlotTarget target) {
+    private int getSlotAt(Position target) {
         for (int i = 0; i < slots.length; i++)
             if (atPosition(i, target))
                 return i;
@@ -235,7 +248,7 @@ public final class Container {
     /**
      * @param slot Slot you wish to move (0, 1 or 2)
      */
-    void moveSlot(int slot, SlotTarget target) {
+    void moveSlot(int slot, Position target) {
         this.selectedSlot = slot;
         this.target = target;
     }
@@ -243,14 +256,14 @@ public final class Container {
     /**
      * @return  If the given slot is at the given target, within tolerance in either direction
      */
-    private boolean atPosition(int slot, SlotTarget target) {
+    private boolean atPosition(int slot, Position target) {
         return abs(getError(slot, target)) <= target.getTolerance();
     }
 
     /**
      * @return  Distance, in radians, between given slot's position and given target
      */
-    private double getError(int slot, SlotTarget target) {
+    private double getError(int slot, Position target) {
         return normalizeRadians(target.radians - getPositionOf(slot));
     }
 
