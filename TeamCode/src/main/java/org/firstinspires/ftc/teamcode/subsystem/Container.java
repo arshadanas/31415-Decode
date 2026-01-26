@@ -40,7 +40,8 @@ public final class Container {
             ROTOR_SPEED_THRESHOLD_INTAKE_SPIN = 0.5,
 
             TOLERANCE_FRONT = toRadians(20),
-            TOLERANCE_BACK = toRadians(20);
+            TOLERANCE_BACK = toRadians(20),
+            TOLERANCE_FRICTION = toRadians(30);
 
     // hardware
     private final CRServo[] servos;
@@ -81,6 +82,7 @@ public final class Container {
         private double getTolerance() {
             switch (this) {
                 case FEEDING:   return TOLERANCE_BACK;
+                case FRICTION:  return TOLERANCE_FRICTION;
                 default:        return TOLERANCE_FRONT;
             }
         }
@@ -170,7 +172,7 @@ public final class Container {
         intake.set(getMinIntakeSpeed());
     }
 
-    private boolean isArtifactTouchingFeeder() {
+    private boolean artifactIsTouchingFeeder() {
         int frictionSlot = getSlotAt(Position.FRICTION);
         return frictionSlot != -1 && artifacts[frictionSlot] != EMPTY;
     }
