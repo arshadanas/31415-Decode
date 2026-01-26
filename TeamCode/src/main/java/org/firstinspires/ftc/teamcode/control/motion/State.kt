@@ -35,22 +35,6 @@ constructor(
         return this + -other
     }
 
-    operator fun times(gains: FullStateGains): State {
-        return State(
-            x * gains.pGain,
-            v * gains.vGain,
-            a * gains.aGain,
-        )
-    }
-
-    operator fun times(gains: FeedforwardGains): State {
-        return State(
-            0.0,
-            v * gains.kV,
-            a * gains.kA,
-        )
-    }
-
     /**
      * Returns the sum of all the derivatives of this [State].
      * Only to be used to get a control output.

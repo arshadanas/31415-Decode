@@ -19,6 +19,6 @@ public class FullStateController implements FeedbackController {
 
     @Override
     public double calculate(State measurement) {
-        return target.minus(measurement).times(gains).sum();
+        return gains.times(target.minus(measurement)).sum();
     }
 }
