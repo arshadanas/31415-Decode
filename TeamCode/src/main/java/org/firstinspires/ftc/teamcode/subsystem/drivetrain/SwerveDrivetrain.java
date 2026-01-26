@@ -42,9 +42,6 @@ public final class SwerveDrivetrain {
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        // TODO: adjust the names of the following hardware devices to match your configuration
-
-        // TODO: if desired, use setLocalizer() to change the localization method
 //        localizer = new ThreeWheelTrackingLocalizer(hardwareMap, new ArrayList<>(), new ArrayList<>());
 
         setCurrentHeading(0);
