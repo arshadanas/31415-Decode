@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
 import static java.lang.Math.toDegrees;
 
@@ -46,10 +47,12 @@ public final class MecanumDrivetrain {
             turnCommand *= SLOW_FACTOR;
         }
 
+        double maxPower = abs(forwardCommand) + abs(strafeCommand) + abs(turnCommand);
+
         drivetrain.setTeleOpDrive(
-                forwardCommand,
-                strafeCommand,
-                -turnCommand,
+                forwardCommand / maxPower,
+                strafeCommand / maxPower,
+                -turnCommand / maxPower,
                 false,
                 isRedAlliance ? PI : 0
         );
