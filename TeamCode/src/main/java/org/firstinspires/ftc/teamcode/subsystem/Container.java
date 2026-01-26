@@ -58,6 +58,7 @@ public final class Container {
     private final Artifact[] slots = {EMPTY, EMPTY, EMPTY};
 
     private final PIDController controller = new PIDController();
+    { controller.setGains(pidGains); }
 
     private int selectedSlot = 0;
 
@@ -142,9 +143,8 @@ public final class Container {
             indicators[n++].setColor(EMPTY.toLEDColor());
 
         // PID
-        controller.setGains(pidGains);
-        controller.setTarget(new State(getPositionOf(selectedSlot) + getError(selectedSlot, target)));
-        double power = controller.calculate(new State(getPositionOf(selectedSlot)));
+        controller.setTarget(new State(getError(selectedSlot, target)));
+        double power = controller.calculate(new State());
         rotorAboveThreshold = power > ROTOR_SPEED_THRESHOLD_INTAKE_SPIN;
         for (CRServo servo : servos)
             servo.setPower(power);
