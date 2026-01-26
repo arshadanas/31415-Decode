@@ -158,18 +158,18 @@ public final class Container {
     }
 
     void print(Telemetry telemetry) {
-        telemetry.addData("SORTER", Arrays.toString(slots));
+        telemetry.addData("CONTAINER", Arrays.toString(slots));
         telemetry.addLine();
-        telemetry.addData("Slot 0 position (rad)", getPositionOf(0));
-        telemetry.addData("Slot 1 position (rad)", getPositionOf(1));
-        telemetry.addData("Slot 2 position (rad)", getPositionOf(2));
+        telemetry.addData("Current (deg)", toDegrees(getPositionOf(selectedSlot)));
+        telemetry.addData("Target (deg", toDegrees(target.radians));
+        telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
+        telemetry.addData("Error deriv (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
         telemetry.addLine();
-        telemetry.addData("Slot 0 position (deg)", toDegrees(getPositionOf(0)));
-        telemetry.addData("Slot 1 position (deg)", toDegrees(getPositionOf(1)));
-        telemetry.addData("Slot 2 position (deg)", toDegrees(getPositionOf(2)));
+        telemetry.addData("Slot 0 pos (rad)", position);
+        telemetry.addData("Slot 0 pos (deg)", toDegrees(position));
         telemetry.addLine();
-        telemetry.addData("Front distance (mm)", frontDist1.getReading());
-        telemetry.addData("Back distance (mm)", backDist1.getReading());
+        telemetry.addData("Front dist (mm)", frontDist1.getReading());
+        telemetry.addData("Back dist (mm)", backDist1.getReading());
     }
 
 
