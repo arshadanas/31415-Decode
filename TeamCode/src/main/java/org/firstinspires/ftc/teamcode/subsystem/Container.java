@@ -36,8 +36,8 @@ public final class Container {
 
     public static double
             ABS_OFFSET_ROTOR = -1.2966209679361516,
-            TOLERANCE_FRONT_RADIANS = toRadians(5),
-            TOLERANCE_BACK_RADIANS = toRadians(5),
+            TOLERANCE_FRONT_RADIANS = toRadians(20),
+            TOLERANCE_BACK_RADIANS = toRadians(20),
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // above rotor = ~75
             INTAKE_SPEED_WHEN_SORTING = 0.5,
