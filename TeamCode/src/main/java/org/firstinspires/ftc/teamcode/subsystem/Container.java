@@ -32,6 +32,7 @@ import java.util.Arrays;
 public final class Container {
 
     public static PIDGains pidGains = new PIDGains(0, 0, 0);
+    public static LowPassGains filterGains = new LowPassGains(0.8, 50);
 
     public static double
             ABS_OFFSET_ROTOR = -1.2966209679361516,
@@ -62,7 +63,8 @@ public final class Container {
 
     private final Artifact[] slots = {EMPTY, EMPTY, EMPTY};
 
-    private final PIDController controller = new PIDController();
+    private final FIRLowPassFilter filter = new FIRLowPassFilter(filterGains);
+    private final PIDController controller = new PIDController(filter);
 
     private int selectedSlot = 0;
 
@@ -154,6 +156,7 @@ public final class Container {
 
         // PID
         controller.setGains(pidGains);
+        filter.setGains(filterGains);
         controller.setTarget(new State(getError(selectedSlot, target)));
         double power = controller.calculate(new State());
         rotorAboveThreshold = power > ROTOR_SPEED_THRESHOLD_INTAKE_SPIN;
@@ -174,7 +177,7 @@ public final class Container {
         telemetry.addData("CONTAINER", Arrays.toString(slots));
         telemetry.addLine();
         telemetry.addData("Current (deg)", toDegrees(getPositionOf(selectedSlot)));
-        telemetry.addData("Target (deg", toDegrees(target.radians));
+        telemetry.addData("Target (deg)", toDegrees(target.radians));
         telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
         telemetry.addData("Error deriv (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
         telemetry.addLine();
