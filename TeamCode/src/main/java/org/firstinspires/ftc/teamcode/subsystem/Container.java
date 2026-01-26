@@ -89,7 +89,7 @@ public final class Container {
     }
 
     private final Artifact[] slots = {EMPTY, EMPTY, EMPTY};
-    private final Artifact[] sorted = slots.clone();
+    private final Artifact[] filtered = slots.clone();
 
     private final PIDController controller = new PIDController();
 
@@ -163,13 +163,13 @@ public final class Container {
         int n = 0;
         for (Artifact a : slots)
             if (a != EMPTY)
-                sorted[n++] = a;
+                filtered[n++] = a;
 
-        while (n < sorted.length)
-            sorted[n++] = EMPTY;
+        while (n < filtered.length)
+            filtered[n++] = EMPTY;
 
-        for (int i = 0; i < sorted.length; i++)
-            indicators[i].setColor(sorted[i].toLEDColor());
+        for (int i = 0; i < filtered.length; i++)
+            indicators[i].setColor(filtered[i].toLEDColor());
 
         // PID
         controller.setGains(pidGains);
