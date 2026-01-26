@@ -57,7 +57,7 @@ public final class Container {
      * Position of given slot, in radians
      */
     private double getPositionOf(int slot) {
-        return position + slot * 2 * PI / 3.0;
+        return normalizeRadians(position + slot * 2 * PI / 3.0);
     }
 
     private final Artifact[] slots = {EMPTY, EMPTY, EMPTY};
