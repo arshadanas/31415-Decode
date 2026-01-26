@@ -67,7 +67,6 @@ public final class Container {
     private final PIDController controller = new PIDController(filter);
 
     private int selectedSlot = 0;
-
     private SlotTarget target = FRONT;
 
     enum SlotTarget {
