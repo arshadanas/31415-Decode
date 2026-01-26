@@ -111,6 +111,7 @@ public final class Container {
         ) {
             color1.update();
             color2.update();
+            // combine Artifact reading from both color sensors
             slots[frontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
 
             if (slots[frontSlot] != EMPTY) {
