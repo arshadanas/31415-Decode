@@ -38,7 +38,7 @@ public final class Container {
             TOLERANCE_FRONT_RADIANS = toRadians(5),
             TOLERANCE_BACK_RADIANS = toRadians(5),
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
-            THRESHOLD_BACK_MM = 80,
+            THRESHOLD_BACK_MM = 70, // above rotor = ~75
             INTAKE_SPEED_WHEN_SORTING = 0.5,
             ROTOR_SPEED_THRESHOLD_INTAKE_SPIN = 0.5;
 
