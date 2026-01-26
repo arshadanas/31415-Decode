@@ -90,6 +90,8 @@ public final class Tele extends LinearOpMode {
 
                 if (gamepad1.squareWasPressed()) doTelemetry = !doTelemetry;
 
+                robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
+
             } else {
 
                 robot.drivetrain.run(
