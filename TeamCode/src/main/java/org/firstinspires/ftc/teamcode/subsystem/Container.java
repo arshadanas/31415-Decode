@@ -194,6 +194,9 @@ public final class Container {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {
+            if (slots[i] == EMPTY)
+                continue;
+
             double error = getError(i, BACK);
             if (error < min){
                 min = error;
