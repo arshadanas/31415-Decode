@@ -29,11 +29,7 @@ import java.util.Arrays;
 @Config
 public final class Container {
 
-    public static PIDGains
-                            deadbandGains = new PIDGains(0, 0, 0),
-                            mainGains =     new PIDGains(0, 0, 0),
-                            frictionGains = new PIDGains(0, 0, 0);
-
+    public static PIDGains pidGains = new PIDGains(0, 0, 0);
     public static LowPassGains filterGains = new LowPassGains(0.8, 50);
 
     public static double
@@ -41,7 +37,10 @@ public final class Container {
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // above rotor = ~75
             INTAKE_SPEED_WHEN_SORTING = 0.5,
-            ROTOR_SPEED_THRESHOLD_INTAKE_SPIN = 0.5;
+            ROTOR_SPEED_THRESHOLD_INTAKE_SPIN = 0.5,
+
+            TOLERANCE_FRONT = toRadians(20),
+            TOLERANCE_BACK = toRadians(20);
 
     // hardware
     private final CRServo[] servos;
@@ -61,7 +60,7 @@ public final class Container {
         return normalizeRadians(position + slot * 2 * PI / 3.0);
     }
 
-    private final Artifact[] slots = {EMPTY, EMPTY, EMPTY};
+    private final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
 
     private final FIRLowPassFilter filter = new FIRLowPassFilter(filterGains);
     private final PIDController controller = new PIDController(filter);
@@ -72,14 +71,7 @@ public final class Container {
     enum Position {
         INTAKING(0),
         FEEDING(PI),
-        DEADBAND(0),
         FRICTION(PI);
-
-        public static double
-                TOLERANCE_FRONT = toRadians(20),
-                TOLERANCE_BACK = toRadians(20),
-                TOLERANCE_DEADBAND = toRadians(20),
-                TOLERANCE_FEEDER_FRICTION = toRadians(20);
 
         private final double radians;
         Position(double radians) {
@@ -89,8 +81,6 @@ public final class Container {
         private double getTolerance() {
             switch (this) {
                 case FEEDING:   return TOLERANCE_BACK;
-                case DEADBAND:  return TOLERANCE_DEADBAND;
-                case FRICTION:  return TOLERANCE_FEEDER_FRICTION;
                 default:        return TOLERANCE_FRONT;
             }
         }
@@ -129,17 +119,17 @@ public final class Container {
         int frontSlot = getSlotAt(Position.INTAKING);
         if (
                 frontSlot != -1 &&
-                slots[frontSlot] == EMPTY &&
+                artifacts[frontSlot] == EMPTY &&
                 frontDist1.getReading() < THRESHOLD_FRONT_MM
                 // TODO check rotor speed under threshold
         ) {
             color1.update();
             color2.update();
             // combine Artifact reading from both color sensors
-            slots[frontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
+            artifacts[frontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
 
-            if (slots[frontSlot] != EMPTY) {
-                int nextEmptySlot = EMPTY.firstOccurrenceIn(slots);
+            if (artifacts[frontSlot] != EMPTY) {
+                int nextEmptySlot = EMPTY.firstOccurrenceIn(artifacts);
 
                 if (nextEmptySlot == -1) // no empty slots
                     moveSlot(getNearestFeedSlot(), Position.FEEDING); // move artifact to feeder
@@ -152,30 +142,37 @@ public final class Container {
         int backSlot = getSlotAt(Position.FEEDING);
         if (
                 backSlot != -1 &&
-                slots[backSlot] != EMPTY &&
+                artifacts[backSlot] != EMPTY &&
                 backDist1.getReading() > THRESHOLD_BACK_MM
                 // TODO check rotor speed under threshold
         )
-            slots[backSlot] = EMPTY;
+            artifacts[backSlot] = EMPTY;
 
         // LEDs
         int n = 0;
-        for (Artifact a : slots)
+        for (Artifact a : artifacts)
             if (a != EMPTY)
                 indicators[n++].setColor(a.toLEDColor());
-        while (n < slots.length)
+        while (n < artifacts.length)
             indicators[n++].setColor(EMPTY.toLEDColor());
 
         // PID
-        controller.setGains(mainGains);
+        double error = getError(selectedSlot, target);
+
+        controller.setGains(pidGains);
         filter.setGains(filterGains);
-        controller.setTarget(new State(getError(selectedSlot, target)));
+        controller.setTarget(new State(error));
         double power = controller.calculate(new State());
         rotorAboveThreshold = power > ROTOR_SPEED_THRESHOLD_INTAKE_SPIN;
         for (CRServo servo : servos)
             servo.setPower(power);
 
         intake.set(getMinIntakeSpeed());
+    }
+
+    private boolean isArtifactTouchingFeeder() {
+        int frictionSlot = getSlotAt(Position.FRICTION);
+        return frictionSlot != -1 && artifacts[frictionSlot] != EMPTY;
     }
 
     /** //TODO only spin intake if ball near the front
@@ -186,11 +183,12 @@ public final class Container {
     }
 
     void print(Telemetry telemetry) {
-        telemetry.addData("CONTAINER", Arrays.toString(slots));
+        telemetry.addData("CONTAINER", Arrays.toString(artifacts));
         telemetry.addLine();
         telemetry.addData("Current (deg)", toDegrees(getPositionOf(selectedSlot)));
         telemetry.addData("Target (deg)", toDegrees(target.radians));
-        telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
+        double error = getError(selectedSlot, target);
+        telemetry.addData("Error (deg)", toDegrees(error));
         telemetry.addData("Error deriv (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
         telemetry.addLine();
         telemetry.addData("Slot 0 pos (rad)", position);
@@ -207,7 +205,7 @@ public final class Container {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {
-            if (slots[i] == EMPTY)
+            if (artifacts[i] == EMPTY)
                 continue;
 
             double error = getError(i, Position.FEEDING);
@@ -223,7 +221,7 @@ public final class Container {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {
-            if (slots[i] != color)
+            if (artifacts[i] != color)
                 continue;
 
             double error = getError(i, Position.FEEDING);
@@ -239,7 +237,7 @@ public final class Container {
      * @return The (index of the) slot currently at the given target, -1 if no slot at that position
      */
     private int getSlotAt(Position target) {
-        for (int i = 0; i < slots.length; i++)
+        for (int i = 0; i < artifacts.length; i++)
             if (atPosition(i, target))
                 return i;
         return -1;

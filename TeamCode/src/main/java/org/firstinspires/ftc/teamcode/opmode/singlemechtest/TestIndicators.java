@@ -23,35 +23,31 @@ public final class TestIndicators extends LinearOpMode {
                 new LEDIndicator(hardwareMap, "led 3a", "led 3b")
         };
 
-        Artifact[] slots = {EMPTY, EMPTY, EMPTY};
-        Artifact[] filtered = new Artifact[slots.length];
+        Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
 
         waitForStart();
 
         while (opModeIsActive()) {
 
             if (gamepad1.dpadLeftWasPressed())
-                slots[0] = slots[0].plus(1);
+                artifacts[0] = artifacts[0].plus(1);
             if (gamepad1.dpadUpWasPressed())
-                slots[1] = slots[1].plus(1);
+                artifacts[1] = artifacts[1].plus(1);
             if (gamepad1.dpadRightWasPressed())
-                slots[2] = slots[2].plus(1);
+                artifacts[2] = artifacts[2].plus(1);
 
 
             int n = 0;
-            for (Artifact a : slots) {
+            for (Artifact a : artifacts) {
                 if (a != EMPTY)
-                    filtered[n++] = a;
+                    indicators[n++].setColor(a.toLEDColor());
             }
-            while (n < filtered.length)
-                filtered[n++] = EMPTY;
+            while (n < artifacts.length)
+                indicators[n++].setColor(EMPTY.toLEDColor());
 
-            for (int i = 0; i < indicators.length; i++)
-                indicators[i].setColor(filtered[i].toLEDColor());
-
-            telemetry.addData("Slot 0", slots[0]);
-            telemetry.addData("Slot 1", slots[1]);
-            telemetry.addData("Slot 2", slots[2]);
+            telemetry.addData("Slot 0", artifacts[0]);
+            telemetry.addData("Slot 1", artifacts[1]);
+            telemetry.addData("Slot 2", artifacts[2]);
             telemetry.update();
         }
     }
