@@ -161,10 +161,10 @@ public final class Container {
 
         // LEDs
         int n = 0;
-        for (Artifact a : slots) {
+        for (Artifact a : slots)
             if (a != EMPTY)
                 sorted[n++] = a;
-        }
+
         while (n < sorted.length)
             sorted[n++] = EMPTY;
 
