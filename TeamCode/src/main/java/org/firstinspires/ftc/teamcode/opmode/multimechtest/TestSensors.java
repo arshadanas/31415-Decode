@@ -28,6 +28,7 @@ import java.util.ArrayList;
 @TeleOp(group = "Multiple mechanism test")
 public final class TestSensors extends LinearOpMode {
 
+    public static double rotorAbsoluteOffset = 0;
     public static double turretAbsoluteOffset = 1.8659156366775742;
 
     @Override
@@ -81,7 +82,7 @@ public final class TestSensors extends LinearOpMode {
             double turretRadQuad = normalizeRadians(turretQuadrature.getPosition() * turretRadPerTick);
             double turretRadPerSec = turretQuadrature.getCorrectedVelocity() * turretRadPerTick;
 
-            double rotorRad = normalizeRadians(rotorEncoder.getReading());
+            double rotorRad = normalizeRadians(rotorEncoder.getReading() + rotorAbsoluteOffset);
 
             double turretRadAbsRaw = -turretAbsolute.getReading();
             double turretRadAbs = normalizeRadians(turretRadAbsRaw + turretAbsoluteOffset);
