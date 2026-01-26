@@ -17,6 +17,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
+import org.firstinspires.ftc.teamcode.control.filter.FIRLowPassFilter;
+import org.firstinspires.ftc.teamcode.control.gainmatrix.LowPassGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
@@ -35,7 +37,7 @@ public final class Container {
             ABS_OFFSET_ROTOR = 0,
             TOLERANCE_FRONT_RADIANS = toRadians(5),
             TOLERANCE_BACK_RADIANS = toRadians(5),
-            THRESHOLD_FRONT_MM = 40,
+            THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 80,
             INTAKE_SPEED_WHEN_SORTING = 0.5,
             ROTOR_SPEED_THRESHOLD_INTAKE_SPIN = 0.5;
@@ -181,8 +183,13 @@ public final class Container {
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", frontDist1.getReading());
         telemetry.addData("Back dist (mm)", backDist1.getReading());
+        telemetry.addLine();
+        telemetry.addData("Front filtered (mm)", front.calculate(frontDist1.getReading()));
+        telemetry.addData("Back filtered (mm)", back.calculate(backDist1.getReading()));
     }
 
+    public static final LowPassGains frontGains = new LowPassGains(), backGains = new LowPassGains();
+    private final FIRLowPassFilter front = new FIRLowPassFilter(frontGains), back = new FIRLowPassFilter(backGains);
 
 
     private boolean rotorAboveThreshold = false;
