@@ -63,7 +63,6 @@ public final class Container {
     private final Artifact[] slots = {EMPTY, EMPTY, EMPTY};
 
     private final PIDController controller = new PIDController();
-    { controller.setGains(pidGains); }
 
     private int selectedSlot = 0;
 
@@ -184,16 +183,7 @@ public final class Container {
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", frontDist1.getReading());
         telemetry.addData("Back dist (mm)", backDist1.getReading());
-
-        front.setGains(frontGains);
-        back.setGains(backGains);
-        telemetry.addLine();
-        telemetry.addData("Front filtered (mm)", front.calculate(frontDist1.getReading()));
-        telemetry.addData("Back filtered (mm)", back.calculate(backDist1.getReading()));
     }
-
-    public static LowPassGains frontGains = new LowPassGains(), backGains = new LowPassGains();
-    private final FIRLowPassFilter front = new FIRLowPassFilter(frontGains), back = new FIRLowPassFilter(backGains);
 
 
     private boolean rotorAboveThreshold = false;
