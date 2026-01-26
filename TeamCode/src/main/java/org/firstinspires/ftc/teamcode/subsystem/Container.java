@@ -218,7 +218,7 @@ public final class Container {
     /**
      * @param slot Slot you wish to move (0, 1 or 2)
      */
-    private void moveSlot(int slot, SlotTarget target) {
+    void moveSlot(int slot, SlotTarget target) {
         this.selectedSlot = slot;
         this.target = target;
     }
