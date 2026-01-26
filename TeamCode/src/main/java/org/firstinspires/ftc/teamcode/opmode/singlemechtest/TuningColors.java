@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.hsvToArtifact;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -19,36 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 @Config
 @TeleOp(group = "Single mechanism test")
 public final class TuningColors extends LinearOpMode {
-
-    public static HSV
-            minPurple = new HSV(
-                    175,
-                    0.4,
-                    0
-            ),
-            maxPurple = new HSV(
-                    350,
-                    1,
-                    1
-            ),
-
-            minGreen = new HSV(
-                    60,
-                    0.65,
-                    0
-            ),
-            maxGreen = new HSV(
-                    160,
-                    1,
-                    1
-            );
-
-    public static Artifact hsvToArtifact(HSV hsv) {
-        return
-                hsv.between(minPurple, maxPurple) ? PURPLE :
-                hsv.between(minGreen, maxGreen) ?   GREEN :
-                                                    EMPTY;
-    }
 
     @Override
     public void runOpMode() throws InterruptedException {

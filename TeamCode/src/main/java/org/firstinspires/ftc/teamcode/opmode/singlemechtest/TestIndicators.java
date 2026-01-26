@@ -2,16 +2,11 @@ package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 
-import static java.lang.Math.min;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
-
-import java.util.Arrays;
-import java.util.Comparator;
 
 
 @TeleOp(group = "Single mechanism test")
@@ -42,8 +37,15 @@ public final class TestIndicators extends LinearOpMode {
             if (gamepad1.dpadRightWasPressed())
                 artifacts[2] = artifacts[2].plus(1);
 
-            System.arraycopy(artifacts, 0, sorted, 0, artifacts.length);
-            Arrays.sort(sorted, Comparator.comparingInt(Enum::ordinal));
+
+            int n = 0;
+            for (Artifact a : artifacts) {
+                if (a != EMPTY)
+                    sorted[n++] = a;
+            }
+            while (n < sorted.length)
+                sorted[n++] = EMPTY;
+
             for (int i = 0; i < indicators.length; i++)
                 indicators[i].setColor(sorted[i].toLEDColor());
 
