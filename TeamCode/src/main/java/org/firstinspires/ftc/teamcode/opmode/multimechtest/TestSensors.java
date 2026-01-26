@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.pedropathing.Constants.pinpointConstants;
-import static org.firstinspires.ftc.teamcode.subsystem.Spindexer.ABS_OFFSET_ROTOR;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.ABS_OFFSET_ROTOR;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
