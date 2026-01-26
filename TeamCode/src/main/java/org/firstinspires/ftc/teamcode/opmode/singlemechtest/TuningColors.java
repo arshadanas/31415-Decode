@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
 
-import static org.firstinspires.ftc.teamcode.subsystem.Container.hsvToArtifact;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -40,8 +38,8 @@ public final class TuningColors extends LinearOpMode {
             HSV hsv1 = color1.getHSV();
             HSV hsv2 = color2.getHSV();
 
-            Artifact a1 = hsvToArtifact(hsv1);
-            Artifact a2 = hsvToArtifact(hsv2);
+            Artifact a1 = Artifact.fromHSV(hsv1);
+            Artifact a2 = Artifact.fromHSV(hsv2);
             
             telemetry.addData("OUTPUT", a1.or(a2));
             telemetry.addLine();

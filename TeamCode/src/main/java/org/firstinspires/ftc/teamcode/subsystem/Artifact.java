@@ -2,12 +2,43 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
 
+import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
 
 public enum Artifact {
     PURPLE,
     GREEN,
     EMPTY;
+
+    public static final HSV
+            minPurple = new HSV(
+                    175,
+                    0.4,
+                    0
+            ),
+            maxPurple = new HSV(
+                    350,
+                    1,
+                    1
+            ),
+
+            minGreen = new HSV(
+                    60,
+                    0.65,
+                    0
+            ),
+            maxGreen = new HSV(
+                    160,
+                    1,
+                    1
+            );
+
+    public static Artifact fromHSV(HSV hsv) {
+        return
+                hsv.between(minPurple, maxPurple) ? PURPLE :
+                hsv.between(minGreen, maxGreen) ?   GREEN :
+                EMPTY;
+    }
 
     private final static Artifact[] artifacts = values();
 

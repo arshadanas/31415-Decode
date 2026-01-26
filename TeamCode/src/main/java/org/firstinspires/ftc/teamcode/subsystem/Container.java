@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static org.firstinspires.ftc.teamcode.subsystem.Container.SlotTarget.BACK;
 import static org.firstinspires.ftc.teamcode.subsystem.Container.SlotTarget.FRONT;
 import static java.lang.Math.PI;
@@ -17,7 +15,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
-import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
@@ -29,37 +26,7 @@ import java.util.Arrays;
 @Config
 public final class Container {
 
-    public static HSV
-            minPurple = new HSV(
-                    175,
-                    0.4,
-                    0
-            ),
-            maxPurple = new HSV(
-                    350,
-                    1,
-                    1
-            ),
-
-            minGreen = new HSV(
-                    60,
-                    0.65,
-                    0
-            ),
-            maxGreen = new HSV(
-                    160,
-                    1,
-                    1
-            );
-
-    public static Artifact hsvToArtifact(HSV hsv) {
-        return
-                hsv.between(minPurple, maxPurple) ? PURPLE :
-                hsv.between(minGreen, maxGreen) ?   GREEN :
-                                                    EMPTY;
-    }
-
-    public static PIDGains pidGains = new PIDGains(0, 0, 0);
+    public static final PIDGains pidGains = new PIDGains(0, 0, 0);
 
     public static double
             ABS_OFFSET_ROTOR = 0,
@@ -135,40 +102,36 @@ public final class Container {
     void run() {
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
 
-        // check front slot sensors
-        for (int i = 0; i < slots.length; i++)
-            if ( // TODO check rotor speed under threshold
-                    atPosition(i, FRONT) &&
-                    slots[i] == EMPTY &&
-                    frontDist1.getReading() < THRESHOLD_FRONT_MM
-            ) {
-                color1.update();
-                color2.update();
-                slots[i] = hsvToArtifact(color1.getHSV()). or (hsvToArtifact(color2.getHSV()));
+        int frontSlot = getSlotAt(FRONT);
+        if (
+                frontSlot != -1 &&
+                slots[frontSlot] == EMPTY &&
+                frontDist1.getReading() < THRESHOLD_FRONT_MM
+                // TODO check rotor speed under threshold
+        ) {
+            color1.update();
+            color2.update();
+            slots[frontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
 
-                if (slots[i] != EMPTY)
-                    break;
-
+            if (slots[frontSlot] != EMPTY) {
                 int nextEmptySlot = EMPTY.firstOccurrenceIn(slots);
 
                 if (nextEmptySlot == -1) // no empty slots
                     moveSlot(getNearestFeedSlot(), BACK); // move artifact to feeder
                 else
                     moveSlot(nextEmptySlot, FRONT);
-
-                break;
             }
+        }
 
         // check back slot sensors
-        for (int i = 0; i < slots.length; i++)
-            if ( // TODO check rotor speed under threshold
-                    atPosition(i, BACK) &&
-                    slots[i] != EMPTY &&
-                    backDist1.getReading() > THRESHOLD_BACK_MM
-            ) {
-                slots[i] = EMPTY;
-                break;
-            }
+        int backSlot = getSlotAt(BACK);
+        if (
+                backSlot != -1 &&
+                slots[backSlot] != EMPTY &&
+                backDist1.getReading() > THRESHOLD_BACK_MM
+                // TODO check rotor speed under threshold
+        )
+            slots[backSlot] = EMPTY;
 
         // LEDs
         int n = 0;
@@ -191,8 +154,6 @@ public final class Container {
             servo.setPower(power);
     }
 
-    private boolean rotorAboveThreshold = false;
-
     /** //TODO only spin intake if ball near the front
      * When we spin the rotor, if an {@link Artifact} is in the front (TBA), the intake omni wheel must spin to contain the {@link Artifact}
      */
@@ -200,7 +161,26 @@ public final class Container {
         return rotorAboveThreshold ? INTAKE_SPEED_WHEN_SORTING : 0;
     }
 
-    int getNearestFeedSlot() {
+    void print(Telemetry telemetry) {
+        telemetry.addData("SORTER", Arrays.toString(slots));
+        telemetry.addLine();
+        telemetry.addData("Slot 0 position (rad)", getPositionOf(0));
+        telemetry.addData("Slot 1 position (rad)", getPositionOf(1));
+        telemetry.addData("Slot 2 position (rad)", getPositionOf(2));
+        telemetry.addLine();
+        telemetry.addData("Slot 0 position (deg)", toDegrees(getPositionOf(0)));
+        telemetry.addData("Slot 1 position (deg)", toDegrees(getPositionOf(1)));
+        telemetry.addData("Slot 2 position (deg)", toDegrees(getPositionOf(2)));
+        telemetry.addLine();
+        telemetry.addData("Front distance (mm)", frontDist1.getReading());
+        telemetry.addData("Back distance (mm)", backDist1.getReading());
+    }
+
+
+
+    private boolean rotorAboveThreshold = false;
+
+    private int getNearestFeedSlot() {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {
@@ -213,7 +193,7 @@ public final class Container {
         return minInd;
     }
 
-    int getNearestFeedSlot(Artifact color) {
+    private int getNearestFeedSlot(Artifact color) {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {
@@ -229,26 +209,20 @@ public final class Container {
         return minInd;
     }
 
-    boolean isFull() {
-        return EMPTY.numOccurrencesIn(slots) == 0;
-    }
-
-    Artifact[] getSlots() {
-        return slots.clone();
+    /**
+     * @return The (index of the) slot currently at the given target, -1 if no slot at that position
+     */
+    private int getSlotAt(SlotTarget target) {
+        for (int i = 0; i < slots.length; i++)
+            if (atPosition(i, target))
+                return i;
+        return -1;
     }
 
     /**
-     * @return Artifact in specified slot
+     * @param slot Slot you wish to move (0, 1 or 2)
      */
-    Artifact getArtifact(int slot) {
-        return slots[slot];
-    }
-
-    /**
-     * @param slot      Slot you wish to move (0, 1 or 2)
-     * @param target  True for intaking position, false for feeding/shooting position
-     */
-    void moveSlot(int slot, SlotTarget target) {
+    private void moveSlot(int slot, SlotTarget target) {
         this.selectedSlot = slot;
         this.target = target;
     }
@@ -265,21 +239,6 @@ public final class Container {
      */
     private double getError(int slot, SlotTarget target) {
         return normalizeRadians(target.radians - getPositionOf(slot));
-    }
-
-    void print(Telemetry telemetry) {
-        telemetry.addData("SORTER", Arrays.toString(slots));
-        telemetry.addLine();
-        telemetry.addData("Slot 0 position (rad)", getPositionOf(0));
-        telemetry.addData("Slot 1 position (rad)", getPositionOf(1));
-        telemetry.addData("Slot 2 position (rad)", getPositionOf(2));
-        telemetry.addLine();
-        telemetry.addData("Slot 0 position (deg)", toDegrees(getPositionOf(0)));
-        telemetry.addData("Slot 1 position (deg)", toDegrees(getPositionOf(1)));
-        telemetry.addData("Slot 2 position (deg)", toDegrees(getPositionOf(2)));
-        telemetry.addLine();
-        telemetry.addData("Front distance (mm)", frontDist1.getReading());
-        telemetry.addData("Back distance (mm)", backDist1.getReading());
     }
 
 }
