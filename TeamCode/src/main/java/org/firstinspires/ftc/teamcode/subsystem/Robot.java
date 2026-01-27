@@ -30,7 +30,7 @@ public final class Robot {
 
     public void run() {
         bulkReader.bulkRead();
-        if (!lift.isActive) drivetrain.update();
+        if (!lift.enabled) drivetrain.update();
         lift.run();
     }
 
