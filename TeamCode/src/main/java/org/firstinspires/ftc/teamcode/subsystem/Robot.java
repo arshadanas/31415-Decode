@@ -13,12 +13,13 @@ public final class Robot {
 
     public final BulkReader bulkReader;
     public final MecanumDrivetrain drivetrain;
+    public final Lift lift;
 
     private final ElapsedTime loopTimer = new ElapsedTime();
 
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
-
+        lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
     }
@@ -29,8 +30,8 @@ public final class Robot {
 
     public void run() {
         bulkReader.bulkRead();
-        drivetrain.update();
-
+        if (!lift.enabled) drivetrain.update();
+        lift.run();
     }
 
     public void print(Telemetry telemetry) {
