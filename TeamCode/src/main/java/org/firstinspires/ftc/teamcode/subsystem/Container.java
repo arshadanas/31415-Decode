@@ -112,19 +112,21 @@ public final class Container {
 
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
 
+
         int currentFrontSlot = getSlotAt(Position.INTAKING);
         if (
-                currentFrontSlot != -1 &&
-                artifacts[currentFrontSlot] == EMPTY &&
-                front1.getReading() < THRESHOLD_FRONT_MM
-                // TODO check rotor speed under threshold
+                currentFrontSlot != -1 &&   // there is a slot near the front intaking zone
+                artifacts[currentFrontSlot] == EMPTY && // the slot was previously empty
+                front1.getReading() < THRESHOLD_FRONT_MM // there is something in front of the distance sensor
         ) {
+            // read i2c
             color1.update();
             color2.update();
+
             // combine Artifact reading from both color sensors
             artifacts[currentFrontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
 
-            if (artifacts[currentFrontSlot] != EMPTY) {
+            if (artifacts[currentFrontSlot] != EMPTY) { // color sensors detected an artifact
                 int nextEmptySlot = EMPTY.firstOccurrenceIn(artifacts);
 
                 if (nextEmptySlot == -1) // no empty slots
@@ -134,16 +136,17 @@ public final class Container {
             }
         }
 
+
         // check back slot sensors
         int currentBackSlot = getSlotAt(Position.FEEDING);
         if (
-                currentBackSlot != -1 &&
-                artifacts[currentBackSlot] != EMPTY &&
-                back1.getReading() > THRESHOLD_BACK_MM &&
-                feederPower > 0
-                // TODO check rotor speed under threshold
+                currentBackSlot != -1 && // there is a slot near the back feeding zone
+                artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
+                feederPower > 0 &&  // the feeder is running
+                back1.getReading() > THRESHOLD_BACK_MM // distance sensor reports no artifact
         )
-            artifacts[currentBackSlot] = EMPTY;
+            artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
+
 
         // LEDs
         int n = 0;
@@ -152,6 +155,7 @@ public final class Container {
                 indicators[n++].setColor(a.toLEDColor());
         while (n < artifacts.length)
             indicators[n++].setColor(EMPTY.toLEDColor());
+
 
         // run pid
         derivFilter.setGains(filterGains);
