@@ -7,6 +7,9 @@ import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.Tes
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_L;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_R;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.HOOD;
+import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_ENGAGED;
+import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_INACTIVE;
+import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_L_OFFSET;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -29,11 +32,7 @@ public final class TuneServos extends LinearOpMode {
 
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
-            ANGLE_PRESSER_L_OFFSET = -37,
-
-            ANGLE_SWITCH_INACTIVE = 36,
-            ANGLE_SWITCH_ENGAGED = 67,
-            ANGLE_SWITCH_L_OFFSET = 4;
+            ANGLE_PRESSER_L_OFFSET = -37;
 
     public static double launchDegToServoDeg(double launchDegrees) {
         return lerp(launchDegrees, LAUNCH_DEG_SHALLOWEST, LAUNCH_DEG_STEEPEST, ANGLE_HOOD_SERVO_MAX, ANGLE_HOOD_SERVO_MIN);
