@@ -187,20 +187,6 @@ public final class Container {
         this.target = target;
     }
 
-    void print(Telemetry telemetry) {
-        telemetry.addData("CONTAINER", Arrays.toString(artifacts));
-        telemetry.addLine();
-        telemetry.addData(String.format("Current (slot %s) (deg)", selectedSlot), toDegrees(getPositionOf(selectedSlot)));
-        telemetry.addData("Target (deg)", toDegrees(target.radians));
-        telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
-        telemetry.addLine();
-        telemetry.addData("Position (slot 0) (rad)", position);
-        telemetry.addData("Position (slot 0) (deg)", toDegrees(position));
-        telemetry.addLine();
-        telemetry.addData("Front dist (mm)", front1.getReading());
-        telemetry.addData("Back dist (mm)", back1.getReading());
-    }
-
     private int getNearestFeedSlot() {
         double min = Double.MAX_VALUE;
         int minInd = -1;
@@ -255,6 +241,20 @@ public final class Container {
      */
     private double getError(int slot, Position target) {
         return normalizeRadians(target.radians - getPositionOf(slot));
+    }
+
+    void print(Telemetry telemetry) {
+        telemetry.addData("CONTAINER", Arrays.toString(artifacts));
+        telemetry.addLine();
+        telemetry.addData(String.format("Current (slot %s) (deg)", selectedSlot), toDegrees(getPositionOf(selectedSlot)));
+        telemetry.addData("Target (deg)", toDegrees(target.radians));
+        telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
+        telemetry.addLine();
+        telemetry.addData("Position (slot 0) (rad)", position);
+        telemetry.addData("Position (slot 0) (deg)", toDegrees(position));
+        telemetry.addLine();
+        telemetry.addData("Front dist (mm)", front1.getReading());
+        telemetry.addData("Back dist (mm)", back1.getReading());
     }
 
 }
