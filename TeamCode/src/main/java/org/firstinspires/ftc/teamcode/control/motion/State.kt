@@ -35,6 +35,15 @@ constructor(
         return this + -other
     }
 
+    operator fun times(scalar: Double): State {
+        return State(
+            x * scalar,
+            v * scalar,
+            a * scalar,
+            j * scalar,
+        )
+    }
+
     /**
      * Returns the sum of all the derivatives of this [State].
      * Only to be used to get a control output.

@@ -7,6 +7,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -29,6 +30,10 @@ public final class TuneContainer extends LinearOpMode {
         while (opModeIsActive()) {
             // Read sensors + gamepads:
             container.run();
+
+//            for (CRServo servo : container.servos)
+//                servo.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
+//                servo.setPower(Container.ffGains.kV * Container.MAX_VEL);
 
             if (gamepad1.dpadLeftWasPressed())
                 container.moveSlot(0, FEEDING);
