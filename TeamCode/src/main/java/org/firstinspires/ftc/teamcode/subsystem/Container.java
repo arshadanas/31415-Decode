@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
@@ -185,6 +187,15 @@ public final class Container {
     void moveSlot(int slot, Position target) {
         this.selectedSlot = slot;
         this.target = target;
+    }
+
+    /**
+     * GREEN in slot 1
+     */
+    public void preloadPGP() {
+        artifacts[0] = PURPLE;
+        artifacts[1] = GREEN;
+        artifacts[2] = PURPLE;
     }
 
     private int getNearestFeedSlot() {
