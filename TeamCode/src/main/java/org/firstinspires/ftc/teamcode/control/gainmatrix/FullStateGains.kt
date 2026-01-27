@@ -6,6 +6,7 @@ data class FullStateGains @JvmOverloads constructor(
     @JvmField var pGain: Double = 0.0,
     @JvmField var vGain: Double = 0.0,
     @JvmField var aGain: Double = 0.0,
+    @JvmField var jGain: Double = 0.0,
 ) {
 
 
@@ -14,6 +15,7 @@ data class FullStateGains @JvmOverloads constructor(
             state.x * pGain,
             state.v * vGain,
             state.a * aGain,
+            state.j * jGain,
         )
     }
 }
