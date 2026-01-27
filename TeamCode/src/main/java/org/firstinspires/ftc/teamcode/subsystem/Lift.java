@@ -1,15 +1,17 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
+@Config
 public final class Lift {
 
     public static double
-            ANGLE_SWITCH_INACTIVE = 36,
+            ANGLE_SWITCH_INACTIVE = 50,
             ANGLE_SWITCH_ENGAGED = 67,
             ANGLE_SWITCH_L_OFFSET = 4;
 
