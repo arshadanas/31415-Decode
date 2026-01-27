@@ -175,6 +175,14 @@ public final class Container {
                         ? INTAKE_SPEED_WHEN_ROTOR_MOVING : 0;
     }
 
+    /**
+     * @param slot Slot you wish to move (0, 1 or 2)
+     */
+    void moveSlot(int slot, Position target) {
+        this.selectedSlot = slot;
+        this.target = target;
+    }
+
     void print(Telemetry telemetry) {
         telemetry.addData("CONTAINER", Arrays.toString(artifacts));
         telemetry.addLine();
@@ -229,14 +237,6 @@ public final class Container {
             if (atPosition(i, target))
                 return i;
         return -1;
-    }
-
-    /**
-     * @param slot Slot you wish to move (0, 1 or 2)
-     */
-    void moveSlot(int slot, Position target) {
-        this.selectedSlot = slot;
-        this.target = target;
     }
 
     /**
