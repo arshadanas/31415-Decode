@@ -95,7 +95,7 @@ public final class Container {
                 hardwareMap.get(CRServo.class, "rotor 2")
         };
 
-        encoder = new AnalogSensor(hardwareMap, "rotor", 3 * 2 * PI);
+        encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
 
         front1 = new AnalogSensor(hardwareMap, "front 1", 1300);
         back1 = new AnalogSensor(hardwareMap, "back 1", 1000);

@@ -52,7 +52,7 @@ public final class TestSensors extends LinearOpMode {
         turretQuadrature.reset();
 
         AnalogSensor
-                rotorEncoder = new AnalogSensor(hardwareMap, "rotor", 3 * 2 * PI),
+                rotorEncoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI),
                 turretAbsolute = new AnalogSensor(hardwareMap, "elc", 2 * PI),
                 frontDistance1 = new AnalogSensor(hardwareMap, "front 1", 1300),
                 backDistance1 = new AnalogSensor(hardwareMap, "back 1", 1000);
