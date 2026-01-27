@@ -35,7 +35,7 @@ public final class Container {
     public static PIDGains pidGains = new PIDGains(0, 0, 0);
 
     public static double
-            ABS_OFFSET_ROTOR = -1.1366964485759112,
+            ABS_OFFSET_ROTOR = 0,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // above rotor = ~75
             INTAKE_SPEED_WHEN_ROTOR_MOVING = 0,
