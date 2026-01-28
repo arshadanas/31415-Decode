@@ -40,6 +40,7 @@ public final class Container {
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // above rotor = ~75
             INTAKE_POWER_OMNI_CONTACT = 0.4,
+            INTAKE_POWER_IDLE = -0.2,
 
             TOLERANCE_FRONT = toRadians(20),
             TOLERANCE_BACK = toRadians(20),
@@ -183,18 +184,26 @@ public final class Container {
     }
 
     /**
-     * Rounds intake speeds of [0, {@link #INTAKE_POWER_OMNI_CONTACT}) <br> up to {@link #INTAKE_POWER_OMNI_CONTACT}
-     * if there is an {@link Artifact} touching the intake's front omni wheel
+     * Rounds intake speeds of [0, {@link #INTAKE_POWER_OMNI_CONTACT}) up to {@link #INTAKE_POWER_OMNI_CONTACT}
+     * if there is an {@link Artifact} touching the intake's front omni wheel <br><br>
+     * Rounds speeds of ({@link #INTAKE_POWER_IDLE}, 0] down to {@link #INTAKE_POWER_IDLE}
+     * if there is no {@link Artifact} touching the intake's front omni wheel
      */
     double clipIntakePower(double intakePower) {
         int omniSlot = getSlotAt(Position.FRONT_OMNI_ZONE);
         if (
                 intakePower >= 0 &&
                 intakePower < INTAKE_POWER_OMNI_CONTACT &&
-                omniSlot != -1 && // a slot is near the front omni zone
-                artifacts[omniSlot] != EMPTY // there is an artifact in the slot
+                omniSlot != -1 && artifacts[omniSlot] != EMPTY // artifact touching omni wheel
         )
             return INTAKE_POWER_OMNI_CONTACT;
+
+        if (
+                intakePower <= 0 &&
+                intakePower > INTAKE_POWER_IDLE &&
+                (omniSlot == -1 || artifacts[omniSlot] == EMPTY) // no artifact near the omni wheel
+        )
+            return INTAKE_POWER_IDLE;
 
         return intakePower;
     }
