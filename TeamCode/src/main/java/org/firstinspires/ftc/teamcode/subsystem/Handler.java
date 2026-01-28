@@ -54,8 +54,7 @@ public final class Handler {
     }
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
-    private final ElapsedTime keepFeedingAfterLast = new ElapsedTime();
-    private int lastFeed = 0;
+    private final ElapsedTime timeSinceLastFeed = new ElapsedTime();
 
     Handler(HardwareMap hardwareMap) {
 
@@ -83,27 +82,27 @@ public final class Handler {
             else
                 feedFastest();
 
-        boolean movingToIntake = intakePower != 0 && EMPTY.numOccurrencesIn(container.artifacts) > 0;
-        if (movingToIntake)
+        // move empty slot to intake
+        if (intakePower != 0 && EMPTY.numOccurrencesIn(container.artifacts) > 0)
             container.moveSlot(container.getNearestIntakeSlot(), Container.Position.INTAKING);
+        // move filled slot to feeder
+        else if (!feedingOrder.isEmpty())
+            container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
 
-        if (!feedingOrder.isEmpty()) { // there is at least one artifact queued to feed
-            keepFeedingAfterLast.reset();
-            lastFeed = feedingOrder.get(feedingOrder.size() - 1);
+        // keep track of the last artifact being fed
+        if (!feedingOrder.isEmpty())
+            timeSinceLastFeed.reset();
 
-            if (!movingToIntake)
-                container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
-        }
 
         double feederPower =
-                manualFeederPower != 0 ? manualFeederPower :
-                        inShootingZone &&
-                        shooterWheelSpunUp &&
+                manualFeederPower != 0 ? manualFeederPower : // manual power takes priority
+                        inShootingZone && shooterWheelSpunUp && // <-- don't feed until we can shoot
                         (
                             !feedingOrder.isEmpty() && container.atPosition(feedingOrder.get(0), Container.Position.FEEDING) ||
-                            feedingOrder.isEmpty() && keepFeedingAfterLast.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST && container.atPosition(lastFeed, Container.Position.FEEDING)
+                            feedingOrder.isEmpty() && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST
                         )
                          ? 1 : 0;
+
 
         for (CRServo servo : feeder)
             servo.setPower(feederPower);
