@@ -132,13 +132,6 @@ public final class Container {
 
             // combine Artifact reading from both color sensors
             artifacts[currentFrontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
-
-            if (artifacts[currentFrontSlot] != EMPTY) { // color sensors detected an artifact
-                int nextEmptySlot = EMPTY.firstOccurrenceIn(artifacts);
-
-                if (nextEmptySlot != -1) // no empty slots
-                    moveSlot(nextEmptySlot, Position.INTAKING);
-            }
         }
 
 
@@ -149,12 +142,8 @@ public final class Container {
                 artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
                 feederPower > 0 &&  // the feeder is running
                 back1.getReading() > THRESHOLD_BACK_MM // distance sensor reports no artifact
-        ) {
+        )
             artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
-
-            if (EMPTY.numOccurrencesIn(artifacts) == 3)
-                moveSlot(getNearestIntakeSlot(), Position.INTAKING);
-        }
 
 
         // LEDs
