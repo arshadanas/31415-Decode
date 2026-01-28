@@ -32,7 +32,7 @@ public final class Container {
     public static LowPassGains filterGains = new LowPassGains(0.6, 40);
 
     private final PIDController controller = new PIDController(derivFilter);
-    public static PIDGains pidGains = new PIDGains(0, 0, 0);
+    public static PIDGains pidGains = new PIDGains(0.125, 0, 0);
 
     public static double
             ABS_OFFSET_ROTOR = 1.4013407230558101,
