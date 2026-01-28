@@ -86,6 +86,8 @@ public final class Tele extends LinearOpMode {
             // Read sensors + gamepads:
             robot.run();
 
+            float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
+
             if (gamepad1.left_bumper) {
 
                 if (gamepad1.squareWasPressed()) doTelemetry = !doTelemetry;
@@ -96,7 +98,11 @@ public final class Tele extends LinearOpMode {
                     robot.lift.enabled = !robot.lift.enabled;
                 robot.lift.setManualPower(gamepad1.left_stick_y);
 
+                robot.handler.runFeeder(triggersSum);
+
             } else {
+
+                robot.handler.runIntake(triggersSum);
 
                 if (!robot.lift.enabled)
                     robot.drivetrain.run(
