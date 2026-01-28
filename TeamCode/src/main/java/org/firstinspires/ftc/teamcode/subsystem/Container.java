@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
+import static java.lang.Math.signum;
 import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
 
@@ -43,7 +44,10 @@ public final class Container {
 
             TOLERANCE_FRONT = toRadians(20),
             TOLERANCE_BACK = toRadians(20),
-            TOLERANCE_FRONT_OMNI = toRadians(30);
+            TOLERANCE_FRICTION = toRadians(30),
+            TOLERANCE_FRONT_OMNI = toRadians(30),
+
+            POWER_OVERCOME_FRICTION = 0;
 
     // hardware
     private final CRServo[] servos;
@@ -82,6 +86,7 @@ public final class Container {
         private double getTolerance() {
             switch (this) {
                 case FEEDING:           return TOLERANCE_BACK;
+                case FRICTION_ZONE:     return TOLERANCE_FRICTION;
                 case FRONT_OMNI_ZONE:   return TOLERANCE_FRONT_OMNI;
                 default:                return TOLERANCE_FRONT;
             }
@@ -166,8 +171,12 @@ public final class Container {
 
         double servoPower = controller.calculate(new State());
 
+        int frictionSlot = getSlotAt(Position.FRICTION_ZONE);
+        double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
+                                    POWER_OVERCOME_FRICTION * signum(servoPower) : 0;
+
         for (CRServo servo : servos)
-            servo.setPower(servoPower);
+            servo.setPower(servoPower + antiFrictionPower);
     }
 
     /**
