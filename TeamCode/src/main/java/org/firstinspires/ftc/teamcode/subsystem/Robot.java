@@ -32,7 +32,8 @@ public final class Robot {
 
     public void run() {
         bulkReader.bulkRead();
-        if (!lift.enabled) drivetrain.update();
+        if (!lift.gearSwitch.isActivated())
+            drivetrain.update();
         handler.run();
         lift.run();
     }
@@ -40,15 +41,11 @@ public final class Robot {
     public void print(Telemetry telemetry) {
         telemetry.addData("LOOP TIME", loopTimer.seconds());
         loopTimer.reset();
-        telemetry.addLine();
+        telemetry.addLine("\n--------------------------------------\n");
         drivetrain.print(telemetry);
-        telemetry.addLine();
-        telemetry.addLine("--------------------------------------");
-        telemetry.addLine();
+        telemetry.addLine("\n--------------------------------------\n");
         handler.print(telemetry);
-        telemetry.addLine();
-        telemetry.addLine("--------------------------------------");
-        telemetry.addLine();
-        telemetry.addLine("INSERT LIFT TELEMETRY HERE");
+        telemetry.addLine("\n--------------------------------------\n");
+        lift.print(telemetry);
     }
 }

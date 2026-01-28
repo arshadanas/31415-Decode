@@ -94,24 +94,24 @@ public final class Tele extends LinearOpMode {
 
                 robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
 
-                if (gamepad1.crossWasPressed())
-                    robot.lift.enabled = !robot.lift.enabled;
-                robot.lift.setManualPower(gamepad1.left_stick_y);
+                robot.lift.setPower(gamepad1.left_stick_y);
 
                 robot.handler.runFeeder(triggersSum);
 
             } else {
 
+                if (gamepad1.triangleWasPressed())
+                    robot.lift.gearSwitch.toggle();
+
                 robot.handler.runIntake(triggersSum);
 
-                if (!robot.lift.enabled)
-                    robot.drivetrain.run(
-                            gamepad1.left_stick_x,
-                            gamepad1.left_stick_y,
-                            gamepad1.right_stick_x,
-                            gamepad1.right_bumper /*|| triggersSum > 0 */,
-                            isRedAlliance
-                    );
+                robot.drivetrain.run(
+                        gamepad1.left_stick_x,
+                        gamepad1.left_stick_y,
+                        gamepad1.right_stick_x,
+                        gamepad1.right_bumper /*|| triggersSum > 0 */,
+                        isRedAlliance
+                );
 
             }
 
