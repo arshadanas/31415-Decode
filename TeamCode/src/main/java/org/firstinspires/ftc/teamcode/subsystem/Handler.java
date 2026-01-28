@@ -89,7 +89,7 @@ public final class Handler {
         else if (!feedingOrder.isEmpty())
             container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
 
-        // keep track of the last artifact being fed
+
         if (!feedingOrder.isEmpty())
             timeSinceLastFeed.reset();
 
