@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
-import org.firstinspires.ftc.teamcode.control.filter.FIRLowPassFilter;
-import org.firstinspires.ftc.teamcode.control.gainmatrix.LowPassGains;
+import org.firstinspires.ftc.teamcode.control.filter.WraparoundKalmanFilter;
+import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
@@ -29,11 +29,11 @@ import java.util.Arrays;
 @Config
 public final class Container {
 
-    private final FIRLowPassFilter derivFilter = new FIRLowPassFilter();
-    public static LowPassGains filterGains = new LowPassGains(0.6, 40);
+    private final WraparoundKalmanFilter derivFilter = new WraparoundKalmanFilter(filterGains);
+    public static KalmanGains filterGains = new KalmanGains(15.9, 12);
 
     private final PIDController controller = new PIDController(derivFilter);
-    public static PIDGains pidGains = new PIDGains(0.125, 0, 0);
+    public static PIDGains pidGains = new PIDGains(0.125, 0, 0.015);
 
     public static double
             ABS_OFFSET_ROTOR = 1.4013407230558101,
