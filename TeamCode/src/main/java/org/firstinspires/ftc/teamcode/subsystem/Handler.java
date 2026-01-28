@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static java.lang.Math.max;
 import static java.lang.Math.signum;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -16,15 +17,27 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMot
 
 import java.util.ArrayList;
 
+@Config
 public final class Handler {
 
     public final Container container;
     private final CachedMotorEx intake;
     private final CRServo[] feeder;
 
-    public Motif randomization;
+    public Motif randomization = Motif.PGP;
     /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
-    public boolean allowOneWrongInMotifs;
+    public boolean allowOneWrongInMotifs = false;
+
+    private byte numArtifactsScored = 0;
+    public void decrementArtifactsScored() {
+        if (numArtifactsScored > 0) numArtifactsScored--;
+    }
+    public void incrementArtifactsScored() {
+        if (numArtifactsScored < 9) numArtifactsScored++;
+    }
+    public void clearRamp() {
+        numArtifactsScored = 0;
+    }
 
     private double intakePower;
     public void runIntake(double power) {
@@ -67,6 +80,9 @@ public final class Handler {
 
     }
 
+    /**
+     * Generate the most efficient feeding order
+     */
     public void feedArbitrary() {
         feedingOrder.clear();
 
@@ -87,12 +103,21 @@ public final class Handler {
             feedingOrder.add(third);
     }
 
-    public void feedMotif(boolean allowOneWrong, byte numArtifactsScored) {
+    /**
+     * Generate feeding order to score {@link Motif} points
+     */
+    public void feedMotif() {
         feedingOrder.clear();
-        feedingOrder.addAll(randomization.getScoringOrder(allowOneWrong, numArtifactsScored, container.getArtifacts()));
+        feedingOrder.addAll(randomization.getScoringOrder(allowOneWrongInMotifs, numArtifactsScored, container.getArtifacts()));
     }
 
     void printTo(Telemetry telemetry) {
+        telemetry.addData("HANDLER", numArtifactsScored + String.format(" ARTIFACT%s SCORED", numArtifactsScored == 1 ? "" : "S"));
+        telemetry.addLine();
+        telemetry.addData("Feeding order", feedingOrder.toString());
+        telemetry.addLine();
+        telemetry.addData("Motifs", allowOneWrongInMotifs ? "Allowing one incorrect Artifact" : "Artifact colors must be gxact");
+        telemetry.addLine("\n--------------------------------------\n");
         container.printTo(telemetry);
     }
 
