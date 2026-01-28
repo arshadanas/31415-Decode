@@ -39,8 +39,7 @@ public final class Container {
             ABS_OFFSET_ROTOR = 1.4013407230558101,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // above rotor = ~75
-            INTAKE_SPEED_WHEN_ROTOR_MOVING = 0,
-            ROTOR_SPEED_THRESHOLD_INTAKE_SPIN = 0.5,
+            INTAKE_POWER_OMNI_CONTACT = 0.4,
 
             TOLERANCE_FRONT = toRadians(20),
             TOLERANCE_BACK = toRadians(20),
@@ -187,7 +186,7 @@ public final class Container {
         return
                 omniSlot != -1 && // a slot is near the front omni zone
                 artifacts[omniSlot] != EMPTY // there is an artifact in the slot
-                        ? INTAKE_SPEED_WHEN_ROTOR_MOVING : 0;
+                        ? INTAKE_POWER_OMNI_CONTACT : 0;
     }
 
     /**
