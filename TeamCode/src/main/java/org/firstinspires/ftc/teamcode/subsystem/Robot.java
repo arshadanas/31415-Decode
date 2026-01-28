@@ -13,12 +13,14 @@ public final class Robot {
 
     public final BulkReader bulkReader;
     public final MecanumDrivetrain drivetrain;
+    public final Handler handler;
     public final Lift lift;
 
     private final ElapsedTime loopTimer = new ElapsedTime();
 
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
+        handler = new Handler(hardwareMap);
         lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
@@ -31,6 +33,7 @@ public final class Robot {
     public void run() {
         bulkReader.bulkRead();
         if (!lift.enabled) drivetrain.update();
+        handler.run();
         lift.run();
     }
 
@@ -39,5 +42,13 @@ public final class Robot {
         loopTimer.reset();
         telemetry.addLine();
         drivetrain.print(telemetry);
+        telemetry.addLine();
+        telemetry.addLine("--------------------------------------");
+        telemetry.addLine();
+        handler.print(telemetry);
+        telemetry.addLine();
+        telemetry.addLine("--------------------------------------");
+        telemetry.addLine();
+        telemetry.addLine("INSERT LIFT TELEMETRY HERE");
     }
 }
