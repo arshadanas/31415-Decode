@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem.utility;
 
 
-import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
+import com.arcrobotics.ftclib.hardware.ServoEx;
 
 /**
  * Servo(s) with two set angles <p>
@@ -12,13 +12,13 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
  */
 public class SimpleServoPivot {
 
-    private final CachedSimpleServo[] servos;
+    private final ServoEx[] servos;
 
     private double ANGLE_INITIAL, ANGLE_ACTIVATED;
 
     private boolean activated = false;
 
-    public SimpleServoPivot(double ANGLE_INITIAL, double ANGLE_ACTIVATED, CachedSimpleServo... servos) {
+    public SimpleServoPivot(double ANGLE_INITIAL, double ANGLE_ACTIVATED, ServoEx... servos) {
         this.servos = servos;
         updateAngles(ANGLE_INITIAL, ANGLE_ACTIVATED);
     }
@@ -58,6 +58,6 @@ public class SimpleServoPivot {
      * Hold {@link #servos} position
      */
     public void run() {
-        for (CachedSimpleServo servo : servos) servo.turnToAngle(isActivated() ? ANGLE_ACTIVATED : ANGLE_INITIAL);
+        for (ServoEx servo : servos) servo.turnToAngle(isActivated() ? ANGLE_ACTIVATED : ANGLE_INITIAL);
     }
 }
