@@ -34,7 +34,7 @@ public final class Robot {
         bulkReader.bulkRead();
         if (!lift.gearSwitch.isActivated())
             drivetrain.update();
-        handler.run();
+        handler.run(true, true);
         lift.run();
     }
 

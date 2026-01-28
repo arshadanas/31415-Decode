@@ -4,13 +4,13 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLO
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static java.lang.Math.max;
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
@@ -20,6 +20,9 @@ import java.util.ArrayList;
 @Config
 public final class Handler {
 
+    public static double
+            TIME_KEEP_FEEDING_AFTER_LAST = 0;
+
     public final Container container;
     private final CachedMotorEx intake;
     private final CRServo[] feeder;
@@ -27,6 +30,7 @@ public final class Handler {
     public Motif randomization = Motif.PGP;
     /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
     public boolean allowOneWrongInMotifs = false;
+    public boolean motifMode = false;
 
     private byte numArtifactsScored = 0;
     public void decrementArtifactsScored() {
@@ -40,16 +44,30 @@ public final class Handler {
     }
 
     private double intakePower;
-    public void runIntake(double power) {
+    public void setIntake(double power) {
+
+        if (intakePower == 0 && power != 0) {// started intaking
+            int nearestIntakeSlot = container.getNearestIntakeSlot();
+            if (nearestIntakeSlot != -1)
+                container.moveSlot(nearestIntakeSlot, Container.Position.INTAKING);
+        }
+
+        else if (intakePower != 0 && power == 0) // stopped intaking
+            if (motifMode)
+                feedMotif();
+            else
+                feedFastest();
+
         this.intakePower = power;
     }
 
-    private double feederPower;
-    public void runFeeder(double power) {
-        this.feederPower = power;
+    private double manualFeederPower;
+    public void setFeederManual(double power) {
+        this.manualFeederPower = power;
     }
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
+    private final ElapsedTime keepFeedingAfterLast = new ElapsedTime();
 
     Handler(HardwareMap hardwareMap) {
 
@@ -66,24 +84,32 @@ public final class Handler {
         feeder[0].setDirection(REVERSE);
     }
 
-    void run() {
+    void run(boolean inShootingZone, boolean shooterWheelSpunUp) {
+
+        feedingOrder.removeIf(slot -> container.get(slot) == EMPTY);
+
+        if (!feedingOrder.isEmpty()) { // there is at least one artifact queued to feed
+            keepFeedingAfterLast.reset();
+            if (inShootingZone && intakePower == 0)
+                container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
+        }
+
+        double feederPower =
+                manualFeederPower != 0 ? manualFeederPower :
+                inShootingZone && shooterWheelSpunUp && (!feedingOrder.isEmpty() || keepFeedingAfterLast.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST) ? 1 : 0;
 
         for (CRServo servo : feeder)
             servo.setPower(feederPower);
 
         container.run(feederPower);
 
-        intake.set(
-                intakePower < 0 ? intakePower :
-                max(intakePower, container.getMinIntakeSpeed())
-        );
-
+        intake.set(container.clipIntakePower(intakePower));
     }
 
     /**
      * Generate the most efficient feeding order
      */
-    public void feedArbitrary() {
+    public void feedFastest() {
         feedingOrder.clear();
 
         int first = container.getNearestFeedSlot();
@@ -108,15 +134,27 @@ public final class Handler {
      */
     public void feedMotif() {
         feedingOrder.clear();
-        feedingOrder.addAll(randomization.getScoringOrder(allowOneWrongInMotifs, numArtifactsScored, container.getArtifacts()));
+        feedingOrder.addAll(randomization.getScoringOrder(allowOneWrongInMotifs, numArtifactsScored, container.artifacts));
+    }
+
+    public void feedSingle(Artifact color) {
+        feedingOrder.clear();
+
+        int first = container.getNearestFeedSlot(color);
+        if (first == -1) // no Artifacts in the container
+            return;
+
+        feedingOrder.add(first);
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("HANDLER", numArtifactsScored + String.format(" ARTIFACT%s SCORED", numArtifactsScored == 1 ? "" : "S"));
+        telemetry.addData("HANDLER", !motifMode ?
+                "Throughput, ignoring motifs" :
+                "Scoring motifs, " + (allowOneWrongInMotifs ? "up to one incorrect color" : "colors must be gxact"));
         telemetry.addLine();
         telemetry.addData("Feeding order", feedingOrder.toString());
         telemetry.addLine();
-        telemetry.addData("Motifs", allowOneWrongInMotifs ? "Allowing one incorrect Artifact" : "Artifact colors must be gxact");
+        telemetry.addLine(numArtifactsScored + String.format(" ARTIFACT%s SCORED", numArtifactsScored == 1 ? "" : "S"));
         telemetry.addLine("\n--------------------------------------\n");
         container.printTo(telemetry);
     }

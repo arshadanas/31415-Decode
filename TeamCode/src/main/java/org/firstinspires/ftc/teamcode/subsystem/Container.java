@@ -66,10 +66,7 @@ public final class Container {
         return normalizeRadians(position + slot * 2 * PI / 3.0);
     }
 
-    private final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
-    Artifact[] getArtifacts() {
-        return artifacts.clone();
-    }
+    final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
 
     private int selectedSlot = 0;
     private Position target = Position.INTAKING;
@@ -186,14 +183,20 @@ public final class Container {
     }
 
     /**
-     * When we spin the rotor, if an {@link Artifact} is in the front, the intake omni wheel must spin to contain the {@link Artifact}
+     * Rounds intake speeds of [0, {@link #INTAKE_POWER_OMNI_CONTACT}) <br> up to {@link #INTAKE_POWER_OMNI_CONTACT}
+     * if there is an {@link Artifact} touching the intake's front omni wheel
      */
-    double getMinIntakeSpeed() {
+    double clipIntakePower(double intakePower) {
         int omniSlot = getSlotAt(Position.FRONT_OMNI_ZONE);
-        return
+        if (
+                intakePower >= 0 &&
+                intakePower < INTAKE_POWER_OMNI_CONTACT &&
                 omniSlot != -1 && // a slot is near the front omni zone
                 artifacts[omniSlot] != EMPTY // there is an artifact in the slot
-                        ? INTAKE_POWER_OMNI_CONTACT : 0;
+        )
+            return INTAKE_POWER_OMNI_CONTACT;
+
+        return intakePower;
     }
 
     /**
@@ -216,7 +219,7 @@ public final class Container {
     /**
      * @return Empty slot closest to the intake. -1 if no such slot found
      */
-    private int getNearestIntakeSlot() {
+    int getNearestIntakeSlot() {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {
@@ -254,7 +257,7 @@ public final class Container {
     /**
      * @return Slot closest to the feeder, and holding an Artifact of the given color. -1 if no such slot found
      */
-    private int getNearestFeedSlot(Artifact color) {
+    int getNearestFeedSlot(Artifact color) {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {

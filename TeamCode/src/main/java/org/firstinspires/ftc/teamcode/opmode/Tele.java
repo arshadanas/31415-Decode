@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.opmode;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.pose;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -96,14 +98,39 @@ public final class Tele extends LinearOpMode {
 
                 robot.lift.setPower(gamepad1.left_stick_y);
 
-                robot.handler.runFeeder(triggersSum);
+                robot.handler.setFeederManual(triggersSum);
 
             } else {
+
+                // tracking classifier ramp (driver 2)
+                if (gamepad2.dpadUpWasPressed())
+                    robot.handler.incrementArtifactsScored();
+                else if (gamepad2.dpadDownWasPressed())
+                    robot.handler.decrementArtifactsScored();
+                else if (gamepad2.dpadLeftWasPressed() || gamepad2.dpadRightWasPressed())
+                    robot.handler.clearRamp();
+
 
                 if (gamepad1.triangleWasPressed())
                     robot.lift.gearSwitch.toggle();
 
-                robot.handler.runIntake(triggersSum);
+                if (gamepad1.squareWasPressed())
+                    robot.handler.feedSingle(GREEN);
+
+                if (gamepad1.circleWasPressed())
+                    robot.handler.feedSingle(PURPLE);
+
+                if (gamepad1.dpadRightWasPressed())
+                    robot.handler.feedFastest();
+
+                if (gamepad1.dpadUpWasPressed())
+                    robot.handler.feedMotif();
+
+                if (gamepad1.dpadLeftWasPressed())
+                    robot.handler.motifMode = !robot.handler.motifMode;
+
+
+                robot.handler.setIntake(triggersSum);
 
                 robot.drivetrain.run(
                         gamepad1.left_stick_x,
