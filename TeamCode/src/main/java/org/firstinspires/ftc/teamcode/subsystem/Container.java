@@ -150,8 +150,12 @@ public final class Container {
                 artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
                 feederPower > 0 &&  // the feeder is running
                 back1.getReading() > THRESHOLD_BACK_MM // distance sensor reports no artifact
-        )
+        ) {
             artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
+
+            if (EMPTY.numOccurrencesIn(artifacts) == 3)
+                moveSlot(getNearestIntakeSlot(), Position.INTAKING);
+        }
 
 
         // LEDs
@@ -204,6 +208,22 @@ public final class Container {
         artifacts[0] = PURPLE;
         artifacts[1] = GREEN;
         artifacts[2] = PURPLE;
+    }
+
+    private int getNearestIntakeSlot() {
+        double min = Double.MAX_VALUE;
+        int minInd = -1;
+        for (int i = 0; i < 3; i++) {
+            if (artifacts[i] != EMPTY)
+                continue;
+
+            double error = getError(i, Position.INTAKING);
+            if (error < min){
+                min = error;
+                minInd = i;
+            }
+        }
+        return minInd;
     }
 
     private int getNearestFeedSlot() {
