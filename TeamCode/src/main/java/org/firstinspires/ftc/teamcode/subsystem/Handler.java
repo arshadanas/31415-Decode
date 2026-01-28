@@ -45,13 +45,6 @@ public final class Handler {
 
     private double intakePower;
     public void setIntake(double power) {
-
-        if (intakePower == 0 && power != 0) {// started intaking
-            int nearestIntakeSlot = container.getNearestIntakeSlot();
-            if (nearestIntakeSlot != -1)
-                container.moveSlot(nearestIntakeSlot, Container.Position.INTAKING);
-        }
-
         this.intakePower = power;
     }
 
@@ -83,17 +76,22 @@ public final class Handler {
 
         feedingOrder.removeIf(slot -> container.get(slot) == EMPTY);
 
+        // generate feeding order if intake is running
         if (intakePower != 0)
             if (motifMode)
                 feedMotif();
             else
                 feedFastest();
 
+        boolean movingToIntake = intakePower != 0 && EMPTY.numOccurrencesIn(container.artifacts) > 0;
+        if (movingToIntake)
+            container.moveSlot(container.getNearestIntakeSlot(), Container.Position.INTAKING);
+
         if (!feedingOrder.isEmpty()) { // there is at least one artifact queued to feed
             keepFeedingAfterLast.reset();
             lastFeed = feedingOrder.get(feedingOrder.size() - 1);
 
-            if (intakePower == 0)
+            if (!movingToIntake)
                 container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
         }
 
