@@ -6,12 +6,12 @@ public final class Wrap {
 
     /**
      * @param num   Number to wrap
-     * @param from  Lower bound (INCLUSIVE)
-     * @param to    Upper bound (EXCLUSIVE), must be greater than from
-     * @return      The number wrapped to the range [from, to)
+     * @param lo    Lower bound (INCLUSIVE)
+     * @param hi    Upper bound (EXCLUSIVE), must be greater than lo
+     * @return      The number wrapped hi the range [lo, hi)
      */
-    public static int wrap(int num, int from, int to) {
-        int mod = to - from;
-        return ((num - from) % mod + mod) % mod + from;
+    public static int wrap(int num, int lo, int hi) {
+        int mod = hi - lo;
+        return ((num - lo) % mod + mod) % mod + lo;
     }
 }
