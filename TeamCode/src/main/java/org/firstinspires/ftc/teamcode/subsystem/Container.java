@@ -136,9 +136,7 @@ public final class Container {
             if (artifacts[currentFrontSlot] != EMPTY) { // color sensors detected an artifact
                 int nextEmptySlot = EMPTY.firstOccurrenceIn(artifacts);
 
-                if (nextEmptySlot == -1) // no empty slots
-                    moveSlot(getNearestFeedSlot(), Position.FEEDING); // move artifact to feeder
-                else
+                if (nextEmptySlot != -1) // no empty slots
                     moveSlot(nextEmptySlot, Position.INTAKING);
             }
         }

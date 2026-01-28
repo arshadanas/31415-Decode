@@ -52,12 +52,6 @@ public final class Handler {
                 container.moveSlot(nearestIntakeSlot, Container.Position.INTAKING);
         }
 
-        else if (intakePower != 0 && power == 0) // stopped intaking
-            if (motifMode)
-                feedMotif();
-            else
-                feedFastest();
-
         this.intakePower = power;
     }
 
@@ -88,6 +82,12 @@ public final class Handler {
     void run(boolean inShootingZone, boolean shooterWheelSpunUp) {
 
         feedingOrder.removeIf(slot -> container.get(slot) == EMPTY);
+
+        if (intakePower != 0)
+            if (motifMode)
+                feedMotif();
+            else
+                feedFastest();
 
         if (!feedingOrder.isEmpty()) { // there is at least one artifact queued to feed
             keepFeedingAfterLast.reset();
