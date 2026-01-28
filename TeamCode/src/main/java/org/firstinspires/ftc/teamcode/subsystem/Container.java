@@ -44,10 +44,10 @@ public final class Container {
 
             TOLERANCE_FRONT = toRadians(20),
             TOLERANCE_BACK = toRadians(20),
-            TOLERANCE_FRICTION = toRadians(30),
+            TOLERANCE_FRICTION = toRadians(35),
             TOLERANCE_FRONT_OMNI = toRadians(30),
 
-            POWER_OVERCOME_FRICTION = 0;
+            POWER_OVERCOME_FRICTION = 0.06;
 
     // hardware
     private final CRServo[] servos;
