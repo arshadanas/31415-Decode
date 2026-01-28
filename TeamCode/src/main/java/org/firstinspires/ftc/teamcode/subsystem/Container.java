@@ -260,6 +260,8 @@ public final class Container {
         telemetry.addData(String.format("Current (slot %s) (deg)", selectedSlot), toDegrees(getPositionOf(selectedSlot)));
         telemetry.addData("Target (deg)", toDegrees(target.radians));
         telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
+        telemetry.addData("Filtered error derivative (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
+        telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
         telemetry.addLine();
         telemetry.addData("Position (slot 0) (rad)", position);
         telemetry.addData("Position (slot 0) (deg)", toDegrees(position));
