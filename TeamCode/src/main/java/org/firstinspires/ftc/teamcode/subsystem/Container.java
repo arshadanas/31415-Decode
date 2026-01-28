@@ -210,6 +210,9 @@ public final class Container {
         artifacts[2] = PURPLE;
     }
 
+    /**
+     * @return Empty slot closest to the intake. -1 if no such slot found
+     */
     private int getNearestIntakeSlot() {
         double min = Double.MAX_VALUE;
         int minInd = -1;
@@ -226,7 +229,10 @@ public final class Container {
         return minInd;
     }
 
-    private int getNearestFeedSlot() {
+    /**
+     * @return Occupied slot closest to the feeder. -1 if no such slot found
+     */
+    int getNearestFeedSlot() {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) {
@@ -242,6 +248,9 @@ public final class Container {
         return minInd;
     }
 
+    /**
+     * @return Slot closest to the feeder, and holding an Artifact of the given color. -1 if no such slot found
+     */
     private int getNearestFeedSlot(Artifact color) {
         double min = Double.MAX_VALUE;
         int minInd = -1;
@@ -256,6 +265,10 @@ public final class Container {
             }
         }
         return minInd;
+    }
+
+    Artifact get(int slot) {
+        return artifacts[slot];
     }
 
     /**
@@ -278,7 +291,7 @@ public final class Container {
     /**
      * @return  Distance, in radians, between given slot's position and given target
      */
-    private double getError(int slot, Position target) {
+    double getError(int slot, Position target) {
         return normalizeRadians(target.radians - getPositionOf(slot));
     }
 

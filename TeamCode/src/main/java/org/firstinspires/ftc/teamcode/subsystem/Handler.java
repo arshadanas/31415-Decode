@@ -2,7 +2,10 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
+import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static java.lang.Math.max;
+import static java.lang.Math.signum;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -10,6 +13,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
+
+import java.util.ArrayList;
 
 public final class Handler {
 
@@ -26,6 +31,8 @@ public final class Handler {
     public void runFeeder(double power) {
         this.feederPower = power;
     }
+
+    private final ArrayList<Integer> feedingOrder = new ArrayList<>();
 
     Handler(HardwareMap hardwareMap) {
 
@@ -54,6 +61,26 @@ public final class Handler {
                 max(intakePower, container.getMinIntakeSpeed())
         );
 
+    }
+
+    public void feedArbitrary() {
+        feedingOrder.clear();
+
+        int first = container.getNearestFeedSlot();
+        if (first == -1) // no Artifacts in the container
+            return;
+
+        feedingOrder.add(first);
+
+        int signOfFirstError = (int) signum(container.getError(first, Container.Position.FEEDING));
+
+        int second = wrap(first - signOfFirstError, 0, 3);
+        if (container.get(second) != EMPTY)
+            feedingOrder.add(second);
+
+        int third = wrap(second - signOfFirstError, 0, 3);
+        if (container.get(third) != EMPTY)
+            feedingOrder.add(third);
     }
 
     void printTo(Telemetry telemetry) {
