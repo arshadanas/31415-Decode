@@ -90,7 +90,8 @@ public final class Handler {
 
         if (!feedingOrder.isEmpty()) { // there is at least one artifact queued to feed
             keepFeedingAfterLast.reset();
-            if (inShootingZone && intakePower == 0)
+
+            if (intakePower == 0)
                 container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
         }
 
