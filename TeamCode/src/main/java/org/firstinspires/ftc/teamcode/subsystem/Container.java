@@ -299,7 +299,7 @@ public final class Container {
     /**
      * @return  If the given slot is at the given target, within tolerance in either direction
      */
-    private boolean atPosition(int slot, Position target) {
+    boolean atPosition(int slot, Position target) {
         return abs(getError(slot, target)) <= target.getTolerance();
     }
 

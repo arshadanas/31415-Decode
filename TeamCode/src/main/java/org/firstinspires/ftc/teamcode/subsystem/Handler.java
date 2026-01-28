@@ -68,6 +68,7 @@ public final class Handler {
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
     private final ElapsedTime keepFeedingAfterLast = new ElapsedTime();
+    private int lastFeed = 0;
 
     Handler(HardwareMap hardwareMap) {
 
@@ -90,6 +91,7 @@ public final class Handler {
 
         if (!feedingOrder.isEmpty()) { // there is at least one artifact queued to feed
             keepFeedingAfterLast.reset();
+            lastFeed = feedingOrder.get(feedingOrder.size() - 1);
 
             if (intakePower == 0)
                 container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
@@ -97,7 +99,13 @@ public final class Handler {
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
-                inShootingZone && shooterWheelSpunUp && (!feedingOrder.isEmpty() || keepFeedingAfterLast.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST) ? 1 : 0;
+                        inShootingZone &&
+                        shooterWheelSpunUp &&
+                        (
+                            !feedingOrder.isEmpty() && container.atPosition(feedingOrder.get(0), Container.Position.FEEDING) ||
+                            feedingOrder.isEmpty() && keepFeedingAfterLast.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST && container.atPosition(lastFeed, Container.Position.FEEDING)
+                        )
+                         ? 1 : 0;
 
         for (CRServo servo : feeder)
             servo.setPower(feederPower);
