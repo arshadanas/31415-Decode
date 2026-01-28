@@ -178,7 +178,7 @@ public final class SwerveDrivetrain {
         this.slowModeLocked = true;
     }
 
-    public void print(Telemetry telemetry) {
+    public void printTo(Telemetry telemetry) {
         telemetry.addData("Current heading (radians)", getHeading());
         telemetry.addData("Current heading (degrees)", toDegrees(getHeading()));
     }

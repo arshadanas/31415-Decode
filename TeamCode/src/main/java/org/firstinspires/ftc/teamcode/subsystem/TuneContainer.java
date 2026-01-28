@@ -52,7 +52,7 @@ public final class TuneContainer extends LinearOpMode {
             else if (gamepad1.circleWasPressed())
                 container.moveSlot(2, INTAKING);
 
-            container.print(telemetry);
+            container.printTo(telemetry);
             telemetry.update();
         }
     }

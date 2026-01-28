@@ -38,14 +38,14 @@ public final class Robot {
         lift.run();
     }
 
-    public void print(Telemetry telemetry) {
+    public void printTo(Telemetry telemetry) {
         telemetry.addData("LOOP TIME", loopTimer.seconds());
         loopTimer.reset();
         telemetry.addLine("\n--------------------------------------\n");
-        drivetrain.print(telemetry);
+        drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
-        handler.print(telemetry);
+        handler.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
-        lift.print(telemetry);
+        lift.printTo(telemetry);
     }
 }

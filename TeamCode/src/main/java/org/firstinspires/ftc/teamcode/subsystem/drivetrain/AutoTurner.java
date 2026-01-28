@@ -94,7 +94,7 @@ public class AutoTurner {
         useAutoTurn = !useAutoTurn;
     }
 
-    public void print(Telemetry telemetry) {
+    public void printTo(Telemetry telemetry) {
         telemetry.addData("Auto turn ", useAutoTurn ? "active" : "INACTIVE");
         telemetry.addLine();
         telemetry.addData("Target heading (radians)", targetHeading);

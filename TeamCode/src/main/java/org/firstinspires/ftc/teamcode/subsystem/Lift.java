@@ -79,7 +79,7 @@ public final class Lift {
         this.motorPower = power;
     }
 
-    void print(Telemetry telemetry) {
+    void printTo(Telemetry telemetry) {
         telemetry.addData("LIFT",
                 motorPower == LIFTING_POWER ? "LIFTING" :
                 motorPower == HOLDING_POWER ?       "HOLDING POSITION" :

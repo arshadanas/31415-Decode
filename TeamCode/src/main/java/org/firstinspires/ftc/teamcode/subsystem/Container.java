@@ -282,7 +282,7 @@ public final class Container {
         return normalizeRadians(target.radians - getPositionOf(slot));
     }
 
-    void print(Telemetry telemetry) {
+    void printTo(Telemetry telemetry) {
         telemetry.addData("CONTAINER", Arrays.toString(artifacts));
         telemetry.addLine();
         telemetry.addData(String.format("Current (slot %s) (deg)", selectedSlot), toDegrees(getPositionOf(selectedSlot)));

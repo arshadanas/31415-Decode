@@ -56,8 +56,8 @@ public final class Handler {
 
     }
 
-    void print(Telemetry telemetry) {
-        container.print(telemetry);
+    void printTo(Telemetry telemetry) {
+        container.printTo(telemetry);
     }
 
 }
