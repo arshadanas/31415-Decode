@@ -2,9 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
-
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -20,12 +18,12 @@ public final class Handler {
     private final CRServo[] feeder;
 
     private double intakePower;
-    public void setIntake(double power) {
+    public void runIntake(double power) {
         this.intakePower = power;
     }
 
     private double feederPower;
-    public void setFeeder(double power) {
+    public void runFeeder(double power) {
         this.feederPower = power;
     }
 
