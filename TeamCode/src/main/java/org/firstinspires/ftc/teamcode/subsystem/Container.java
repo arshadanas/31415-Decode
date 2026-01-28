@@ -67,6 +67,9 @@ public final class Container {
     }
 
     private final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+    Artifact[] getArtifacts() {
+        return artifacts.clone();
+    }
 
     private int selectedSlot = 0;
     private Position target = Position.INTAKING;

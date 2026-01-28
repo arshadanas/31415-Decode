@@ -22,6 +22,10 @@ public final class Handler {
     private final CachedMotorEx intake;
     private final CRServo[] feeder;
 
+    public Motif randomization;
+    /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
+    public boolean allowOneWrongInMotifs;
+
     private double intakePower;
     public void runIntake(double power) {
         this.intakePower = power;
@@ -81,6 +85,11 @@ public final class Handler {
         int third = wrap(second - signOfFirstError, 0, 3);
         if (container.get(third) != EMPTY)
             feedingOrder.add(third);
+    }
+
+    public void feedMotif(boolean allowOneWrong, byte numArtifactsScored) {
+        feedingOrder.clear();
+        feedingOrder.addAll(randomization.getScoringOrder(allowOneWrong, numArtifactsScored, container.getArtifacts()));
     }
 
     void printTo(Telemetry telemetry) {
