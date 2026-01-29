@@ -94,11 +94,12 @@ public final class Handler {
             timeSinceLastFeed.reset();
 
 
+        int slotAtFeeder = container.getSlotAt(Container.Position.FEEDING);
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower : // manual power takes priority
                         inShootingZone && shooterWheelSpunUp && // <-- don't feed until we can shoot
                         (
-                            !feedingOrder.isEmpty() && container.atPosition(feedingOrder.get(0), Container.Position.FEEDING) ||
+                            !feedingOrder.isEmpty() && (slotAtFeeder == -1 || slotAtFeeder == feedingOrder.get(0)) ||
                             feedingOrder.isEmpty() && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST
                         )
                          ? 1 : 0;

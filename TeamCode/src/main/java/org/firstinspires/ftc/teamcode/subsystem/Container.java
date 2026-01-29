@@ -276,7 +276,7 @@ public final class Container {
     /**
      * @return The (index of the) slot currently at the given target, -1 if no slot at that position
      */
-    private int getSlotAt(Position target) {
+    int getSlotAt(Position target) {
         for (int i = 0; i < artifacts.length; i++)
             if (atPosition(i, target))
                 return i;
