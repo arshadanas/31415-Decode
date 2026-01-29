@@ -71,8 +71,8 @@ public final class MecanumDrivetrain {
         telemetry.addLine();
         telemetry.addData("X", pose.getX());
         telemetry.addData("Y", pose.getY());
-        telemetry.addData("Heading (rad)", heading);
         telemetry.addData("Heading (deg)", toDegrees(heading));
+        telemetry.addData("Heading (rad)", heading);
     }
 
 
