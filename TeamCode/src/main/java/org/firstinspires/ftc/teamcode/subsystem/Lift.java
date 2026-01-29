@@ -67,7 +67,7 @@ public final class Lift {
             return;
         }
 
-        if (motorPower == LIFTING_POWER && motors[0].encoder.getDistance() > HEIGHT_LIFTED)
+        if (motorPower >= 1 && motors[0].encoder.getDistance() > HEIGHT_LIFTED)
             setPower(HOLDING_POWER);
 
         for (CachedMotorEx motor : motors)
