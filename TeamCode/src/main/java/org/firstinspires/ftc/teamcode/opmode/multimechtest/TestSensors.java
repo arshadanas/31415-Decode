@@ -18,19 +18,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.control.filter.FIRLowPassFilter;
 import org.firstinspires.ftc.teamcode.subsystem.DigitalArtifactColor;
+import org.firstinspires.ftc.teamcode.subsystem.Turret;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
-import java.util.ArrayList;
-
 @Config
 @TeleOp(group = "Multiple mechanism test")
 public final class TestSensors extends LinearOpMode {
-
-    public static double turretAbsoluteOffset = 1.8659156366775742;
 
     @Override
     public void runOpMode() {
@@ -68,8 +64,6 @@ public final class TestSensors extends LinearOpMode {
         PinpointLocalizer pinpoint = new PinpointLocalizer(hardwareMap, pinpointConstants);
         pinpoint.resetIMU();
 
-        ArrayList<Double> absReadings = new ArrayList<>();
-
         waitForStart();
 
         while (opModeIsActive()) {
@@ -86,16 +80,7 @@ public final class TestSensors extends LinearOpMode {
             double rotorRad = normalizeRadians(rotorEncoder.getReading() + ABS_OFFSET_ROTOR);
 
             double turretRadAbsRaw = -turretAbsolute.getReading();
-            double turretRadAbs = normalizeRadians(turretRadAbsRaw + turretAbsoluteOffset);
-
-            if (gamepad1.square)
-                absReadings.add(turretRadAbsRaw);
-            if (gamepad1.circleWasPressed()) {
-                double sum = 0;
-                for (double read : absReadings)
-                    sum += read;
-                turretAbsoluteOffset = -sum / absReadings.size();
-            }
+            double turretRadAbs = normalizeRadians(turretRadAbsRaw + Turret.TURRET_ABSOLUTE_OFFSET);
 
             Pose pose = pinpoint.getPose();
 
@@ -118,8 +103,6 @@ public final class TestSensors extends LinearOpMode {
             telemetry.addData("Rotor position (rad)", rotorRad);
             telemetry.addData("Rotor position (deg)", toDegrees(rotorRad));
             telemetry.addLine();
-            telemetry.addData("Turret abs offset (rad)", turretAbsoluteOffset);
-            telemetry.addData("Num of offset samples", absReadings.size());
             telemetry.addData("Turret abs position (rad)", turretRadAbs);
             telemetry.addData("Turret abs position (deg)", toDegrees(turretRadAbs));
             telemetry.addLine();
