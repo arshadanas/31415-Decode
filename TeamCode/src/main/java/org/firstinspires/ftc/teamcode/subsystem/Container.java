@@ -176,7 +176,7 @@ public final class Container {
      * Rounds speeds of ({@link #INTAKE_POWER_IDLE}, 0] down to {@link #INTAKE_POWER_IDLE}
      * if there is no {@link Artifact} touching the intake's front omni wheel
      */
-    double clipIntakePower(double intakePower) {
+    double adaptiveClipIntakePower(double intakePower) {
         int omniSlot = getSlotAt(Position.FRONT_OMNI_ZONE);
         if (
                 intakePower >= 0 &&

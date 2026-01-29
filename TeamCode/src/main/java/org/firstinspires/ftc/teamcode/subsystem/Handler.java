@@ -110,7 +110,7 @@ public final class Handler {
 
         container.run(feederPower);
 
-        intake.set(container.clipIntakePower(intakePower));
+        intake.set(container.adaptiveClipIntakePower(intakePower));
     }
 
     /**
