@@ -59,7 +59,7 @@ public final class Turret {
         absoluteEnc = new AnalogSensor(hardwareMap, "elc", 2 * PI);
     }
 
-    void run(double intakePower, ArrayList<Integer> feedingOrder) {
+    void run(double intakePower, ArrayList<Integer> feedingOrder, boolean inShootingZone) {
 
         if (intakePower == 0 && feedingOrder.isEmpty() && atPosition(target, HOMING_TOLERANCE))
             recalibrateQuadrature();

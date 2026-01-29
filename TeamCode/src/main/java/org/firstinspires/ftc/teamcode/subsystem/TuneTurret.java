@@ -28,7 +28,7 @@ public final class TuneTurret extends LinearOpMode {
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            turret.run(gamepad1.square ? 0 : 1, feedingOrder);
+            turret.run(gamepad1.square ? 0 : 1, feedingOrder, true);
 
             float x = gamepad1.right_stick_x, y = gamepad1.right_stick_y;
             if (x*x + y*y >= 0.64)
