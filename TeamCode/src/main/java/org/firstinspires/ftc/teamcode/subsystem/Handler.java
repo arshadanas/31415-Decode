@@ -90,10 +90,6 @@ public final class Handler {
             container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
 
 
-        if (!feedingOrder.isEmpty())
-            timeSinceLastFeed.reset();
-
-
         int slotAtFeeder = container.getSlotAt(Container.Position.FEEDING);
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower : // manual power takes priority
@@ -104,6 +100,10 @@ public final class Handler {
                         )
                          ? 1 : 0;
 
+
+        if (!feedingOrder.isEmpty() && feederPower != 0)
+            timeSinceLastFeed.reset();
+        
 
         for (CRServo servo : feeder)
             servo.setPower(feederPower);
