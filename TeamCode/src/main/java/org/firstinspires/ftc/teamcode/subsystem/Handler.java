@@ -71,7 +71,7 @@ public final class Handler {
         feeder[0].setDirection(REVERSE);
     }
 
-    void run(boolean inShootingZone, boolean shooterWheelSpunUp) {
+    void run(boolean inShootingZone, boolean shooterReady) {
 
         feedingOrder.removeIf(slot -> container.get(slot) == EMPTY);
 
@@ -93,7 +93,7 @@ public final class Handler {
         int slotAtFeeder = container.getSlotAt(Container.Position.FEEDING);
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower : // manual power takes priority
-                        inShootingZone && shooterWheelSpunUp && // <-- don't feed until we can shoot
+                        inShootingZone && shooterReady && // <-- don't feed until we can shoot
                         (
                             !feedingOrder.isEmpty() && (slotAtFeeder == -1 || slotAtFeeder == feedingOrder.get(0)) ||
                             feedingOrder.isEmpty() && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST
