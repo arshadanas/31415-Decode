@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
+import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
@@ -64,7 +65,7 @@ public final class Container {
      * Position of given slot, in radians
      */
     private double getPositionOf(int slot) {
-        return normalizeRadians(position + slot * 2 * PI / 3.0);
+        return normalizeRadians(position + wrap(slot, 0, artifacts.length) * 2 * PI / 3.0);
     }
 
     final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
@@ -199,7 +200,7 @@ public final class Container {
      * @param slot Slot you wish to move (0, 1 or 2)
      */
     void moveSlot(int slot, Position target) {
-        this.selectedSlot = slot;
+        this.selectedSlot = wrap(slot, 0, artifacts.length);
         this.target = target;
     }
 
@@ -270,7 +271,7 @@ public final class Container {
     }
 
     Artifact get(int slot) {
-        return artifacts[slot];
+        return artifacts[wrap(slot, 0, artifacts.length)];
     }
 
     /**
