@@ -306,7 +306,6 @@ public final class Container {
         telemetry.addData("Filtered error derivative (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
         telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
         telemetry.addLine();
-        telemetry.addData("Position (slot 0) (rad)", position);
         telemetry.addData("Position (slot 0) (deg)", toDegrees(position));
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", front1.getReading());
