@@ -81,8 +81,8 @@ public final class Lift {
 
     void printTo(Telemetry telemetry) {
         telemetry.addData("LIFT",
-                motorPower == LIFTING_POWER ? "LIFTING" :
-                motorPower == HOLDING_POWER ?       "HOLDING POSITION" :
+                Double.compare(motorPower, LIFTING_POWER) == 0 ? "LIFTING" :
+                Double.compare(motorPower, HOLDING_POWER) == 0 ?       "HOLDING POSITION" :
                 motorPower != 0 ?                   "MANUAL" :
                                                     "inactive"
         );
