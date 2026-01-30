@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 
-import static com.acmerobotics.roadrunner.Math.lerp;
 import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_L;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_R;
@@ -10,6 +9,8 @@ import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.Tes
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_ENGAGED;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_INACTIVE;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_L_OFFSET;
+import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_SHALLOWEST;
+import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_STEEPEST;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -23,20 +24,9 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 public final class TuneServos extends LinearOpMode {
 
     public static double
-
-            LAUNCH_DEG_SHALLOWEST = 31.901328,
-            LAUNCH_DEG_STEEPEST = 61.7419355,
-
-            ANGLE_HOOD_SERVO_MAX = 360,
-            ANGLE_HOOD_SERVO_MIN = 10,
-
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
             ANGLE_PRESSER_L_OFFSET = -37;
-
-    public static double launchDegToServoDeg(double launchDegrees) {
-        return lerp(launchDegrees, LAUNCH_DEG_SHALLOWEST, LAUNCH_DEG_STEEPEST, ANGLE_HOOD_SERVO_MAX, ANGLE_HOOD_SERVO_MIN);
-    }
 
     enum TestServo {
         HOOD, GATE_R, GATE_L, GEAR_R, GEAR_L;
@@ -104,7 +94,7 @@ public final class TuneServos extends LinearOpMode {
                 }
             }
 
-            hood.turnToAngle(hoodMax ? ANGLE_HOOD_SERVO_MAX : ANGLE_HOOD_SERVO_MIN);
+            hood.turnToAngle(hoodMax ? ANGLE_HOOD_SHALLOWEST : ANGLE_HOOD_STEEPEST);
 
             gateR.turnToAngle(gateRMax ? ANGLE_PRESSER_EXTENDED : ANGLE_PRESSER_RETRACTED);
             gearL.offset = ANGLE_SWITCH_L_OFFSET;

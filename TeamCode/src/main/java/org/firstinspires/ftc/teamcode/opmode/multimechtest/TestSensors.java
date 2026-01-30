@@ -44,7 +44,7 @@ public final class TestSensors extends LinearOpMode {
         turretQuadrature.setDirection(REVERSE);
 
         liftEncoder.reset();
-        shooterEncoder.reset();
+//        shooterEncoder.reset(); this breaks velo measurements
         turretQuadrature.reset();
 
         AnalogSensor
