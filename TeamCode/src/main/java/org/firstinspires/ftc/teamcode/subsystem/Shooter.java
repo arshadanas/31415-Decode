@@ -127,9 +127,9 @@ public final class Shooter {
                         "RPM out of shooting tolerance"
         );
         telemetry.addLine();
-        telemetry.addData("Velocity (rpm)", currentRPM);
-        telemetry.addData("Target vel (rpm)", targetRPM);
-        telemetry.addData("Raw velocity (rpm)", rawRPM);
+        telemetry.addData("Current (rpm)", currentRPM);
+        telemetry.addData("Target (rpm)", targetRPM);
+        telemetry.addData("Raw (rpm)", rawRPM);
         telemetry.addLine();
         telemetry.addData("Filtered error derivative (rpm/s)", controller.getFilteredErrorDerivative());
         telemetry.addData("Raw error derivative (rpm/s)", controller.getRawErrorDerivative());
