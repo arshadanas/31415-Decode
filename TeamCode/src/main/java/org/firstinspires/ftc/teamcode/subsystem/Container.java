@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
-import org.firstinspires.ftc.teamcode.control.filter.WraparoundKalmanFilter;
+import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
@@ -30,7 +30,7 @@ import java.util.Arrays;
 @Config
 public final class Container {
 
-    private final WraparoundKalmanFilter derivFilter = new WraparoundKalmanFilter(filterGains);
+    private final KalmanFilter derivFilter = new KalmanFilter(filterGains, true);
     public static KalmanGains filterGains = new KalmanGains(15.9, 12);
 
     private final PIDController controller = new PIDController(derivFilter);

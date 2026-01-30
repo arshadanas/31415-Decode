@@ -4,16 +4,20 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.norm
 
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 
-public final class WraparoundKalmanFilter implements Filter {
+public final class KalmanFilter implements Filter {
 
     private KalmanGains gains;
+    private final boolean wraparound;
 
-    public WraparoundKalmanFilter() {
+    public KalmanFilter() {
         this(new KalmanGains());
     }
-
-    public WraparoundKalmanFilter(KalmanGains gains) {
+    public KalmanFilter(KalmanGains gains) {
+        this(gains, false);
+    }
+    public KalmanFilter(KalmanGains gains, boolean wraparound) {
         setGains(gains);
+        this.wraparound = wraparound;
     }
 
     public void setGains(KalmanGains gains) {
@@ -41,7 +45,8 @@ public final class WraparoundKalmanFilter implements Filter {
     @Override
     public double calculate(double newValue) {
 
-        newValue = x_previous + normalizeRadians(newValue - x_previous);
+        if (wraparound)
+            newValue = x_previous + normalizeRadians(newValue - x_previous);
 
         u = 0;
         // Predict our new state

@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
-import org.firstinspires.ftc.teamcode.control.filter.WraparoundKalmanFilter;
+import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
@@ -44,7 +44,7 @@ public final class Turret {
         this.target = normalizeRadians(target);
     }
 
-    private final WraparoundKalmanFilter derivFilter = new WraparoundKalmanFilter(filterGains);
+    private final KalmanFilter derivFilter = new KalmanFilter(filterGains, true);
     private final PIDController controller = new PIDController(derivFilter);
 
     Turret(HardwareMap hardwareMap) {
