@@ -61,7 +61,7 @@ public final class Shooter {
         setRPM(radPerSec * 2 * PI / 60);
     }
     public void setLaunchVel(double inPerSec) {
-        setRPM(0); // TODO Tune w regression
+        setRPM(29.68064 * inPerSec - 0.445157); // TODO Tune empirically
     }
 
     public void setLaunchAngle(double radians) {
