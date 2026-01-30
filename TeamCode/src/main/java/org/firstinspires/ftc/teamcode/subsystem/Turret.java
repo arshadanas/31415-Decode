@@ -30,8 +30,9 @@ public final class Turret {
             TURRET_ABSOLUTE_OFFSET = 1.8659156366775742,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
             WRAPAROUND_POSITION = toRadians(180),
-            DEFAULT_TOLERANCE = toRadians(3),
-            HOMING_TOLERANCE = DEFAULT_TOLERANCE;
+            TOLERANCE_SHOOTING = toRadians(3),
+            TOLERANCE_HOMING = toRadians(3),
+            TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
 
     private final CachedMotorEx motor;
     private final AnalogSensor absoluteEnc;
@@ -61,7 +62,7 @@ public final class Turret {
 
     void run(double intakePower, ArrayList<Integer> feedingOrder, boolean inShootingZone) {
 
-        if (intakePower == 0 && feedingOrder.isEmpty() && atPosition(target, HOMING_TOLERANCE))
+        if (intakePower == 0 && feedingOrder.isEmpty() && inTolerance(TOLERANCE_HOMING))
             recalibrateQuadrature();
 
         position = motor.encoder.getDistance() + quadratureOffset;
@@ -73,12 +74,8 @@ public final class Turret {
         motor.set(controller.calculate(new State(position + PI - WRAPAROUND_POSITION)));
     }
 
-    private boolean atPosition(double target, double tolerance) {
-        return abs(getError(target)) <= tolerance;
-    }
-
-    private double getError(double target) {
-        return normalizeRadians(target - position);
+    boolean inTolerance(double tolerance) {
+        return abs(normalizeRadians(target - position)) <= tolerance;
     }
 
     private void recalibrateQuadrature() {

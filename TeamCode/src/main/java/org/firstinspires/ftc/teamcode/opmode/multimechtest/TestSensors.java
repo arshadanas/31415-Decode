@@ -79,8 +79,7 @@ public final class TestSensors extends LinearOpMode {
 
             double rotorRad = normalizeRadians(rotorEncoder.getReading() + ABS_OFFSET_ROTOR);
 
-            double turretRadAbsRaw = -turretAbsolute.getReading();
-            double turretRadAbs = normalizeRadians(turretRadAbsRaw + Turret.TURRET_ABSOLUTE_OFFSET);
+            double turretRadAbs = normalizeRadians(-turretAbsolute.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
 
             Pose pose = pinpoint.getPose();
 
