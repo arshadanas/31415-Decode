@@ -1,16 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static java.lang.Math.atan2;
-
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@Config
 @TeleOp
-public final class TuneTurret extends LinearOpMode {
+public final class TuneShooter extends LinearOpMode {
+
+    public static double targetRPM = 3000;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -18,20 +20,18 @@ public final class TuneTurret extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Turret turret = new Turret(hardwareMap);
+        Shooter shooter = new Shooter(hardwareMap);
 
         waitForStart(); // -------------------------------------------------------------------------------------------------------------------
 
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            turret.run(!gamepad1.square);
+            shooter.run(gamepad1.square, gamepad1.square);
 
-            float x = gamepad1.right_stick_x, y = gamepad1.right_stick_y;
-            if (x*x + y*y >= 0.64)
-                turret.setTarget(atan2(x, y));
+            shooter.setRPM(targetRPM);
 
-            turret.printTo(telemetry);
+            shooter.printTo(telemetry);
             telemetry.update();
         }
     }

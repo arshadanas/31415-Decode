@@ -56,6 +56,14 @@ public final class Handler {
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
     private final ElapsedTime timeSinceLastFeed = new ElapsedTime();
 
+    private boolean keepRunningAfterLastFeed() {
+        return feedingOrder.isEmpty() && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
+    }
+
+    boolean feedsPending() {
+        return !feedingOrder.isEmpty() || keepRunningAfterLastFeed();
+    }
+
     Handler(HardwareMap hardwareMap) {
 
         container = new Container(hardwareMap);
@@ -96,7 +104,7 @@ public final class Handler {
                         inShootingZone && shooterReady && // <-- don't feed until we can shoot
                         (
                             !feedingOrder.isEmpty() && (slotAtFeeder == -1 || slotAtFeeder == feedingOrder.get(0)) ||
-                            feedingOrder.isEmpty() && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST
+                            keepRunningAfterLastFeed()
                         )
                          ? 1 : 0;
 

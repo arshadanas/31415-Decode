@@ -98,7 +98,8 @@ public final class Tele extends LinearOpMode {
 
                 robot.lift.setPower(gamepad1.left_stick_y);
 
-                robot.handler.setFeederManual(triggersSum);
+                robot.handler.setFeederManual(gamepad1.left_trigger);
+                robot.shooter.setManual(gamepad1.right_trigger);
 
             } else {
 

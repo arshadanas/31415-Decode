@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
+import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
@@ -18,8 +19,6 @@ import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
-
-import java.util.ArrayList;
 
 public final class Turret {
 
@@ -51,6 +50,7 @@ public final class Turret {
     Turret(HardwareMap hardwareMap) {
         motor = new CachedMotorEx(hardwareMap,  "turret", Motor.GoBILDA.RPM_1150);
         motor.setInverted(true);
+        motor.setZeroPowerBehavior(BRAKE);
 
         motor.encoder = new CachedMotorEx(hardwareMap, "BL", Motor.GoBILDA.RPM_1150).encoder;
         motor.encoder.setDirection(REVERSE);
@@ -60,10 +60,7 @@ public final class Turret {
         absoluteEnc = new AnalogSensor(hardwareMap, "elc", 2 * PI);
     }
 
-    void run(double intakePower, ArrayList<Integer> feedingOrder, boolean inShootingZone) {
-
-        if (intakePower == 0 && feedingOrder.isEmpty() && inTolerance(TOLERANCE_HOMING))
-            recalibrateQuadrature();
+    void run(boolean feedsPending) {
 
         position = motor.encoder.getDistance() + quadratureOffset;
 
@@ -71,7 +68,15 @@ public final class Turret {
         controller.setGains(pidGains);
 
         controller.setTarget(new State(normalizeRadians(target + PI - WRAPAROUND_POSITION)));
-        motor.set(controller.calculate(new State(position + PI - WRAPAROUND_POSITION)));
+        double pid = controller.calculate(new State(position + PI - WRAPAROUND_POSITION));
+
+        if (feedsPending)
+            motor.set(pid);
+        else {
+            motor.set(0);
+            if (inTolerance(TOLERANCE_HOMING))
+                recalibrateQuadrature();
+        }
     }
 
     boolean inTolerance(double tolerance) {

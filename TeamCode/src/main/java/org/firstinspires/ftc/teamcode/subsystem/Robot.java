@@ -14,6 +14,8 @@ public final class Robot {
     public final BulkReader bulkReader;
     public final MecanumDrivetrain drivetrain;
     public final Handler handler;
+    public final Shooter shooter;
+    public final Turret turret;
     public final Lift lift;
 
     private final ElapsedTime loopTimer = new ElapsedTime();
@@ -21,6 +23,8 @@ public final class Robot {
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         handler = new Handler(hardwareMap);
+        shooter = new Shooter(hardwareMap);
+        turret = new Turret(hardwareMap);
         lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
@@ -34,7 +38,16 @@ public final class Robot {
         bulkReader.bulkRead();
         if (!lift.gearSwitch.isActivated())
             drivetrain.update();
-        handler.run(true, true);
+
+        boolean inShootingZone = true; // TODO Check dt in zone
+
+        handler.run(inShootingZone,
+                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
+                turret.inTolerance(Turret.TOLERANCE_FEEDING)
+        );
+        shooter.run(inShootingZone, handler.feedsPending());
+        turret.run(handler.feedsPending());
+
         lift.run();
     }
 

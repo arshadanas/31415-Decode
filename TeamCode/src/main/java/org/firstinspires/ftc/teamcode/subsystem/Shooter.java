@@ -19,8 +19,6 @@ import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
-import java.util.ArrayList;
-
 public final class Shooter {
 
     public static PIDGains pidGains = new PIDGains();
@@ -52,7 +50,7 @@ public final class Shooter {
             outputFilter = new KalmanFilter(outputFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
 
-    private double currentRPM, targetRPM, rawRPM;
+    private double currentRPM, targetRPM = RPM_ARMING, rawRPM;
 
     public void setRPM(double rpm) {
         this.targetRPM = rpm;
@@ -91,7 +89,7 @@ public final class Shooter {
         motors[0].encoder = new CachedMotorEx(hardwareMap, "BR", Motor.GoBILDA.BARE).encoder;
     }
 
-    void run(boolean inShootingZone, ArrayList<Integer> feedingOrder) {
+    void run(boolean inShootingZone, boolean feedsPending) {
         rpmFilter.setGains(rpmFilterGains);
         derivFilter.setGains(pidFilterGains);
         controller.setGains(pidGains);
@@ -100,9 +98,9 @@ public final class Shooter {
         currentRPM = rpmFilter.calculate(rawRPM);
 
         double rpmSetpoint =
-                inShootingZone ?            targetRPM :
-                !feedingOrder.isEmpty() ?   RPM_ARMING : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) < 3 ?
-                                            RPM_IDLE;
+                !feedsPending ?     RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
+                inShootingZone ?    targetRPM :
+                                    RPM_ARMING;
 
         controller.setTarget(new State(rpmSetpoint));
         double pid = controller.calculate(new State(currentRPM));
