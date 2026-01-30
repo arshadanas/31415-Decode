@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static com.qualcomm.robotcore.util.Range.clip;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -28,6 +30,13 @@ public final class TuneShooter extends LinearOpMode {
         while (opModeIsActive()) {
             // Read sensors + gamepads:
             shooter.run(gamepad1.square, gamepad1.square);
+
+            if (gamepad1.dpadUpWasPressed())
+                targetRPM += 50;
+            if (gamepad1.dpadDownWasPressed())
+                targetRPM -= 50;
+
+            targetRPM = clip(targetRPM, Shooter.RPM_IDLE, Shooter.RPM_MAX);
 
             shooter.setRPM(targetRPM);
 
