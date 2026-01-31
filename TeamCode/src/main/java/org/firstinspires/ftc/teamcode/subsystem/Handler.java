@@ -32,7 +32,7 @@ public final class Handler {
     public boolean allowOneWrongInMotifs = false;
     public boolean motifMode = false;
 
-    private byte numArtifactsScored = 0;
+    private int numArtifactsScored = 0;
     public void decrementArtifactsScored() {
         if (numArtifactsScored > 0) numArtifactsScored--;
     }
