@@ -32,14 +32,16 @@ public enum LaunchZone {
         Coordinate[] near = new Coordinate[]{
                 new Coordinate(0, SIZE_FIELD),
                 new Coordinate(SIZE_FIELD, SIZE_FIELD),
-                new Coordinate(SIZE_FIELD / 2, SIZE_FIELD / 2)
+                new Coordinate(SIZE_FIELD / 2, SIZE_FIELD / 2),
+                new Coordinate(0, SIZE_FIELD),
         };
         nearTriangle = geometryFactory.createPolygon(near);
 
         Coordinate[] far = new Coordinate[]{
                 new Coordinate(SIZE_TILE * 2, 0),
                 new Coordinate(SIZE_TILE * 3, SIZE_TILE),
-                new Coordinate(SIZE_TILE * 4, 0)
+                new Coordinate(SIZE_TILE * 4, 0),
+                new Coordinate(SIZE_TILE * 2, 0),
         };
 
         farTriangle = geometryFactory.createPolygon(far);
