@@ -64,10 +64,10 @@ public final class Auto extends LinearOpMode {
 
     public static double
             DEAD_TIME = 0,
-            LENGTH_ROBOT = 14.386976771653545,
-            WIDTH_ROBOT = 14.28740157480315,
-            SIZE_HALF_FIELD = 70.5,
-            SIZE_TILE = 23.625,
+            LENGTH_DRIVETRAIN = 14.386976771653545,
+            WIDTH_DRIVETRAIN = 14.28740157480315,
+            SIZE_FIELD = 141.5,
+            SIZE_TILE = SIZE_FIELD/6,
             DISTANCE_BETWEEN_SPECIMENS = 2,
 
             WAIT_BARNACLE_DETECT = 0.5,
@@ -164,7 +164,7 @@ public final class Auto extends LinearOpMode {
             park2 = new EditablePose(-1.5 * SIZE_TILE, -2 * SIZE_TILE, PI / 2),
             park3 = new EditablePose(-2.5 * SIZE_TILE, -2 * SIZE_TILE, PI / 2),
 
-            chamberRight = new EditablePose(0.5 * WIDTH_ROBOT + 0.375, -33, PI / 2),
+            chamberRight = new EditablePose(0.5 * WIDTH_DRIVETRAIN + 0.375, -33, PI / 2),
 
             specSpike1 = new EditablePose(48, -26.8, PI / 2),
             specSpike2 = new EditablePose(60, -27.4, PI / 2),
@@ -178,7 +178,7 @@ public final class Auto extends LinearOpMode {
 
             intakingSpec = new EditablePose(36, -60, PI / 2);
 
-    static Pose pose = new Pose(72,72, PI / 2);
+    static Pose pose = new Pose(SIZE_FIELD/2,SIZE_FIELD/2, PI / 2);
     static boolean isRedAlliance = false;
 
     enum AutonConfig {
@@ -289,7 +289,7 @@ public final class Auto extends LinearOpMode {
 
 //            robot.deposit.preloadSpecimen();
 
-            pose = new Pose(chamberRight.x, 0.5 * LENGTH_ROBOT - SIZE_HALF_FIELD, PI / 2, FTCCoordinates.INSTANCE);
+            pose = new Pose(chamberRight.x, 0.5 * LENGTH_DRIVETRAIN - SIZE_FIELD/2, PI / 2, FTCCoordinates.INSTANCE);
 
 //            Action scorePreload = robot.drivetrain.actionBuilder(pose)
 //                    .strafeTo(chamberRight.toVector2d())
