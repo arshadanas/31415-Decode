@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.util.Range.clip;
-import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toRadians;
 
@@ -20,6 +19,22 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMot
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 public final class Shooter {
+
+    /**
+     * Inverse of {@link #getLaunchVel}
+     * @return Angular velocity of shooter wheel at launch, in rpm
+     */
+    public static double getLaunchRPM(double inPerSec) {
+        return 29.68064 * inPerSec - 0.445157; // TODO Tune empirically
+    }
+
+    /**
+     * Inverse of {@link #getLaunchRPM}
+     * @return Linear velocity of {@link Artifact} at launch, in inches/sec
+     */
+    public static double getLaunchVel(double rpm) {
+        return (rpm + 0.445157) / 29.68064; // TODO Tune empirically
+    }
 
     public static PIDGains pidGains = new PIDGains();
     public static KalmanGains
@@ -55,17 +70,14 @@ public final class Shooter {
     public void setRPM(double rpm) {
         this.targetRPM = rpm;
     }
-    public void setRadPerSec(double radPerSec) {
-        setRPM(radPerSec * 2 * PI / 60);
-    }
     public void setLaunchVel(double inPerSec) {
-        setRPM(29.68064 * inPerSec - 0.445157); // TODO Tune empirically
+        setRPM(getLaunchRPM(inPerSec));
     }
 
     public void setLaunchAngle(double radians) {
         hood.turnToAngle(Math.lerp(
                 radians,
-                LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST,
+                LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST, // TODO Tune empirically
                 ANGLE_HOOD_SHALLOWEST, ANGLE_HOOD_STEEPEST
         ));
     }
