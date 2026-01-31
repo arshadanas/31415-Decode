@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -39,13 +41,14 @@ public final class Robot {
         if (!lift.gearSwitch.isActivated())
             drivetrain.update();
 
-        boolean inShootingZone = true; // TODO Check dt in zone
+        LaunchZone currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
 
-        handler.run(inShootingZone,
+        handler.run(
+                currentZone != NONE,
                 shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
                 turret.inTolerance(Turret.TOLERANCE_FEEDING)
         );
-        shooter.run(inShootingZone, handler.feedsPending());
+        shooter.run(currentZone != NONE, handler.feedsPending());
         turret.run(handler.feedsPending());
 
         lift.run();
