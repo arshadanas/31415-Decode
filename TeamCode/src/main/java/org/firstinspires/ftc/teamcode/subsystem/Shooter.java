@@ -101,7 +101,7 @@ public final class Shooter {
         motors[0].encoder = new CachedMotorEx(hardwareMap, "BR", Motor.GoBILDA.BARE).encoder;
     }
 
-    void run(boolean inShootingZone, boolean feedsPending) {
+    void run(boolean inLaunchZone, boolean feedsPending) {
         rpmFilter.setGains(rpmFilterGains);
         derivFilter.setGains(pidFilterGains);
         controller.setGains(pidGains);
@@ -110,9 +110,9 @@ public final class Shooter {
         currentRPM = rpmFilter.calculate(rawRPM);
 
         double rpmSetpoint =
-                !feedsPending ?     RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
-                inShootingZone ?    targetRPM :
-                                    RPM_ARMING;
+                !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
+                inLaunchZone ?  targetRPM :
+                                RPM_ARMING;
 
         controller.setTarget(new State(rpmSetpoint));
         double pid = controller.calculate(new State(currentRPM));
