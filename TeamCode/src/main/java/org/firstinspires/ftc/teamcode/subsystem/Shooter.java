@@ -79,6 +79,10 @@ public final class Shooter {
         setRPM(getLaunchRPM(inPerSec));
     }
 
+    /**
+     * @param radians Launch angle (in radians, where 0 is horizontal, parallel to the floor)
+     *                in the range [{@link #LAUNCH_RAD_SHALLOWEST}, {@link #LAUNCH_RAD_STEEPEST}]
+     */
     public void setLaunchAngle(double radians) {
         hood.turnToAngle(Math.lerp(
                 clip(radians, LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST),
