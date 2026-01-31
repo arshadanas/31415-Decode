@@ -86,7 +86,7 @@ public final class Tele extends LinearOpMode {
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            robot.run();
+            robot.run(gamepad1.square);
 
             float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
 

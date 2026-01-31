@@ -1044,7 +1044,7 @@ public final class Auto extends LinearOpMode {
                 trajectory,
                 telemetryPacket -> {
 //                    pose = robot.drivetrain.pose;
-                    robot.run();
+//                    robot.run();
                     return opModeIsActive();
                 }
         );

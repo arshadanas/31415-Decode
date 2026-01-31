@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
+import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_FAR;
+import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_NEAR;
+import static org.firstinspires.ftc.teamcode.subsystem.Shooter.RPM_FAR;
+import static org.firstinspires.ftc.teamcode.subsystem.Shooter.RPM_NEAR;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -37,15 +41,27 @@ public final class Robot {
 
     }
 
-    public void run() {
+    public void run(boolean feed) {
         bulkReader.bulkRead();
         if (!lift.gearSwitch.isActivated())
             drivetrain.update();
 
         currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
 
+        switch (currentZone) {
+            case NEAR:
+                shooter.setRPM(RPM_NEAR);
+                shooter.setLaunchAngle(LAUNCH_RAD_NEAR);
+                break;
+            case FAR:
+                shooter.setRPM(RPM_FAR);
+                shooter.setLaunchAngle(LAUNCH_RAD_FAR);
+                break;
+        }
+
         handler.run(
                 currentZone != NONE,
+                feed &&
                 shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
                 turret.inTolerance(Turret.TOLERANCE_FEEDING)
         );
