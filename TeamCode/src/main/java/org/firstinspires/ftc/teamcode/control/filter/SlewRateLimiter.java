@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.control.filter;
 
-import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 

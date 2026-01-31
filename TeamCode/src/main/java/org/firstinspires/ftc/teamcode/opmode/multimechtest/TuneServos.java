@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 
-import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
+import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_L;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_R;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_L;

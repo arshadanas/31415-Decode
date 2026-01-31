@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
+import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 
 import com.acmerobotics.dashboard.config.Config;
 

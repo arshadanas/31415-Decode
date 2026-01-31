@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;

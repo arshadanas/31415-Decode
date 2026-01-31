@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.opmode.multimechtest;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
-import static org.firstinspires.ftc.teamcode.control.Wrap.wrap;
+import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TestMotorsCRServos.TestMech.ROTOR;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;

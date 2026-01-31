@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
-import static com.qualcomm.robotcore.util.Range.clip;
+import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.abs;
 import static java.lang.Math.toRadians;
 
@@ -81,7 +81,7 @@ public final class Shooter {
 
     public void setLaunchAngle(double radians) {
         hood.turnToAngle(Math.lerp(
-                radians,
+                clip(radians, LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST),
                 LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST, // TODO Tune empirically
                 ANGLE_HOOD_SHALLOWEST, ANGLE_HOOD_STEEPEST
         ));
