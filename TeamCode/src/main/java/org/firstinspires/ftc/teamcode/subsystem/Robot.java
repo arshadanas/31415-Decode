@@ -21,6 +21,7 @@ public final class Robot {
     public final Lift lift;
 
     private final ElapsedTime loopTimer = new ElapsedTime();
+    private LaunchZone currentZone;
 
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
@@ -41,7 +42,7 @@ public final class Robot {
         if (!lift.gearSwitch.isActivated())
             drivetrain.update();
 
-        LaunchZone currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
+        currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
 
         handler.run(
                 currentZone != NONE,
@@ -57,6 +58,8 @@ public final class Robot {
     public void printTo(Telemetry telemetry) {
         telemetry.addData("LOOP TIME", loopTimer.seconds());
         loopTimer.reset();
+        telemetry.addLine();
+        telemetry.addData("CURRENT ZONE", currentZone);
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
