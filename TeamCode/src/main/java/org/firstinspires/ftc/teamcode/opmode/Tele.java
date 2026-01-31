@@ -115,7 +115,7 @@ public final class Tele extends LinearOpMode {
                 if (gamepad1.triangleWasPressed())
                     robot.lift.gearSwitch.toggle();
 
-                if (gamepad1.squareWasPressed())
+                if (gamepad1.crossWasPressed())
                     robot.handler.feedSingle(GREEN);
 
                 if (gamepad1.circleWasPressed())
