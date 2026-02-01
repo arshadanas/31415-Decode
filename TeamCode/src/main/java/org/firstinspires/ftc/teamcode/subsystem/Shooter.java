@@ -9,6 +9,7 @@ import static java.lang.Math.toRadians;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
@@ -49,6 +50,8 @@ public final class Shooter {
             outputFilterGains = new KalmanGains();
 
     public static double
+            MAX_VOLTAGE = 13,
+
             RPM_B = 7521.4285714285725,
             POWER_B = 1,
             RPM_A = 3350,
@@ -73,6 +76,7 @@ public final class Shooter {
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
+    private final VoltageSensor batteryVoltageSensor;
 
     private final KalmanFilter
             rpmFilter = new KalmanFilter(rpmFilterGains),
@@ -118,6 +122,8 @@ public final class Shooter {
             motor.setZeroPowerBehavior(FLOAT);
 
         motors[0].encoder = new CachedMotorEx(hardwareMap, "BR", Motor.GoBILDA.BARE).encoder;
+
+        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 
     void run(boolean inLaunchZone, boolean feedsPending) {
@@ -135,9 +141,11 @@ public final class Shooter {
                 inLaunchZone ?  targetRPM :
                                 RPM_ARMING;
 
+        double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
+
         controller.setTarget(new State(rpmSetpoint));
         double pid = controller.calculate(new State(currentRPM));
-        double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B);
+        double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
 
         double output = manualPower != 0 ? manualPower : clip(
