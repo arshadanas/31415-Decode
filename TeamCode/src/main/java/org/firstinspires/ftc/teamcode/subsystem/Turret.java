@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 public final class Turret {
 
     public static KalmanGains filterGains = new KalmanGains();
-    public static PIDGains pidGains = new PIDGains();
+    public static PIDGains pidGains = new PIDGains(0, 0, 0, 0.25);
 
     public static double
             TURRET_ABSOLUTE_OFFSET = 1.8659156366775742,
