@@ -34,7 +34,7 @@ public final class Container {
     public static KalmanGains filterGains = new KalmanGains(15.9, 12);
 
     private final PIDController controller = new PIDController(derivFilter);
-    public static PIDGains pidGains = new PIDGains(0.125, 0, 0.015, 0.25);
+    public static PIDGains pidGains = new PIDGains(0.125, 0.5, 0.015, 0.15);
 
     public static double
             ABS_OFFSET_ROTOR = 2.3780904389900916,
