@@ -46,6 +46,7 @@ public final class Shooter {
 
     public static double
             RPM_MAX = 7521.4285714285725,
+            RPM_DROP_LAUNCH = 0,
             RPM_ARMING = 2700,
             RPM_IDLE = 1620,
 
