@@ -40,7 +40,7 @@ public final class Shooter {
 
     public static PIDGains pidGains = new PIDGains();
     public static KalmanGains
-            rpmFilterGains = new KalmanGains(),
+            rpmFilterGains = new KalmanGains(10, 60),
             pidFilterGains = new KalmanGains(),
             outputFilterGains = new KalmanGains();
 
@@ -121,8 +121,10 @@ public final class Shooter {
         derivFilter.setGains(pidFilterGains);
         controller.setGains(pidGains);
 
+        double lastRawRPM = rawRPM;
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
-        currentRPM = rpmFilter.calculate(rawRPM);
+        if (lastRawRPM != rawRPM)
+            currentRPM = rpmFilter.calculate(rawRPM);
 
         double rpmSetpoint =
                 !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?

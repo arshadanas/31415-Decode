@@ -29,14 +29,14 @@ public final class TuneShooter extends LinearOpMode {
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            shooter.run(gamepad1.square, gamepad1.square);
+            shooter.run(!gamepad1.square, !gamepad1.square);
 
             if (gamepad1.dpadUpWasPressed())
                 targetRPM += 50;
             if (gamepad1.dpadDownWasPressed())
                 targetRPM -= 50;
 
-            targetRPM = clip(targetRPM, Shooter.RPM_IDLE, Shooter.RPM_MAX);
+            targetRPM = clip(targetRPM, 0, 8000);
 
             shooter.setRPM(targetRPM);
             shooter.setManual(gamepad1.right_trigger);
