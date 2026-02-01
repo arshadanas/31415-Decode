@@ -28,7 +28,7 @@ public final class Turret {
     public static PIDGains pidGains = new PIDGains(0, 0, 0, 0.25);
 
     public static double
-            TURRET_ABSOLUTE_OFFSET = 1.8659156366775742,
+            TURRET_ABSOLUTE_OFFSET = 1.9439794541304116,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
             WRAPAROUND_POSITION = toRadians(180),
             TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
