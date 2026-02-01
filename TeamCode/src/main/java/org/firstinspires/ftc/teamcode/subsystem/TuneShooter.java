@@ -39,6 +39,7 @@ public final class TuneShooter extends LinearOpMode {
             targetRPM = clip(targetRPM, Shooter.RPM_IDLE, Shooter.RPM_MAX);
 
             shooter.setRPM(targetRPM);
+            shooter.setManual(gamepad1.right_trigger);
 
             shooter.printTo(telemetry);
             telemetry.update();
