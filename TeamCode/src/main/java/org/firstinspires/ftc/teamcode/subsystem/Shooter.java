@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static com.acmerobotics.roadrunner.Math.lerp;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.abs;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.Math;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -45,7 +45,10 @@ public final class Shooter {
             outputFilterGains = new KalmanGains();
 
     public static double
-            RPM_MAX = 7521.4285714285725,
+            RPM_B = 7521.4285714285725,
+            POWER_B = 1,
+            RPM_A = 3350,
+            POWER_A = 0.5,
             RPM_DROP_LAUNCH = 0,
             RPM_ARMING = 2700,
             RPM_IDLE = 1620,
@@ -87,7 +90,7 @@ public final class Shooter {
      *                in the range [{@link #LAUNCH_RAD_SHALLOWEST}, {@link #LAUNCH_RAD_STEEPEST}]
      */
     public void setLaunchAngle(double radians) {
-        hood.turnToAngle(Math.lerp(
+        hood.turnToAngle(lerp(
                 clip(radians, LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST),
                 LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST, // TODO Tune empirically
                 ANGLE_HOOD_SHALLOWEST, ANGLE_HOOD_STEEPEST
@@ -128,16 +131,16 @@ public final class Shooter {
 
         controller.setTarget(new State(rpmSetpoint));
         double pid = controller.calculate(new State(currentRPM));
-        double feedforward = rpmSetpoint / RPM_MAX;
-        double autoPower = pid + feedforward;
+        double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B);
+        double pidf = pid + feedforward;
 
-        double power = manualPower != 0 ? manualPower : clip(
+        double output = manualPower != 0 ? manualPower : clip(
                         inTolerance(TOLERANCE_RPM_FILTERING) ?
-                                    outputFilter.calculate(autoPower) :
-                                    autoPower
+                                    outputFilter.calculate(pidf) :
+                                    pidf
                 , 0, 1);
         for (CachedMotorEx motor : motors)
-            motor.set(power);
+            motor.set(output);
     }
 
     boolean inTolerance(double rpmTolerance) {
