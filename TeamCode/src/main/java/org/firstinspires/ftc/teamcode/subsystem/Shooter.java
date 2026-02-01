@@ -53,7 +53,7 @@ public final class Shooter {
             ANGLE_HOOD_SHALLOWEST = 360,
             ANGLE_HOOD_STEEPEST = 10,
 
-            TOLERANCE_RPM_SHOOTING = 10,
+            TOLERANCE_RPM_FILTERING = 10,
             TOLERANCE_RPM_FEEDING = 10, // TODO increase for faster feeding
 
             RPM_NEAR = 4000,
@@ -129,7 +129,7 @@ public final class Shooter {
         double autoPower = pid + feedforward;
 
         double power = manualPower != 0 ? manualPower : clip(
-                        inTolerance(TOLERANCE_RPM_SHOOTING) ?
+                        inTolerance(TOLERANCE_RPM_FILTERING) ?
                                     outputFilter.calculate(autoPower) :
                                     autoPower
                 , 0, 1);
@@ -143,9 +143,9 @@ public final class Shooter {
 
     void printTo(Telemetry telemetry) {
         telemetry.addData("SHOOTER",
-                inTolerance(TOLERANCE_RPM_SHOOTING) ?
-                        "RPM in shooting tolerance" :
-                        "RPM out of shooting tolerance"
+                inTolerance(TOLERANCE_RPM_FILTERING) ?  "RPM in filtering tolerance" :
+                inTolerance(TOLERANCE_RPM_FEEDING) ?    "RPM in feeding tolerance" :
+                                                        "RPM out of tolerance"
         );
         telemetry.addLine();
         telemetry.addData("Current (rpm)", currentRPM);

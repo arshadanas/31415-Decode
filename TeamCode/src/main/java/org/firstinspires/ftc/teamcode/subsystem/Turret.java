@@ -29,7 +29,6 @@ public final class Turret {
             TURRET_ABSOLUTE_OFFSET = 1.8659156366775742,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
             WRAPAROUND_POSITION = toRadians(180),
-            TOLERANCE_SHOOTING = toRadians(3),
             TOLERANCE_HOMING = toRadians(3),
             TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
 
