@@ -40,7 +40,7 @@ public final class Shooter {
 
     public static PIDGains pidGains = new PIDGains();
     public static KalmanGains
-            rpmFilterGains = new KalmanGains(10, 60),
+            rpmFilterGains = new KalmanGains(.8, 3),
             pidFilterGains = new KalmanGains(),
             outputFilterGains = new KalmanGains();
 
