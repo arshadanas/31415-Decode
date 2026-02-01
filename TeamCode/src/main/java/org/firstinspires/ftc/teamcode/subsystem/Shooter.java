@@ -50,12 +50,12 @@ public final class Shooter {
             outputFilterGains = new KalmanGains();
 
     public static double
-            MAX_VOLTAGE = 13,
 
-            RPM_B = 7521.4285714285725,
-            POWER_B = 1,
-            RPM_A = 3350,
             POWER_A = 0.5,
+            RPM_A = 3500,
+            POWER_B = 1,
+            RPM_B = 7520,
+            MAX_VOLTAGE = 13,
 
             RPM_ARMING = 2700,
             RPM_IDLE = 1620,
