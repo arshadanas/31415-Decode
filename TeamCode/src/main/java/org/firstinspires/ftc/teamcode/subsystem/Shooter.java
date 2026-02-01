@@ -84,7 +84,7 @@ public final class Shooter {
             outputFilter = new KalmanFilter(outputFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
 
-    private double currentRPM, targetRPM = RPM_ARMING, rawRPM;
+    private double currentRPM, targetRPM = RPM_ARMING, rawRPM, output;
 
     public void setRPM(double rpm) {
         this.targetRPM = rpm;
@@ -148,7 +148,7 @@ public final class Shooter {
         double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
 
-        double output = manualPower != 0 ? manualPower : clip(
+        output = manualPower != 0 ? manualPower : clip(
                         inTolerance(TOLERANCE_RPM_FILTERING) ?
                                     outputFilter.calculate(pidf) :
                                     pidf
@@ -171,6 +171,7 @@ public final class Shooter {
         telemetry.addData("Current (rpm)", currentRPM);
         telemetry.addData("Target (rpm)", targetRPM);
         telemetry.addData("Raw (rpm)", rawRPM);
+        telemetry.addData("Output power [0,1]", output);
         telemetry.addLine();
         telemetry.addData("Filtered error derivative (rpm/s)", controller.getFilteredErrorDerivative());
         telemetry.addData("Raw error derivative (rpm/s)", controller.getRawErrorDerivative());
