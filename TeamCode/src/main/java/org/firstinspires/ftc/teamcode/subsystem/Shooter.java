@@ -138,8 +138,8 @@ public final class Shooter {
 
         double rpmSetpoint =
                 !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
-                inLaunchZone ?  targetRPM :
-                                RPM_ARMING;
+                !inLaunchZone ? RPM_ARMING :
+                                targetRPM;
 
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
 
