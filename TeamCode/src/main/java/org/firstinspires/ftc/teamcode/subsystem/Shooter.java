@@ -38,6 +38,10 @@ public final class Shooter {
         return (rpm + 0.445157) / 29.68064; // TODO Tune empirically
     }
 
+    public static double getRPMDrop(double preLaunchRPM) {
+        return 0.271632 * preLaunchRPM + 109.1459;
+    }
+
     public static PIDGains pidGains = new PIDGains();
     public static KalmanGains
             rpmFilterGains = new KalmanGains(.8, 3),
@@ -49,7 +53,7 @@ public final class Shooter {
             POWER_B = 1,
             RPM_A = 3350,
             POWER_A = 0.5,
-            RPM_DROP_LAUNCH = 0,
+
             RPM_ARMING = 2700,
             RPM_IDLE = 1620,
 
