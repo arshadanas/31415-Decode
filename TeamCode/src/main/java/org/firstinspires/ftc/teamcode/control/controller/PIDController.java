@@ -36,7 +36,8 @@ public class PIDController implements FeedbackController {
     }
 
     /**
-     * @param measurement Only the X attribute of the {@link State} parameter is used as feedback
+     * @param measurement The x attribute of the given {@link State} is used to calculate error for feedback.
+     *                    If the v attribute is non-zero, -v will be used as the {@link #filteredErrorDerivative}
      */
     public double calculate(State measurement) {
         State lastError = error;
@@ -46,6 +47,8 @@ public class PIDController implements FeedbackController {
         errorIntegral = integrator.getIntegral(error.x);
         rawErrorDerivative = differentiator.getDerivative(error.x);
         filteredErrorDerivative = filterDiff.getDerivative(derivFilter.calculate(error.x));
+        if (measurement.v != 0)
+            filteredErrorDerivative = -measurement.v;
 
         double output = (gains.kP * error.x) + (gains.kI * errorIntegral) + (gains.kD * filteredErrorDerivative);
 

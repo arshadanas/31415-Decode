@@ -154,7 +154,7 @@ public final class Shooter {
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
 
         controller.setTarget(new State(rpmSetpoint));
-        double pid = controller.calculate(new State(currentRPM));
+        double pid = controller.calculate(new State(currentRPM, currentRPMPerSec));
         double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
 
