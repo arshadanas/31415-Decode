@@ -44,7 +44,7 @@ public final class Container {
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // above rotor = ~75
             INTAKE_POWER_OMNI_CONTACT = 0.4,
-            INTAKE_POWER_IDLE = -0.2,
+            INTAKE_POWER_IDLE = 0,
 
             TOLERANCE_FRONT = toRadians(20),
             TOLERANCE_BACK = toRadians(20),
