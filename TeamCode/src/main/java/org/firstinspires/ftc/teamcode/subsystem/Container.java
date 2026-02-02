@@ -9,7 +9,6 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -42,13 +41,13 @@ public final class Container {
 
     public static double
             ABS_OFFSET_ROTOR = 2.3780904389900916,
-            THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
-            THRESHOLD_BACK_MM = 70, // above rotor = ~75
+            THRESHOLD_FRONT_MM = 70, // start of ramp = ~115 // TODO Feature: Switch intaking slot EARLY, on detect ~90
+            THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
-            TOLERANCE_INTAKE_SENSORS = 0.15,
-            TOLERANCE_FEEDER_SENSORS = 0.15,
+            TOLERANCE_INTAKE_SENSORS = 0.15, // too high => false positives, too low => false negatives (no-detect)
+            TOLERANCE_FEEDER_SENSORS = 0.05, // too high => false negatives (removals)
             TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
             TOLERANCE_FEEDER_FRICTION = 0.6108652381980153,
             TOLERANCE_INTAKE_OMNI = 0.5235987755982988,
