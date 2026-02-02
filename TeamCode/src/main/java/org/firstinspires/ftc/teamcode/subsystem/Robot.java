@@ -21,7 +21,7 @@ public final class Robot {
     public final MecanumDrivetrain drivetrain;
     public final Handler handler;
     public final Shooter shooter;
-    public final Turret turret;
+//    public final Turret turret;
     public final Lift lift;
 
     private final ElapsedTime loopTimer = new ElapsedTime();
@@ -31,7 +31,7 @@ public final class Robot {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         handler = new Handler(hardwareMap);
         shooter = new Shooter(hardwareMap);
-        turret = new Turret(hardwareMap);
+//        turret = new Turret(hardwareMap);
         lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
@@ -60,12 +60,12 @@ public final class Robot {
         }
 
         shooter.run(currentZone != NONE, handler.feedsPending());
-        turret.run(handler.feedsPending());
+//        turret.run(handler.feedsPending());
         handler.run(
                 currentZone != NONE,
                 feed &&
-                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
-                turret.inTolerance(Turret.TOLERANCE_FEEDING)
+                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) //&&
+//                turret.inTolerance(Turret.TOLERANCE_FEEDING)
         );
 
         lift.run();
@@ -83,8 +83,8 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         shooter.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
-        turret.printTo(telemetry);
-        telemetry.addLine("\n--------------------------------------\n");
+//        turret.printTo(telemetry);
+//        telemetry.addLine("\n--------------------------------------\n");
         lift.printTo(telemetry);
     }
 }
