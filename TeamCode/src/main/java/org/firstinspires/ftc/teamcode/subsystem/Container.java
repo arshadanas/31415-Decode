@@ -14,6 +14,7 @@ import static java.lang.Math.toRadians;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
@@ -51,13 +52,15 @@ public final class Container {
             TOLERANCE_FEEDER_OMNIS = toRadians(35),
             TOLERANCE_INTAKE_OMNI = toRadians(30),
 
-            POWER_OVERCOME_FRICTION = 0.06;
+            POWER_OVERCOME_FRICTION = 0.06,
+            MAX_VOLTAGE = 13;
 
     // hardware
     private final CRServo[] servos;
     private final AnalogSensor encoder, front1, back1;
     private final ColorSensor color1, color2;
     private final LEDIndicator[] indicators;
+    private final VoltageSensor batteryVoltageSensor;
 
     /**
      * Position of slot 0, in radians
@@ -117,6 +120,8 @@ public final class Container {
                 new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
                 new LEDIndicator(hardwareMap, "led 3a", "led 3b")
         };
+
+        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 
     void run(double feederPower) {
@@ -166,9 +171,11 @@ public final class Container {
 
         double servoPower = controller.calculate(new State(0, velocity));
 
+        double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
+
         int frictionSlot = getSlotAt(Zone.FEEDER_OMNIS);
         double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
-                                    POWER_OVERCOME_FRICTION * signum(servoPower) : 0;
+                                    POWER_OVERCOME_FRICTION * signum(servoPower) * voltageScalar : 0;
 
         for (CRServo servo : servos)
             servo.setPower(servoPower + antiFrictionPower);
