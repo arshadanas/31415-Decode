@@ -47,10 +47,11 @@ public final class Container {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
-            TOLERANCE_INTAKE_SENSORS = toRadians(20),
-            TOLERANCE_FEEDER_SENSORS = toRadians(20),
-            TOLERANCE_FEEDER_OMNIS = toRadians(35),
-            TOLERANCE_INTAKE_OMNI = toRadians(30),
+            TOLERANCE_INTAKE_SENSORS = 0.15,
+            TOLERANCE_FEEDER_SENSORS = 0.15,
+            TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
+            TOLERANCE_FEEDER_FRICTION = 0.6108652381980153,
+            TOLERANCE_INTAKE_OMNI = 0.5235987755982988,
 
             POWER_OVERCOME_FRICTION = 0.06,
             MAX_VOLTAGE = 13;
@@ -83,7 +84,8 @@ public final class Container {
         INTAKE_SENSORS(0),
         INTAKE_OMNI(0),
         FEEDER_SENSORS(PI),
-        FEEDER_OMNIS(PI);
+        FEEDER_OMNIS(PI),
+        FEEDER_FRICTION(PI);
 
         private final double radians;
         Zone(double radians) {
@@ -92,10 +94,11 @@ public final class Container {
 
         private double getTolerance() {
             switch (this) {
-                case INTAKE_OMNI:    return TOLERANCE_INTAKE_OMNI;
-                case FEEDER_SENSORS: return TOLERANCE_FEEDER_SENSORS;
-                case FEEDER_OMNIS:   return TOLERANCE_FEEDER_OMNIS;
-                default:             return TOLERANCE_INTAKE_SENSORS;
+                case INTAKE_OMNI:       return TOLERANCE_INTAKE_OMNI;
+                case FEEDER_SENSORS:    return TOLERANCE_FEEDER_SENSORS;
+                case FEEDER_OMNIS:      return TOLERANCE_FEEDER_OMNIS;
+                case FEEDER_FRICTION:   return TOLERANCE_FEEDER_FRICTION;
+                default:                return TOLERANCE_INTAKE_SENSORS;
             }
         }
 
@@ -173,7 +176,7 @@ public final class Container {
 
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
 
-        int frictionSlot = getSlotAt(Zone.FEEDER_OMNIS);
+        int frictionSlot = getSlotAt(Zone.FEEDER_FRICTION);
         double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
                                     POWER_OVERCOME_FRICTION * signum(servoPower) * voltageScalar : 0;
 

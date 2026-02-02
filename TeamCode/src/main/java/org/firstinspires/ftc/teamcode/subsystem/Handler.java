@@ -98,7 +98,7 @@ public final class Handler {
             container.moveSlot(feedingOrder.get(0), Container.Zone.FEEDER_SENSORS);
 
 
-        int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_SENSORS);
+        int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_OMNIS);
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower : // manual power takes priority
                         inLaunchZone && shooterReady && // <-- don't feed until we can shoot
