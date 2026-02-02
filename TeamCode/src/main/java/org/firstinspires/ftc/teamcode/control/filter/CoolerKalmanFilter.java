@@ -77,6 +77,7 @@ public class CoolerKalmanFilter {
     private final KalmanFilter filter = new KalmanFilter(pm, mm);
 
     public CoolerKalmanFilter() {
+        updateProcessNoise(initialDt);
     }
 
     private final RealVector realMeasurement = new ArrayRealVector(new double[]{ 0.0d });
