@@ -44,11 +44,11 @@ public final class Shooter {
         return 0.271632 * preLaunchRPM + 109.1459;
     }
 
-    public static PIDGains pidGains = new PIDGains();
+    public static PIDGains pidGains = new PIDGains(0.00022, 0, 0.000015, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(2.9, 0.03),
             pidFilterGains = new KalmanGains(),
-            outputFilterGains = new KalmanGains();
+            outputFilterGains = new KalmanGains(.02, 5);
 
     public static double
 
@@ -67,7 +67,7 @@ public final class Shooter {
             ANGLE_HOOD_SHALLOWEST = 360,
             ANGLE_HOOD_STEEPEST = 10,
 
-            TOLERANCE_RPM_FILTERING = 10,
+            TOLERANCE_RPM_FILTERING = 0.001,
             TOLERANCE_RPM_FEEDING = 10, // TODO increase for faster feeding
 
             RPM_NEAR = 4000,
