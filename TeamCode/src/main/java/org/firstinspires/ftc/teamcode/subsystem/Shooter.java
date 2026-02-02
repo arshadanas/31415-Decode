@@ -131,6 +131,7 @@ public final class Shooter {
     void run(boolean inLaunchZone, boolean feedsPending) {
         rpmFilter.setGains(rpmFilterGains);
         derivFilter.setGains(pidFilterGains);
+        outputFilter.setGains(outputFilterGains);
         controller.setGains(pidGains);
 
         double lastRawRPM = rawRPM;
