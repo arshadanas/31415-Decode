@@ -59,14 +59,14 @@ public final class Robot {
                 break;
         }
 
+        shooter.run(currentZone != NONE, handler.feedsPending());
+        turret.run(handler.feedsPending());
         handler.run(
                 currentZone != NONE,
                 feed &&
                 shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
                 turret.inTolerance(Turret.TOLERANCE_FEEDING)
         );
-        shooter.run(currentZone != NONE, handler.feedsPending());
-        turret.run(handler.feedsPending());
 
         lift.run();
     }
