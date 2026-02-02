@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
+import org.firstinspires.ftc.teamcode.control.filter.CoolerKalmanFilter;
 import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
@@ -45,7 +46,7 @@ public final class Shooter {
 
     public static PIDGains pidGains = new PIDGains();
     public static KalmanGains
-            rpmFilterGains = new KalmanGains(.8, 3),
+            rpmFilterGains = new KalmanGains(3, 0.01),
             pidFilterGains = new KalmanGains(),
             outputFilterGains = new KalmanGains();
 
@@ -78,13 +79,14 @@ public final class Shooter {
     private final CachedMotorEx[] motors;
     private final VoltageSensor batteryVoltageSensor;
 
+    private final CoolerKalmanFilter rpmFilter = new CoolerKalmanFilter();
     private final KalmanFilter
-            rpmFilter = new KalmanFilter(rpmFilterGains),
+//            rpmFilter = new KalmanFilter(rpmFilterGains),
             derivFilter = new KalmanFilter(pidFilterGains),
             outputFilter = new KalmanFilter(outputFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
 
-    private double currentRPM, targetRPM = RPM_ARMING, rawRPM, output;
+    private double currentRPM, currentRPMPerSec, targetRPM = RPM_ARMING, rawRPM, output, lastOutput;
 
     public void setRPM(double rpm) {
         this.targetRPM = rpm;
@@ -133,8 +135,16 @@ public final class Shooter {
 
         double lastRawRPM = rawRPM;
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
-        if (lastRawRPM != rawRPM)
-            currentRPM = rpmFilter.calculate(rawRPM);
+
+        double controlInput = (lerp(output, POWER_A, POWER_B, RPM_A, RPM_B)
+                            - lerp(lastOutput, POWER_A, POWER_B, RPM_A, RPM_B));
+
+        double[] stateEstimate = lastRawRPM == rawRPM ?
+                rpmFilter.predictOnly(controlInput) :
+                rpmFilter.predictAndCalculate(rawRPM, controlInput);
+
+        currentRPM = stateEstimate[0];
+        currentRPMPerSec = stateEstimate[1];
 
         double rpmSetpoint =
                 !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
@@ -148,6 +158,7 @@ public final class Shooter {
         double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
 
+        lastOutput = output;
         output = manualPower != 0 ? manualPower : clip(
                         inTolerance(TOLERANCE_RPM_FILTERING) ?
                                     outputFilter.calculate(pidf) :
@@ -168,9 +179,10 @@ public final class Shooter {
                                                         "RPM out of tolerance"
         );
         telemetry.addLine();
-        telemetry.addData("Current (rpm)", currentRPM);
-        telemetry.addData("Target (rpm)", targetRPM);
-        telemetry.addData("Raw (rpm)", rawRPM);
+        telemetry.addData("Current vel (rpm)", currentRPM);
+        telemetry.addData("Current accel (rpm/s)", currentRPMPerSec);
+        telemetry.addData("Target vel (rpm)", targetRPM);
+        telemetry.addData("Raw vel (rpm)", rawRPM);
         telemetry.addData("Output power [0,1]", output);
         telemetry.addLine();
         telemetry.addData("Filtered error derivative (rpm/s)", controller.getFilteredErrorDerivative());

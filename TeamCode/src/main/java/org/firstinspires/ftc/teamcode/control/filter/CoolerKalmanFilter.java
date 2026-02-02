@@ -98,7 +98,7 @@ public class CoolerKalmanFilter {
     }
 
     private void predict(double controlInput) {
-        double dt = timer.seconds();
+        double dt = Math.max(timer.seconds(), 0.000000001);
         timer.reset();
 
         stateTransitionA.setEntry(0, 1, dt);
