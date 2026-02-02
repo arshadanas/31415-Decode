@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NEAR;
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
 import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_FAR;
 import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_NEAR;
@@ -46,7 +47,8 @@ public final class Robot {
         if (!lift.gearSwitch.isActivated())
             drivetrain.update();
 
-        currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
+        currentZone = NEAR;
+                LaunchZone.getCurrentZone(drivetrain.getPose());
 
         switch (currentZone) {
             case NEAR:
