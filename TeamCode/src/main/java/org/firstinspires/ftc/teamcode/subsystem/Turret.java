@@ -77,6 +77,7 @@ public final class Turret {
             motor.set(pid);
         else {
             motor.set(0);
+            controller.reset();
             quadratureOffset += normalizeRadians(absolutePosition - position);
         }
     }
