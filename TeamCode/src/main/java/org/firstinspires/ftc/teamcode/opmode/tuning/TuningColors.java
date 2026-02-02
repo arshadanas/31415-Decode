@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
 @Config
-@TeleOp(group = "Single mechanism test")
+@TeleOp(group = "Testing/tuning")
 public final class TuningColors extends LinearOpMode {
 
     @Override

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-@TeleOp
+@TeleOp(group = "Testing/tuning")
 public final class TuneContainer extends LinearOpMode {
 
     @Override

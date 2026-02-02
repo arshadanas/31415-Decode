@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.LaserRangefinder;
 
-@TeleOp(group = "Brushland")
+@TeleOp(group = "Testing/tuning")
 public class ConfigureLaserRangefinder extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

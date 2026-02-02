@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -9,7 +10,8 @@ import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
 
 
-@TeleOp(group = "Single mechanism test")
+@Disabled
+@TeleOp(group = "Testing/tuning")
 public final class TestIndicators extends LinearOpMode {
 
     @Override

@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.opmode.multimechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
-import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_L;
-import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GATE_R;
-import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_L;
-import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.GEAR_R;
-import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TuneServos.TestServo.HOOD;
+import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GATE_L;
+import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GATE_R;
+import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GEAR_L;
+import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GEAR_R;
+import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.HOOD;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_ENGAGED;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_INACTIVE;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_L_OFFSET;
@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 @Config
-@TeleOp(group = "Multiple mechanism test")
+@TeleOp(group = "Testing/tuning")
 public final class TuneServos extends LinearOpMode {
 
     public static double

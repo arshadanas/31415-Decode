@@ -1,18 +1,20 @@
-package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.control.motion.PIDDriver;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 
-
-//@TeleOp(group = "Single mechanism test")
+@Disabled
 //@Config
+@TeleOp(group = "Testing/tuning")
 public final class TuningPIDDriver extends LinearOpMode {
 
     public static EditablePose target = new EditablePose(0, 0, 0);

@@ -19,27 +19,43 @@
  * SOFTWARE.
  */
 
-package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
+
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.control.vision.detector.TeamPropDetector;
+import org.firstinspires.ftc.teamcode.control.vision.detector.AprilTagDetector;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
-//@TeleOp(group = "Single mechanism test")
-public final class TestTeamPropDetector extends LinearOpMode {
+@Disabled
+@TeleOp(group = "Testing/tuning")
+public final class TestAprilTagDetector extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        TeamPropDetector detector = new TeamPropDetector(hardwareMap, telemetry);
+        telemetry = new MultipleTelemetry(telemetry);
+        AprilTagDetector camera = new AprilTagDetector(
+                hardwareMap,
+                OpenCvCameraRotation.UPRIGHT,
+                "camera back",
+                0.166,
+                1, 2, 3
+        );
 
         while (opModeInInit()) {
-
-            if (gamepad1.x) detector.pipeline.isRedAlliance = false;
-            if (gamepad1.b) detector.pipeline.isRedAlliance = true;
-
-            detector.print();
+            camera.run();
+            camera.printTagIsVisible(telemetry);
+            camera.printDetections(telemetry);
             telemetry.update();
         }
+
+        //START IS HERE//
+
+        camera.stop();
+        telemetry.update();
     }
 }

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.singlemechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorRangefinder;
 
 @Config
-@TeleOp(group = "Brushland")
+@TeleOp(group = "Testing/tuning")
 public class ConfigureColorRangefinder extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

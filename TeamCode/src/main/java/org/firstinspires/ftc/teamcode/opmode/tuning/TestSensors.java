@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode.multimechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMot
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
 @Config
-@TeleOp(group = "Multiple mechanism test")
+@TeleOp(group = "Testing/tuning")
 public final class TestSensors extends LinearOpMode {
 
     @Override

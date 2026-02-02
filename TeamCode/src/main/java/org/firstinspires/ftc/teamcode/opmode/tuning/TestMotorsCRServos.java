@@ -1,9 +1,9 @@
-package org.firstinspires.ftc.teamcode.opmode.multimechtest;
+package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
-import static org.firstinspires.ftc.teamcode.opmode.multimechtest.TestMotorsCRServos.TestMech.ROTOR;
+import static org.firstinspires.ftc.teamcode.opmode.tuning.TestMotorsCRServos.TestMech.ROTOR;
 
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 
-@TeleOp(group = "Multiple mechanism test")
+@TeleOp(group = "Testing/tuning")
 public final class TestMotorsCRServos extends LinearOpMode {
 
     enum TestMech {

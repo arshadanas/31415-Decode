@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-@TeleOp
+@TeleOp(group = "Testing/tuning")
 public final class TuneShooter extends LinearOpMode {
 
     public static double targetRPM = 3000;
