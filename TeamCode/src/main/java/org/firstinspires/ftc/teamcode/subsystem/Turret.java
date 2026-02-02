@@ -65,21 +65,20 @@ public final class Turret {
     void run(boolean feedsPending) {
 
         position = motor.encoder.getDistance() + quadratureOffset;
-        absolutePosition = normalizeRadians(-absoluteEnc.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
+
+        if (!feedsPending) {
+            motor.set(0);
+            controller.reset();
+            absolutePosition = normalizeRadians(-absoluteEnc.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
+            quadratureOffset += normalizeRadians(absolutePosition - position);
+            return;
+        }
 
         derivFilter.setGains(filterGains);
         controller.setGains(pidGains);
 
         controller.setTarget(new State(normalizeRadians(target + PI - WRAPAROUND_POSITION)));
-        double pid = controller.calculate(new State(position + PI - WRAPAROUND_POSITION));
-
-        if (feedsPending)
-            motor.set(pid);
-        else {
-            motor.set(0);
-            controller.reset();
-            quadratureOffset += normalizeRadians(absolutePosition - position);
-        }
+        motor.set(controller.calculate(new State(position + PI - WRAPAROUND_POSITION)));
     }
 
     boolean inTolerance(double tolerance) {
