@@ -226,7 +226,7 @@ public final class Container {
             if (artifacts[i] != EMPTY)
                 continue;
 
-            double error = getError(i, Position.INTAKING);
+            double error = abs(getError(i, Position.INTAKING));
             if (error < min){
                 min = error;
                 minInd = i;
@@ -245,7 +245,7 @@ public final class Container {
             if (artifacts[i] == EMPTY)
                 continue;
 
-            double error = getError(i, Position.FEEDING);
+            double error = abs(getError(i, Position.FEEDING));
             if (error < min){
                 min = error;
                 minInd = i;
@@ -264,7 +264,7 @@ public final class Container {
             if (artifacts[i] != color)
                 continue;
 
-            double error = getError(i, Position.FEEDING);
+            double error = abs(getError(i, Position.FEEDING));
             if (error < min){
                 min = error;
                 minInd = i;
@@ -304,13 +304,10 @@ public final class Container {
     void printTo(Telemetry telemetry) {
         telemetry.addData("CONTAINER", Arrays.toString(artifacts));
         telemetry.addLine();
-        telemetry.addData(String.format("Current (slot %s) (deg)", selectedSlot), toDegrees(getPositionOf(selectedSlot)));
-        telemetry.addData("Target (deg)", toDegrees(target.radians));
+        telemetry.addData("Position [0] (deg)", toDegrees(position));
         telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
         telemetry.addData("Filtered error derivative (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
         telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
-        telemetry.addLine();
-        telemetry.addData("Position (slot 0) (deg)", toDegrees(position));
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", front1.getReading());
         telemetry.addData("Back dist (mm)", back1.getReading());
