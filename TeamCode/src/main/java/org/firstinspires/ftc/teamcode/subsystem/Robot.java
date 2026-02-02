@@ -81,6 +81,10 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         handler.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
+        shooter.printTo(telemetry);
+        telemetry.addLine("\n--------------------------------------\n");
+        turret.printTo(telemetry);
+        telemetry.addLine("\n--------------------------------------\n");
         lift.printTo(telemetry);
     }
 }
