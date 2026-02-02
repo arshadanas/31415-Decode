@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.control.controller.PIDController;
 import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
+import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
@@ -31,10 +32,12 @@ import java.util.Arrays;
 public final class Container {
 
     private final KalmanFilter derivFilter = new KalmanFilter(filterGains, true);
-    public static KalmanGains filterGains = new KalmanGains(15.9, 12);
+    public static KalmanGains filterGains = new KalmanGains(5, 0);
 
-    private final PIDController controller = new PIDController(derivFilter);
-    public static PIDGains pidGains = new PIDGains(0.125, 0.5, 0.015, 0.15);
+    private final Differentiator kD = new Differentiator();
+
+    private final PIDController controller = new PIDController();
+    public static PIDGains pidGains = new PIDGains(0.14, 0, 0.01, 0.15);
 
     public static double
             ABS_OFFSET_ROTOR = 2.3780904389900916,
@@ -119,7 +122,7 @@ public final class Container {
     void run(double feederPower) {
 
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
-
+        double velocity = kD.getDerivative(derivFilter.calculate(position));
 
         int currentFrontSlot = getSlotAt(Position.INTAKING);
         if (
@@ -161,7 +164,7 @@ public final class Container {
         controller.setGains(pidGains);
         controller.setTarget(new State(getError(selectedSlot, target)));
 
-        double servoPower = controller.calculate(new State());
+        double servoPower = controller.calculate(new State(0, velocity));
 
         int frictionSlot = getSlotAt(Position.FRICTION_ZONE);
         double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
