@@ -127,13 +127,14 @@ public final class Container {
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 
-    void run(double feederPower) {
+    void run(double intakePower, double feederPower) {
 
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
         double velocity = kD.getDerivative(derivFilter.calculate(position));
 
         int currentFrontSlot = getSlotAt(Zone.INTAKE_SENSORS);
         if (
+                intakePower > 0 && // intake is running
                 currentFrontSlot != -1 &&   // there is a slot near the front intaking zone
                 artifacts[currentFrontSlot] == EMPTY && // the slot was previously empty
                 front1.getReading() < THRESHOLD_FRONT_MM // there is something in front of the distance sensor
@@ -150,9 +151,9 @@ public final class Container {
         // check back slot sensors
         int currentBackSlot = getSlotAt(Zone.FEEDER_SENSORS);
         if (
+                feederPower > 0 &&  // the feeder is running
                 currentBackSlot != -1 && // there is a slot near the back feeding zone
                 artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
-                feederPower > 0 &&  // the feeder is running
                 back1.getReading() > THRESHOLD_BACK_MM // distance sensor reports no artifact
         )
             artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out

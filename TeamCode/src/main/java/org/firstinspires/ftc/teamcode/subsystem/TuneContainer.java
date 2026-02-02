@@ -28,7 +28,7 @@ public final class TuneContainer extends LinearOpMode {
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            container.run(0);
+            container.run(1,1);
 
 //            for (CRServo servo : container.servos)
 //                servo.setPower(gamepad1.right_trigger - gamepad1.left_trigger);

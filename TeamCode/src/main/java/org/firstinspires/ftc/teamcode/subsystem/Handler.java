@@ -116,7 +116,7 @@ public final class Handler {
         for (CRServo servo : feeder)
             servo.setPower(feederPower);
 
-        container.run(feederPower);
+        container.run(intakePower, feederPower);
 
         intake.set(container.adaptiveClipIntakePower(intakePower));
     }
