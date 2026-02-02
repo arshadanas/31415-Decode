@@ -5,7 +5,6 @@ import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
-import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
 
 @Config
 public enum Artifact {
@@ -50,18 +49,7 @@ public enum Artifact {
     }
 
     public Artifact or(Artifact other) {
-        return
-                this == other ? this :
-                this == EMPTY ? other :
-                                this;
-    }
-
-    public LEDIndicator.LEDColor toLEDColor() {
-        switch (this) {
-            case PURPLE:    return LEDIndicator.LEDColor.RED;
-            case GREEN:     return LEDIndicator.LEDColor.GREEN;
-            default:        return LEDIndicator.LEDColor.OFF;
-        }
+        return this == EMPTY ? other : this;
     }
 
     /**

@@ -162,9 +162,9 @@ public final class Container {
         int n = 0;
         for (Artifact a : artifacts)
             if (a != EMPTY)
-                indicators[n++].setColor(a.toLEDColor());
+                indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
         while (n < artifacts.length)
-            indicators[n++].setColor(EMPTY.toLEDColor());
+            indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
 
 
         // run pid

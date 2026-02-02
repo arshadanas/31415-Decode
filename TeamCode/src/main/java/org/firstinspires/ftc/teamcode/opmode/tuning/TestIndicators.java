@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -42,10 +43,10 @@ public final class TestIndicators extends LinearOpMode {
             int n = 0;
             for (Artifact a : artifacts) {
                 if (a != EMPTY)
-                    indicators[n++].setColor(a.toLEDColor());
+                    indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
             }
             while (n < artifacts.length)
-                indicators[n++].setColor(EMPTY.toLEDColor());
+                indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
 
             telemetry.addData("Slot 0", artifacts[0]);
             telemetry.addData("Slot 1", artifacts[1]);
