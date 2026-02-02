@@ -46,7 +46,7 @@ public final class Shooter {
 
     public static PIDGains pidGains = new PIDGains();
     public static KalmanGains
-            rpmFilterGains = new KalmanGains(3, 0.01),
+            rpmFilterGains = new KalmanGains(2.9, 0.03),
             pidFilterGains = new KalmanGains(),
             outputFilterGains = new KalmanGains();
 
@@ -137,12 +137,7 @@ public final class Shooter {
         double lastRawRPM = rawRPM;
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
 
-        double controlInput = (lerp(output, POWER_A, POWER_B, RPM_A, RPM_B)
-                            - lerp(lastOutput, POWER_A, POWER_B, RPM_A, RPM_B));
-
-        double[] stateEstimate = lastRawRPM == rawRPM ?
-                rpmFilter.predictOnly(controlInput) :
-                rpmFilter.predictAndCalculate(rawRPM, controlInput);
+        double[] stateEstimate = rpmFilter.predictAndCalculate(rawRPM, 0);
 
         currentRPM = stateEstimate[0];
         currentRPMPerSec = stateEstimate[1];

@@ -32,8 +32,8 @@ public class CoolerKalmanFilter {
     // B = [ dt ]
     //     [ 1  ]
     private final RealMatrix controlB = new Array2DRowRealMatrix(new double[][] {
-            { initialDt },
-            {         1 }
+            { Math.pow(initialDt, 2d) / 2d },
+            {         initialDt }
     }, false);
 
     // H = [ 1 0 ]
@@ -102,7 +102,8 @@ public class CoolerKalmanFilter {
         timer.reset();
 
         stateTransitionA.setEntry(0, 1, dt);
-        controlB.setEntry(0, 0, dt);
+        controlB.setEntry(0, 0, Math.pow(dt, 2d) / 2d );
+        controlB.setEntry(1, 0, dt);
         updateProcessNoise(dt);
         measurementNoiseR.setEntry(0,0, Math.pow(gains.R, 2));
 
