@@ -46,10 +46,10 @@ public final class Container {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
-            TOLERANCE_FRONT = toRadians(20),
-            TOLERANCE_BACK = toRadians(20),
-            TOLERANCE_FRICTION = toRadians(35),
-            TOLERANCE_FRONT_OMNI = toRadians(30),
+            TOLERANCE_INTAKE_SENSORS = toRadians(20),
+            TOLERANCE_FEEDER_SENSORS = toRadians(20),
+            TOLERANCE_FEEDER_OMNIS = toRadians(35),
+            TOLERANCE_INTAKE_OMNI = toRadians(30),
 
             POWER_OVERCOME_FRICTION = 0.06;
 
@@ -74,25 +74,25 @@ public final class Container {
     final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
 
     private int selectedSlot = 0;
-    private Position target = Position.INTAKING;
+    private Zone target = Zone.INTAKE_SENSORS;
 
-    enum Position {
-        INTAKING(0),
-        FEEDING(PI),
-        FRICTION_ZONE(PI),
-        FRONT_OMNI_ZONE(0);
+    enum Zone {
+        INTAKE_SENSORS(0),
+        INTAKE_OMNI(0),
+        FEEDER_SENSORS(PI),
+        FEEDER_OMNIS(PI);
 
         private final double radians;
-        Position(double radians) {
+        Zone(double radians) {
             this.radians = radians;
         }
 
         private double getTolerance() {
             switch (this) {
-                case FEEDING:           return TOLERANCE_BACK;
-                case FRICTION_ZONE:     return TOLERANCE_FRICTION;
-                case FRONT_OMNI_ZONE:   return TOLERANCE_FRONT_OMNI;
-                default:                return TOLERANCE_FRONT;
+                case INTAKE_OMNI:    return TOLERANCE_INTAKE_OMNI;
+                case FEEDER_SENSORS: return TOLERANCE_FEEDER_SENSORS;
+                case FEEDER_OMNIS:   return TOLERANCE_FEEDER_OMNIS;
+                default:             return TOLERANCE_INTAKE_SENSORS;
             }
         }
 
@@ -124,7 +124,7 @@ public final class Container {
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
         double velocity = kD.getDerivative(derivFilter.calculate(position));
 
-        int currentFrontSlot = getSlotAt(Position.INTAKING);
+        int currentFrontSlot = getSlotAt(Zone.INTAKE_SENSORS);
         if (
                 currentFrontSlot != -1 &&   // there is a slot near the front intaking zone
                 artifacts[currentFrontSlot] == EMPTY && // the slot was previously empty
@@ -140,7 +140,7 @@ public final class Container {
 
 
         // check back slot sensors
-        int currentBackSlot = getSlotAt(Position.FEEDING);
+        int currentBackSlot = getSlotAt(Zone.FEEDER_SENSORS);
         if (
                 currentBackSlot != -1 && // there is a slot near the back feeding zone
                 artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
@@ -166,7 +166,7 @@ public final class Container {
 
         double servoPower = controller.calculate(new State(0, velocity));
 
-        int frictionSlot = getSlotAt(Position.FRICTION_ZONE);
+        int frictionSlot = getSlotAt(Zone.FEEDER_OMNIS);
         double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
                                     POWER_OVERCOME_FRICTION * signum(servoPower) : 0;
 
@@ -181,7 +181,7 @@ public final class Container {
      * if there is no {@link Artifact} touching the intake's front omni wheel
      */
     double adaptiveClipIntakePower(double intakePower) {
-        int omniSlot = getSlotAt(Position.FRONT_OMNI_ZONE);
+        int omniSlot = getSlotAt(Zone.INTAKE_OMNI);
         if (
                 intakePower >= 0 &&
                 intakePower < INTAKE_POWER_OMNI_CONTACT &&
@@ -202,7 +202,7 @@ public final class Container {
     /**
      * @param slot Slot you wish to move (0, 1 or 2)
      */
-    void moveSlot(int slot, Position target) {
+    void moveSlot(int slot, Zone target) {
         this.selectedSlot = wrap(slot, 0, artifacts.length);
         this.target = target;
     }
@@ -226,7 +226,7 @@ public final class Container {
             if (artifacts[i] != EMPTY)
                 continue;
 
-            double error = abs(getError(i, Position.INTAKING));
+            double error = abs(getError(i, Zone.INTAKE_SENSORS));
             if (error < min){
                 min = error;
                 minInd = i;
@@ -245,7 +245,7 @@ public final class Container {
             if (artifacts[i] == EMPTY)
                 continue;
 
-            double error = abs(getError(i, Position.FEEDING));
+            double error = abs(getError(i, Zone.FEEDER_SENSORS));
             if (error < min){
                 min = error;
                 minInd = i;
@@ -264,7 +264,7 @@ public final class Container {
             if (artifacts[i] != color)
                 continue;
 
-            double error = abs(getError(i, Position.FEEDING));
+            double error = abs(getError(i, Zone.FEEDER_SENSORS));
             if (error < min){
                 min = error;
                 minInd = i;
@@ -280,7 +280,7 @@ public final class Container {
     /**
      * @return The (index of the) slot currently at the given target, -1 if no slot at that position
      */
-    int getSlotAt(Position target) {
+    int getSlotAt(Zone target) {
         for (int i = 0; i < artifacts.length; i++)
             if (atPosition(i, target))
                 return i;
@@ -290,14 +290,14 @@ public final class Container {
     /**
      * @return  If the given slot is at the given target, within tolerance in either direction
      */
-    boolean atPosition(int slot, Position target) {
+    boolean atPosition(int slot, Zone target) {
         return abs(getError(slot, target)) <= target.getTolerance();
     }
 
     /**
      * @return  Distance, in radians, between given slot's position and given target
      */
-    double getError(int slot, Position target) {
+    double getError(int slot, Zone target) {
         return normalizeRadians(target.radians - getPositionOf(slot));
     }
 

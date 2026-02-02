@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.subsystem.Container.Position.FEEDING;
-import static org.firstinspires.ftc.teamcode.subsystem.Container.Position.INTAKING;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.Zone.FEEDER_SENSORS;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.Zone.INTAKE_SENSORS;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -35,22 +35,22 @@ public final class TuneContainer extends LinearOpMode {
 //                servo.setPower(Container.ffGains.kV * Container.MAX_VEL);
 
             if (gamepad1.dpadLeftWasPressed())
-                container.moveSlot(0, FEEDING);
+                container.moveSlot(0, FEEDER_SENSORS);
 
             else if (gamepad1.dpadUpWasPressed())
-                container.moveSlot(1, FEEDING);
+                container.moveSlot(1, FEEDER_SENSORS);
 
             else if (gamepad1.dpadRightWasPressed())
-                container.moveSlot(2, FEEDING);
+                container.moveSlot(2, FEEDER_SENSORS);
 
             else if (gamepad1.squareWasPressed())
-                container.moveSlot(0, INTAKING);
+                container.moveSlot(0, INTAKE_SENSORS);
 
             else if (gamepad1.triangleWasPressed())
-                container.moveSlot(1, INTAKING);
+                container.moveSlot(1, INTAKE_SENSORS);
 
             else if (gamepad1.circleWasPressed())
-                container.moveSlot(2, INTAKING);
+                container.moveSlot(2, INTAKE_SENSORS);
 
             container.printTo(telemetry);
             telemetry.update();

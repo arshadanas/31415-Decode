@@ -92,13 +92,13 @@ public final class Handler {
 
         // move empty slot to intake
         if (intakePower != 0 && EMPTY.numOccurrencesIn(container.artifacts) > 0)
-            container.moveSlot(container.getNearestIntakeSlot(), Container.Position.INTAKING);
+            container.moveSlot(container.getNearestIntakeSlot(), Container.Zone.INTAKE_SENSORS);
         // move filled slot to feeder
         else if (!feedingOrder.isEmpty())
-            container.moveSlot(feedingOrder.get(0), Container.Position.FEEDING);
+            container.moveSlot(feedingOrder.get(0), Container.Zone.FEEDER_SENSORS);
 
 
-        int slotAtFeeder = container.getSlotAt(Container.Position.FEEDING);
+        int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_SENSORS);
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower : // manual power takes priority
                         inLaunchZone && shooterReady && // <-- don't feed until we can shoot
@@ -133,7 +133,7 @@ public final class Handler {
 
         feedingOrder.add(first);
 
-        int signOfFirstError = (int) signum(container.getError(first, Container.Position.FEEDING));
+        int signOfFirstError = (int) signum(container.getError(first, Container.Zone.FEEDER_SENSORS));
 
         int second = wrap(first - signOfFirstError, 0, 3);
         if (container.get(second) != EMPTY)
