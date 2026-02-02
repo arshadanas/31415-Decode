@@ -4,6 +4,7 @@ import static com.acmerobotics.roadrunner.Math.lerp;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.abs;
+import static java.lang.Math.max;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -134,10 +135,9 @@ public final class Shooter {
         outputFilter.setGains(outputFilterGains);
         controller.setGains(pidGains);
 
-        double lastRawRPM = rawRPM;
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
 
-        double[] stateEstimate = rpmFilter.predictAndCalculate(rawRPM, 0);
+        double[] stateEstimate = rpmFilter.predictAndCalculate(max(rawRPM, 0), 0);
 
         currentRPM = stateEstimate[0];
         currentRPMPerSec = stateEstimate[1];
