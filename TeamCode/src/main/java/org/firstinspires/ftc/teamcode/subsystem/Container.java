@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
+import static org.firstinspires.ftc.teamcode.control.Ranges.lerp;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
@@ -37,7 +38,36 @@ public final class Container {
     private final Differentiator kD = new Differentiator();
 
     private final PIDController controller = new PIDController();
-    public static PIDGains pidGains = new PIDGains(0.14, 0, 0.01, 0.15);
+    public static PIDGains
+            pidGainsEmpty = new PIDGains(0.14, 0, 0.01, 0.15),
+            pidGainsFull = new PIDGains(0.14, 0, 0.01, 0.15);
+
+    private final PIDGains pidGains = new PIDGains();
+
+    private PIDGains getPIDGains() {
+        double t = EMPTY.numOccurrencesIn(artifacts) / 3.0;
+        pidGains.kP = lerp(
+                pidGainsFull.kP,
+                pidGainsEmpty.kP,
+                t
+        );
+        pidGains.kI = lerp(
+                pidGainsFull.kI,
+                pidGainsEmpty.kI,
+                t
+        );
+        pidGains.kD = lerp(
+                pidGainsFull.kD,
+                pidGainsEmpty.kD,
+                t
+        );
+        pidGains.maxOutputWithIntegral = lerp(
+                pidGainsFull.maxOutputWithIntegral,
+                pidGainsEmpty.maxOutputWithIntegral,
+                t
+        );
+        return pidGains;
+    }
 
     public static double
             ABS_OFFSET_ROTOR = 2.3780904389900916,
@@ -169,7 +199,7 @@ public final class Container {
 
         // run pid
         derivFilter.setGains(filterGains);
-        controller.setGains(pidGains);
+        controller.setGains(getPIDGains());
         controller.setTarget(new State(getError(selectedSlot, target)));
 
         double servoPower = controller.calculate(new State(0, velocity));
