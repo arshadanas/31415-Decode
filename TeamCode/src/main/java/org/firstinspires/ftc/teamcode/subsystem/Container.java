@@ -10,6 +10,7 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static java.lang.Math.toDegrees;
+import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -70,7 +71,7 @@ public final class Container {
     }
 
     public static double
-            ABS_OFFSET_ROTOR = 2.3780904389900916,
+            ABS_OFFSET_ROTOR = 2.8863382504856223,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
@@ -189,13 +190,16 @@ public final class Container {
 
 
         // LEDs
-        int n = 0;
-        for (Artifact a : artifacts)
-            if (a != EMPTY)
-                indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
-        while (n < artifacts.length)
-            indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
+//        int n = 0;
+//        for (Artifact a : artifacts)
+//            if (a != EMPTY)
+//                indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
+//        while (n < artifacts.length)
+//            indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
 
+//        boolean teegooglycoffemeat = true;
+//        if (teegooglycoffemeat)
+//            return;
 
         // run pid
         derivFilter.setGains(filterGains);

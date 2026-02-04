@@ -1,18 +1,23 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.PI;
 import static java.lang.Math.atan2;
+import static java.lang.Math.max;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(group = "Testing/tuning")
 public final class TuneTurret extends LinearOpMode {
 
+    private final ElapsedTime loopTimer = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -20,13 +25,14 @@ public final class TuneTurret extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         Turret turret = new Turret(hardwareMap);
+        turret.motor.encoder.setDirection(Motor.Direction.REVERSE);
 
         waitForStart(); // -------------------------------------------------------------------------------------------------------------------
 
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            turret.run(!gamepad1.square);
+            turret.run(gamepad1.square);
 
             float x = gamepad1.right_stick_x, y = gamepad1.right_stick_y;
             if (x*x + y*y >= 0.64)
@@ -41,6 +47,8 @@ public final class TuneTurret extends LinearOpMode {
             else if (gamepad1.dpadRightWasPressed())
                 turret.setTarget(-PI/2);
 
+            telemetry.addData("LOOP TIME", loopTimer.seconds());
+            loopTimer.reset();
             turret.printTo(telemetry);
             telemetry.update();
         }

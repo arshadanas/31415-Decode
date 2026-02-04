@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
+import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.FORWARD;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
+import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
@@ -33,13 +34,13 @@ public final class Turret {
             WRAPAROUND_POSITION = toRadians(180),
             TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
 
-    private final CachedMotorEx motor;
+    final CachedMotorEx motor;
     private final AnalogSensor absoluteEnc;
 
     /**
      * In radians
      */
-    private double position, quadratureOffset, target, absolutePosition;
+    private double position, quadratureOffset, target, absolutePosition, output;
     public void setTarget(double target) {
         this.target = normalizeRadians(target);
     }
@@ -53,7 +54,7 @@ public final class Turret {
         motor.setZeroPowerBehavior(BRAKE);
 
         motor.encoder = new CachedMotorEx(hardwareMap, "BL", Motor.GoBILDA.RPM_1150).encoder;
-        motor.encoder.setDirection(REVERSE);
+        motor.encoder.setDirection(FORWARD);
         motor.encoder.setDistancePerPulse(QUADRATURE_RAD_PER_TICK);
         motor.encoder.reset();
 
@@ -78,7 +79,7 @@ public final class Turret {
         controller.setGains(pidGains);
 
         controller.setTarget(new State(normalizeRadians(target + PI - WRAPAROUND_POSITION)));
-        motor.set(controller.calculate(new State(position + PI - WRAPAROUND_POSITION)));
+        motor.set(output = controller.calculate(new State(position + PI - WRAPAROUND_POSITION)));
     }
 
     boolean inTolerance(double tolerance) {
@@ -96,5 +97,8 @@ public final class Turret {
         telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
         telemetry.addLine();
         telemetry.addData("Absolute position (deg)", toDegrees(absolutePosition));
+
+        telemetry.addData("Turret motor output power", output);
+
     }
 }

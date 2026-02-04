@@ -2,11 +2,14 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 
+import static java.lang.Math.max;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -14,6 +17,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @TeleOp(group = "Testing/tuning")
 public final class TuneShooter extends LinearOpMode {
 
+    private final ElapsedTime loopTimer = new ElapsedTime();
     public static double targetRPM = 3000;
 
     @Override
@@ -41,6 +45,8 @@ public final class TuneShooter extends LinearOpMode {
             shooter.setRPM(targetRPM);
             shooter.setManual(gamepad1.right_trigger);
 
+            telemetry.addData("LOOP TIME", loopTimer.seconds());
+            loopTimer.reset();
             shooter.printTo(telemetry);
             telemetry.update();
         }

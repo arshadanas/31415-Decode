@@ -3,16 +3,20 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static org.firstinspires.ftc.teamcode.subsystem.Container.Zone.FEEDER_SENSORS;
 import static org.firstinspires.ftc.teamcode.subsystem.Container.Zone.INTAKE_SENSORS;
 
+import static java.lang.Math.max;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @TeleOp(group = "Testing/tuning")
 public final class TuneContainer extends LinearOpMode {
 
+    private final ElapsedTime loopTimer = new ElapsedTime();
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -53,7 +57,12 @@ public final class TuneContainer extends LinearOpMode {
                 container.moveSlot(2, INTAKE_SENSORS);
 
             container.printTo(telemetry);
+
+            telemetry.addData("LOOP TIME", loopTimer.seconds());
+            loopTimer.reset();
             telemetry.update();
+
+
         }
     }
 }
