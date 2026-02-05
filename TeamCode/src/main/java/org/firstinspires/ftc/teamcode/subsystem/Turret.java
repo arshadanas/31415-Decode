@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.FORWARD;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.BRAKE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
@@ -26,12 +25,12 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 public final class Turret {
 
     public static KalmanGains filterGains = new KalmanGains(.5, 50);
-    public static PIDGains pidGains = new PIDGains(1, 0.5, 0.057, 0.25);
+    public static PIDGains pidGains = new PIDGains(0, 0, 0, 0.25);
 
     public static double
-            TURRET_ABSOLUTE_OFFSET = 1.4318046518178937,
+            TURRET_ABSOLUTE_OFFSET = 0,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
-            WRAPAROUND_POSITION = toRadians(180),
+            WRAPAROUND_POSITION = toRadians(0),
             TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
 
     final CachedMotorEx motor;
