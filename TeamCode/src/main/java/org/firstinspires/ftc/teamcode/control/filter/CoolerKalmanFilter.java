@@ -2,15 +2,15 @@ package org.firstinspires.ftc.teamcode.control.filter;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.apache.commons.math4.legacy.filter.DefaultMeasurementModel;
-import org.apache.commons.math4.legacy.filter.DefaultProcessModel;
-import org.apache.commons.math4.legacy.filter.MeasurementModel;
-import org.apache.commons.math4.legacy.filter.ProcessModel;
-import org.apache.commons.math4.legacy.linear.Array2DRowRealMatrix;
-import org.apache.commons.math4.legacy.linear.ArrayRealVector;
-import org.apache.commons.math4.legacy.linear.RealMatrix;
-import org.apache.commons.math4.legacy.linear.RealVector;
-import org.apache.commons.math4.legacy.filter.KalmanFilter;
+import org.apache.commons.math3.filter.DefaultMeasurementModel;
+import org.apache.commons.math3.filter.DefaultProcessModel;
+import org.apache.commons.math3.filter.MeasurementModel;
+import org.apache.commons.math3.filter.ProcessModel;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 
 public class CoolerKalmanFilter {
@@ -26,7 +26,7 @@ public class CoolerKalmanFilter {
     //     [ 0  1 ]
     private final RealMatrix stateTransitionA = new Array2DRowRealMatrix(new double[][] {
             { 1, initialDt },
-            { 0,         1 }
+            { 0.01,         1 }
     }, false);
 
     // B = [ dt ]
@@ -38,7 +38,7 @@ public class CoolerKalmanFilter {
 
     // H = [ 1 0 ]
     private final RealMatrix measurementModelH = new Array2DRowRealMatrix(new double[][] {
-            { 1d, 0d }
+            { 1d, 0.01d }
     }, false);
 
     // x = [ 0 0 ]
@@ -47,8 +47,8 @@ public class CoolerKalmanFilter {
     // Q = [ dt^4/4 dt^3/2 ]
     //     [ dt^3/2 dt^2   ]
     private final RealMatrix processNoiseQ = new Array2DRowRealMatrix(new double[][] {
-            { 0, 0 },
-            { 0, 0 }
+            { 0.01, 0.01 },
+            { 0.01, 0.01 }
     }, false);
 
     private void updateProcessNoise(double dt){
@@ -62,8 +62,8 @@ public class CoolerKalmanFilter {
     // P0 = [ 1 1 ]
     //      [ 1 1 ]
     private final RealMatrix errorCovarianceP0 = new Array2DRowRealMatrix(new double[][] {
-            { 1, 1 },
-            { 1, 1 }
+            { 1.01, 1.01 },
+            { 1.01, 1.01 }
     }, false);
 
     // R = [ measurementNoise^2 ]
@@ -80,7 +80,7 @@ public class CoolerKalmanFilter {
         updateProcessNoise(initialDt);
     }
 
-    private final RealVector realMeasurement = new ArrayRealVector(new double[]{ 0.0d });
+    private final RealVector realMeasurement = new ArrayRealVector(new double[]{ 0.001d });
 
     private final ElapsedTime timer = new ElapsedTime();
 
@@ -88,13 +88,16 @@ public class CoolerKalmanFilter {
         predict(controlInput);
         return filter.getStateEstimation();
     }
-
+    boolean completedFirstLoop = false;
     public double[] predictAndCalculate(double measurement, double controlInput) {
         predict(controlInput);
 
         realMeasurement.setEntry(0, measurement);
-        filter.correct(realMeasurement);
-
+        if (!completedFirstLoop) {
+            completedFirstLoop = true;
+        } else {
+            filter.correct(realMeasurement);
+        }
         return filter.getStateEstimation();
     }
 
