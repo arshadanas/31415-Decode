@@ -10,7 +10,6 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -24,7 +23,6 @@ import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
 import org.firstinspires.ftc.teamcode.control.motion.State;
-import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
@@ -40,8 +38,8 @@ public final class Container {
 
     private final PIDController controller = new PIDController();
     public static PIDGains
-            pidGainsEmpty = new PIDGains(0.14, 0, 0.01, 0.15),
-            pidGainsFull = new PIDGains(0.14, 0, 0.01, 0.15);
+            pidGainsEmpty = new PIDGains(0, 0, 0, 0),
+            pidGainsFull = new PIDGains(0, 0, 0, 0);
 
     private final PIDGains pidGains = new PIDGains();
 
@@ -71,7 +69,7 @@ public final class Container {
     }
 
     public static double
-            ABS_OFFSET_ROTOR = 2.8863382504856223,
+            ABS_OFFSET_ROTOR = 0,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
@@ -90,7 +88,7 @@ public final class Container {
     private final CRServo[] servos;
     private final AnalogSensor encoder, front1, back1;
     private final ColorSensor color1, color2;
-    private final LEDIndicator[] indicators;
+//    private final LEDIndicator[] indicators;
     private final VoltageSensor batteryVoltageSensor;
 
     /**
@@ -148,11 +146,11 @@ public final class Container {
         color1 = new ColorSensor(hardwareMap, "color 1", 1);
         color2 = new ColorSensor(hardwareMap, "color 2", 1);
 
-        indicators = new LEDIndicator[]{
-                new LEDIndicator(hardwareMap, "led 1a", "led 1b"),
-                new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
-                new LEDIndicator(hardwareMap, "led 3a", "led 3b")
-        };
+//        indicators = new LEDIndicator[]{
+//                new LEDIndicator(hardwareMap, "led 1a", "led 1b"),
+//                new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
+//                new LEDIndicator(hardwareMap, "led 3a", "led 3b")
+//        };
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
