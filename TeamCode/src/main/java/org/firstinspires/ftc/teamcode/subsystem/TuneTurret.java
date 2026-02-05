@@ -47,6 +47,7 @@ public final class TuneTurret extends LinearOpMode {
             else if (gamepad1.dpadRightWasPressed())
                 turret.setTarget(-PI/2);
 
+            Thread.sleep((long)(max(30 - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());
             loopTimer.reset();
             turret.printTo(telemetry);

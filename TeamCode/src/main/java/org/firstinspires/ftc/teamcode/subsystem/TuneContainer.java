@@ -58,6 +58,7 @@ public final class TuneContainer extends LinearOpMode {
 
             container.printTo(telemetry);
 
+            Thread.sleep((long)(max(30 - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());
             loopTimer.reset();
             telemetry.update();
