@@ -8,10 +8,9 @@ import static java.lang.Math.toRadians;
 
 import com.pedropathing.geometry.Pose;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Polygon;
-import org.locationtech.jts.util.GeometricShapeFactory;
+import org.dyn4j.collision.narrowphase.Gjk;
+import org.dyn4j.geometry.Rectangle;
+import org.dyn4j.geometry.Transform;
 
 public enum LaunchZone {
     NONE,
@@ -23,52 +22,53 @@ public enum LaunchZone {
             LENGTH_TOTAL_IN = 17.73172,
             WIDTH_TOTAL_IN = 15.53937;
 
-    private final static GeometricShapeFactory factory = new GeometricShapeFactory();
-    private final static Polygon nearTriangle, farTriangle;
+
+    static final Transform nearZonePosition;
+    static final Transform farZonePosition;
+
+    static final Rectangle nearZoneRect;
+    static final Rectangle farZoneRect;
+    static final Rectangle robotRect;
+    static final Gjk collisionSolver = new Gjk();
 
     static {
-        GeometryFactory geometryFactory = new GeometryFactory();
+        double nearZoneSize = SIZE_TILE * Math.sqrt(2) * 3;
+        double farZoneSize = SIZE_TILE * Math.sqrt(2);
 
-        Coordinate[] near = new Coordinate[]{
-                new Coordinate(0, SIZE_FIELD),
-                new Coordinate(SIZE_FIELD, SIZE_FIELD),
-                new Coordinate(SIZE_FIELD / 2, SIZE_FIELD / 2),
-                new Coordinate(0, SIZE_FIELD),
-        };
-        nearTriangle = geometryFactory.createPolygon(near);
+        nearZoneRect = new Rectangle(nearZoneSize, nearZoneSize);
+        farZoneRect = new Rectangle(farZoneSize, farZoneSize);
 
-        Coordinate[] far = new Coordinate[]{
-                new Coordinate(SIZE_TILE * 2, 0),
-                new Coordinate(SIZE_TILE * 3, SIZE_TILE),
-                new Coordinate(SIZE_TILE * 4, 0),
-                new Coordinate(SIZE_TILE * 2, 0),
-        };
+        robotRect = new Rectangle(LENGTH_TOTAL_IN, WIDTH_TOTAL_IN * 1);
 
-        farTriangle = geometryFactory.createPolygon(far);
+        nearZonePosition = new Transform();
+        farZonePosition = new Transform();
 
+        nearZonePosition.rotate(toRadians(45));
+        nearZonePosition.translate(SIZE_FIELD / 2, SIZE_FIELD);
+
+        farZonePosition.rotate(toRadians(45));
+        farZonePosition.translate(SIZE_FIELD / 2, 0);
     }
 
     static LaunchZone getCurrentZone(Pose currentPose) {
 
         double heading = currentPose.getHeading();
-        factory.setCentre(new Coordinate(
+        Transform robotPose = new Transform();
+
+        robotPose.rotate(heading);
+        robotPose.translate(
                 currentPose.getX() + (FORWARD_OFFSET_IN * cos(heading)),
                 currentPose.getY() + (FORWARD_OFFSET_IN * sin(heading))
-        ));
-        // 2d width corresponds to robot length when heading = 0
-        factory.setWidth(LENGTH_TOTAL_IN);
-        // 2d height corresponds to robot width when heading = 0
-        factory.setHeight(WIDTH_TOTAL_IN * 1);
+        );
 
-        factory.setRotation(heading);
+        if (collisionSolver.detect(robotRect, robotPose, nearZoneRect, nearZonePosition)) {
+            return NEAR;
+        } else if (collisionSolver.detect(robotRect, robotPose, farZoneRect, farZonePosition)){
+            return FAR;
+        } else{
+            return NONE;
+        }
 
-        Polygon rectangle = factory.createRectangle();
-
-
-        return
-                rectangle.intersects(nearTriangle) ? NEAR :
-                rectangle.intersects(farTriangle) ?  FAR :
-                                                        NONE;
     }
 
     public static void main(String... args) {
