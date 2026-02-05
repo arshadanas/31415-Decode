@@ -16,6 +16,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 
+import dev.nullftc.profiler.Profiler;
+import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
+import dev.nullftc.profiler.exporter.CSVProfilerExporter;
+
 @TeleOp
 public final class Tele extends LinearOpMode {
 
@@ -44,7 +48,7 @@ public final class Tele extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Robot robot = new Robot(hardwareMap, pose);
+        Robot robot = new Robot(hardwareMap, pose, null);
         robot.drivetrain.startTeleopDrive();
 
         TeleOpConfig selected = EDITING_ALLIANCE;
