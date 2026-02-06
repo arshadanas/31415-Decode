@@ -17,12 +17,12 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 
 @Config
 public final class Robot {
-
+// TODO gate pressers
     public final BulkReader bulkReader;
     public final MecanumDrivetrain drivetrain;
     public final Handler handler;
     public final Shooter shooter;
-//    public final Turret turret;
+    public final Turret turret;
     public final Lift lift;
 
     private final ElapsedTime loopTimer = new ElapsedTime();
@@ -32,7 +32,7 @@ public final class Robot {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         handler = new Handler(hardwareMap);
         shooter = new Shooter(hardwareMap);
-//        turret = new Turret(hardwareMap);
+        turret = new Turret(hardwareMap);
         lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
@@ -62,7 +62,7 @@ public final class Robot {
 
         boolean inLaunchZone = true, a = currentZone != NONE;
         shooter.run(inLaunchZone, handler.feedsPending());
-//        turret.run(handler.feedsPending());
+        turret.run(handler.feedsPending());
         handler.run(
                 inLaunchZone,
                 feed //&&
@@ -85,8 +85,8 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         shooter.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
-//        turret.printTo(telemetry);
-//        telemetry.addLine("\n--------------------------------------\n");
+        turret.printTo(telemetry);
+        telemetry.addLine("\n--------------------------------------\n");
         lift.printTo(telemetry);
     }
 }

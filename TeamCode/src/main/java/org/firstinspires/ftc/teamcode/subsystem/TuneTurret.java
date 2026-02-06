@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static java.lang.Math.PI;
 import static java.lang.Math.atan2;
 import static java.lang.Math.max;
+import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -40,11 +41,11 @@ public final class TuneTurret extends LinearOpMode {
             if (gamepad1.dpadUpWasPressed())
                 turret.setTarget(0);
             else if (gamepad1.dpadLeftWasPressed())
-                turret.setTarget(PI/2);
-            else if (gamepad1.dpadDownWasPressed())
-                turret.setTarget(PI);
+                turret.setTarget(toRadians(160));
+//            else if (gamepad1.dpadDownWasPressed())
+//                turret.setTarget(toRadians());
             else if (gamepad1.dpadRightWasPressed())
-                turret.setTarget(-PI/2);
+                turret.setTarget(toRadians(-160));
 
             Thread.sleep((long)(max(35 - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());

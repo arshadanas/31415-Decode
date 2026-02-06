@@ -25,10 +25,10 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 public final class Turret {
 
     public static KalmanGains filterGains = new KalmanGains(.5, 50);
-    public static PIDGains pidGains = new PIDGains(0, 0, 0, 0.25);
+    public static PIDGains pidGains = new PIDGains(0.25, 0, 0.1, 0.25);
 
     public static double
-            TURRET_ABSOLUTE_OFFSET = 0,
+            TURRET_ABSOLUTE_OFFSET = -0.06283185307179595,//0.1161437284054414,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
             WRAPAROUND_POSITION = toRadians(0),
             TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
@@ -39,7 +39,7 @@ public final class Turret {
     /**
      * In radians
      */
-    private double position, quadratureOffset, target, absolutePosition, output;
+    private double position, relativeEncoderOffset, target, absolutePosition, output;
     public void setTarget(double target) {
         this.target = normalizeRadians(target);
     }
@@ -64,21 +64,39 @@ public final class Turret {
 
     void run(boolean feedsPending) {
 
-        position = motor.encoder.getDistance() + quadratureOffset;
+        position = motor.encoder.getDistance() + relativeEncoderOffset;
 
         if (!feedsPending) {
+            // When we're not using the shooter (it be idle)
+
+            // Turn turret off
             motor.set(0);
+
+            // Reset PID controller to zero
             controller.reset();
-            absolutePosition = normalizeRadians(-absoluteEnc.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
-            quadratureOffset += normalizeRadians(absolutePosition - position);
+
+            // Get the absolute position from our abs encoder (and offset it by the tuned offset)
+            absolutePosition = -normalizeRadians(absoluteEnc.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
+
+            // Reset the relative encoder. We're not moving so we'll recalibrate it to the abs encoder.
+            motor.encoder.reset();
+
+            // Now we need to recalibrate our relative encoder
+            relativeEncoderOffset = normalizeRadians(relativeEncoderOffset + absolutePosition - position);
             return;
         }
+
 
         derivFilter.setGains(filterGains);
         controller.setGains(pidGains);
 
-        controller.setTarget(new State(normalizeRadians(target + PI - WRAPAROUND_POSITION)));
-        motor.set(output = controller.calculate(new State(position + PI - WRAPAROUND_POSITION)));
+
+//        + PI - WRAPAROUND_POSITION
+//        + PI - WRAPAROUND_POSITION
+
+        controller.setTarget(new State(normalizeRadians(target)));
+        motor.set(output = controller.calculate(new State(position)));
+
     }
 
     boolean inTolerance(double tolerance) {
@@ -96,6 +114,7 @@ public final class Turret {
         telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
         telemetry.addLine();
         telemetry.addData("Absolute position (deg)", toDegrees(absolutePosition));
+        telemetry.addData("Absolute position (rad)", (absolutePosition));
 
         telemetry.addData("Turret motor output power", output);
 
