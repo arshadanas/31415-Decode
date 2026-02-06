@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.opmode;
+package org.firstinspires.ftc.teamcode.subsystem.drivetrain;
 
 import com.arcrobotics.ftclib.drivebase.MecanumDrive;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
 
 
-public final class MecanumDrivetrain {
+public final class FTCLIBMecanumDrivetrain {
 
     private final MecanumDrive mecanumDrivetrain;
 
@@ -20,7 +20,7 @@ public final class MecanumDrivetrain {
 
     public final GoBildaPinpointDriver pinpoint;
 
-    public MecanumDrivetrain(HardwareMap hardwareMap) {
+    public FTCLIBMecanumDrivetrain(HardwareMap hardwareMap) {
 
         // Assign motors using their hardware map names, each drive-type can have different names if needed
         motors = new MotorEx[]{

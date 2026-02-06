@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.opmode.MecanumDrivetrain;
+import org.firstinspires.ftc.teamcode.subsystem.drivetrain.FTCLIBMecanumDrivetrain;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 
 @TeleOp(group = "Testing/tuning")
@@ -18,7 +18,7 @@ public final class TestFTCLibMecanum extends LinearOpMode {
         BulkReader bulkReader = new BulkReader(hardwareMap);
         ElapsedTime timer = new ElapsedTime();
 
-        MecanumDrivetrain drivetrain = new MecanumDrivetrain(hardwareMap);
+        FTCLIBMecanumDrivetrain drivetrain = new FTCLIBMecanumDrivetrain(hardwareMap);
 
         waitForStart();
 
