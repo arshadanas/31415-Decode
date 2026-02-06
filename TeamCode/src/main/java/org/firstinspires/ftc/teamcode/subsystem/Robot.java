@@ -50,9 +50,9 @@ public final class Robot {
     }
 
     public void run(boolean feed) {
-        profiler.start("bulkread");
+        profiler.start("Robot_bulkread");
         bulkReader.bulkRead();
-        profiler.end("bulkread");
+        profiler.end("Robot_bulkread");
 
         if (!lift.gearSwitch.isActivated())
         {
@@ -60,16 +60,14 @@ public final class Robot {
             drivetrain.update();
             profiler.end("dt");
         }
-        profiler.start("getcurrentzone");
-        currentZone = NEAR;
-                LaunchZone.getCurrentZone(drivetrain.getPose());
+        profiler.start("GetCurrentZone");
 
         currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
 
-        profiler.end("getcurrentzone");
+        profiler.end("GetCurrentZone");
 
         profiler.start("setShooterRPMAngle");
-        switch (currentZone) {
+//        switch (currentZone) {
         switch (NEAR) {
             case NEAR:
                 shooter.setRPM(RPM_NEAR);
@@ -83,12 +81,11 @@ public final class Robot {
         profiler.end("setShooterRPMAngle");
 
         profiler.start("shooter");
-        shooter.run(currentZone != NONE, handler.feedsPending());
+        boolean inLaunchZone = true, a = currentZone != NONE;
+        shooter.run(inLaunchZone, handler.feedsPending());
         profiler.end("shooter");
 
         profiler.start("turret");
-        boolean inLaunchZone = true, a = currentZone != NONE;
-        shooter.run(inLaunchZone, handler.feedsPending());
         turret.run(handler.feedsPending());
         profiler.end("turret");
 
