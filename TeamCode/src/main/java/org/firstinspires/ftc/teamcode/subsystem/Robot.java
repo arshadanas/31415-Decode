@@ -60,7 +60,7 @@ public final class Robot {
                 break;
         }
 
-        boolean inLaunchZone = true; // currentZone != NONE;
+        boolean inLaunchZone = true, a = currentZone != NONE;
         shooter.run(inLaunchZone, handler.feedsPending());
 //        turret.run(handler.feedsPending());
         handler.run(

@@ -22,14 +22,12 @@ public enum LaunchZone {
             LENGTH_TOTAL_IN = 17.73172,
             WIDTH_TOTAL_IN = 15.53937;
 
-
-    static final Transform nearZonePosition;
-    static final Transform farZonePosition;
-
-    static final Rectangle nearZoneRect;
-    static final Rectangle farZoneRect;
-    static final Rectangle robotRect;
-    static final Gjk collisionSolver = new Gjk();
+    private static final Transform nearZonePosition;
+    private static final Transform farZonePosition;
+    private static final Rectangle nearZoneRect;
+    private static final Rectangle farZoneRect;
+    private static final Rectangle robotRect;
+    private static final Gjk collisionSolver = new Gjk();
 
     static {
         double nearZoneSize = SIZE_TILE * Math.sqrt(2) * 3;
