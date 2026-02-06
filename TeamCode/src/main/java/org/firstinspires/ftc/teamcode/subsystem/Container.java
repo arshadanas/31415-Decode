@@ -83,7 +83,9 @@ public final class Container {
             TOLERANCE_INTAKE_OMNI = 0.5235987755982988,
 
             POWER_OVERCOME_FRICTION = 0.06,
-            MAX_VOLTAGE = 13;
+            MAX_VOLTAGE = 13,
+
+            CACHE_THRESHOLD_ROTOR = 0;
 
     // hardware
     private final CachedDcMotor[] servos;
@@ -214,8 +216,10 @@ public final class Container {
         double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
                                     POWER_OVERCOME_FRICTION * signum(servoPower) * voltageScalar : 0;
 
-        for (CachedDcMotor servo : servos)
+        for (CachedDcMotor servo : servos) {
+            servo.threshold = CACHE_THRESHOLD_ROTOR;
             servo.setPower(servoPower + antiFrictionPower);
+        }
     }
 
     /**

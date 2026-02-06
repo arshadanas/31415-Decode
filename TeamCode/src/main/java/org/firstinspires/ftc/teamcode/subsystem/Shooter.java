@@ -4,7 +4,6 @@ import static com.acmerobotics.roadrunner.Math.lerp;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.abs;
-import static java.lang.Math.max;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -75,7 +74,10 @@ public final class Shooter {
             RPM_NEAR = 3000,
             RPM_FAR = 5000,
             LAUNCH_RAD_NEAR = LAUNCH_RAD_STEEPEST,
-            LAUNCH_RAD_FAR = LAUNCH_RAD_SHALLOWEST;
+            LAUNCH_RAD_FAR = LAUNCH_RAD_SHALLOWEST,
+
+            CACHE_THRESHOLD_HOOD = 0,
+            CACHE_THRESHOLD_MOTORS = 0;
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
@@ -102,6 +104,7 @@ public final class Shooter {
      *                in the range [{@link #LAUNCH_RAD_SHALLOWEST}, {@link #LAUNCH_RAD_STEEPEST}]
      */
     public void setLaunchAngle(double radians) {
+        hood.threshold = CACHE_THRESHOLD_HOOD;
         hood.turnToAngle(lerp(
                 clip(radians, LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST),
                 LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST, // TODO Tune empirically
@@ -181,8 +184,10 @@ public final class Shooter {
         profiler.end("shooter_pid_new");
 
         profiler.start("shooter_motors");
-        for (CachedMotorEx motor : motors)
+        for (CachedMotorEx motor : motors) {
+            motor.threshold = CACHE_THRESHOLD_MOTORS;
             motor.set(output);
+        }
         profiler.end("shooter_motors");
     }
 

@@ -28,6 +28,7 @@ public final class Turret {
     public static PIDGains pidGains = new PIDGains(0.25, 0, 0.1, 0.25);
 
     public static double
+            CACHE_THRESHOLD_MOTOR = 0,
             TURRET_ABSOLUTE_OFFSET = 0,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
             TOLERANCE_NO_RECALIBRATING = toRadians(10),
@@ -67,6 +68,7 @@ public final class Turret {
     }
 
     void run(boolean feedsPending) {
+        motor.threshold = CACHE_THRESHOLD_MOTOR;
 
         position = motor.encoder.getDistance() + relativeEncoderOffset;
         absolutePosition = normalizeRadians(-absoluteEnc.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);

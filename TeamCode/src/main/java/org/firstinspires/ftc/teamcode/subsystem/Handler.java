@@ -27,12 +27,17 @@ public final class Handler {
             TIME_KEEP_FEEDING_AFTER_LAST = 0,
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
-            ANGLE_PRESSER_L_OFFSET = -37;
+            ANGLE_PRESSER_L_OFFSET = -37,
+
+            CACHE_THRESHOLD_INTAKE = 0,
+            CACHE_THRESHOLD_FEEDER = 0,
+            CACHE_THRESHOLD_PRESSERS = 0;
 
     public final Container container;
     private final CachedMotorEx intake;
     private final CachedDcMotor[] feeder;
     public final SimpleServoPivot presserR, presserL;
+    private final CachedSimpleServo presserRServo, presserLServo;
 
     public Motif randomization = Motif.PGP;
     /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
@@ -86,11 +91,11 @@ public final class Handler {
         feeder[0].motor.setDirection(REVERSE);
 
 
-        presserR = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED,
-                new CachedSimpleServo(hardwareMap, "gate R", 0, 300));
-
-        CachedSimpleServo presserLServo = new CachedSimpleServo(hardwareMap, "gate L", 0, 300).reversed();
+        presserRServo = new CachedSimpleServo(hardwareMap, "gate R", 0, 300);
+        presserLServo = new CachedSimpleServo(hardwareMap, "gate L", 0, 300).reversed();
         presserLServo.offset = ANGLE_PRESSER_L_OFFSET;
+
+        presserR = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED, presserRServo);
         presserL = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED, presserLServo);
     }
 
@@ -128,13 +133,18 @@ public final class Handler {
             timeSinceLastFeed.reset();
         
 
-        for (CachedDcMotor servo : feeder)
+        for (CachedDcMotor servo : feeder) {
+            servo.threshold = CACHE_THRESHOLD_FEEDER;
             servo.setPower(feederPower);
+        }
 
         container.run(intakePower, feederPower);
 
+        intake.threshold = CACHE_THRESHOLD_INTAKE;
         intake.set(container.adaptiveClipIntakePower(intakePower));
 
+        presserRServo.threshold = CACHE_THRESHOLD_PRESSERS;
+        presserLServo.threshold = CACHE_THRESHOLD_PRESSERS;
         presserR.run();
         presserL.run();
     }
