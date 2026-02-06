@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystem.utility.ToggleProfiler;
 
 @Config
 @TeleOp(group = "Testing/tuning")
@@ -26,7 +27,7 @@ public final class TuneShooter extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Shooter shooter = new Shooter(hardwareMap);
+        Shooter shooter = new Shooter(hardwareMap, new ToggleProfiler(null));
 
         waitForStart(); // -------------------------------------------------------------------------------------------------------------------
 

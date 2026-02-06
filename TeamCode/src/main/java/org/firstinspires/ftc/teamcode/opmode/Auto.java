@@ -42,6 +42,10 @@ import org.firstinspires.ftc.teamcode.control.vision.detector.SampleDetector;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotorEx;
 
+import dev.nullftc.profiler.Profiler;
+import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
+import dev.nullftc.profiler.exporter.CSVProfilerExporter;
+
 @Config
 @Autonomous(preselectTeleOp = "Tele")
 public final class Auto extends LinearOpMode {
@@ -214,7 +218,7 @@ public final class Auto extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot:
-        Robot robot = new Robot(hardwareMap, pose);
+        Robot robot = new Robot(hardwareMap, pose, null);
 //        robot.deposit.claw.turnToAngle(ANGLE_CLAW_SAMPLE);
 
         // Initialize gamepads:

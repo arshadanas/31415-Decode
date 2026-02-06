@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
+import org.firstinspires.ftc.teamcode.subsystem.utility.ToggleProfiler;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
@@ -113,7 +114,10 @@ public final class Shooter {
         manualPower = power;
     }
 
-    Shooter(HardwareMap hardwareMap) {
+    private final ToggleProfiler profiler;
+
+    Shooter(HardwareMap hardwareMap, ToggleProfiler profiler) {
+        this.profiler = profiler;
         hood = new CachedSimpleServo(hardwareMap, "hood", 0, 360).reversed();
 
         motors = new CachedMotorEx[]{
@@ -130,27 +134,40 @@ public final class Shooter {
     }
 
     void run(boolean inLaunchZone, boolean feedsPending) {
+        profiler.start("shooter_set_gains");
         rpmFilter.setGains(rpmFilterGains);
         derivFilter.setGains(kDFilterGains);
         outputFilter.setGains(outputFilterGains);
         controller.setGains(pidGains);
+        profiler.end("shooter_set_gains");
 
+        profiler.start("shooter_get_encoder_vel");
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
+        profiler.end("shooter_get_encoder_vel");
 
+        profiler.start("shooter_kalman_predict");
         try {
             double[] stateEstimate = rpmFilter.predictAndCalculate(rawRPM, 0);
             currentRPM = stateEstimate[0];
             currentRPMPerSec = stateEstimate[1];
         } catch (Exception ignored) {}
+        profiler.end("shooter_kalman_predict");
 
+        profiler.start("shooter_set_vars");
         double rpmSetpoint =
                 !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
                 !inLaunchZone ? RPM_ARMING :
                                 targetRPM;
 
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
+        profiler.end("shooter_set_vars");
 
+        profiler.start("shooter_set_controller");
         controller.setTarget(new State(rpmSetpoint));
+        profiler.end("shooter_set_controller");
+
+
+        profiler.start("shooter_pid_new");
         double pid = controller.calculate(new State(currentRPM, currentRPMPerSec));
         double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
@@ -160,8 +177,13 @@ public final class Shooter {
                                     outputFilter.calculate(pidf) :
                                     pidf
                 , 0, 1);
+
+        profiler.end("shooter_pid_new");
+
+        profiler.start("shooter_motors");
         for (CachedMotorEx motor : motors)
             motor.set(output);
+        profiler.end("shooter_motors");
     }
 
     boolean inTolerance(double rpmTolerance) {

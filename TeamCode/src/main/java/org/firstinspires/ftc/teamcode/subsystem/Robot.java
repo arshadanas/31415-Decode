@@ -14,6 +14,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
+import org.firstinspires.ftc.teamcode.subsystem.utility.ToggleProfiler;
+
+import dev.nullftc.profiler.Profiler;
 
 @Config
 public final class Robot {
@@ -28,10 +31,14 @@ public final class Robot {
     private final ElapsedTime loopTimer = new ElapsedTime();
     private LaunchZone currentZone;
 
-    public Robot(HardwareMap hardwareMap, Pose startPose) {
+    private final ToggleProfiler profiler;
+
+    public Robot(HardwareMap hardwareMap, Pose startPose, Profiler profiler) {
+        this.profiler = new ToggleProfiler(profiler);
+
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         handler = new Handler(hardwareMap);
-        shooter = new Shooter(hardwareMap);
+        shooter = new Shooter(hardwareMap, this.profiler);
         turret = new Turret(hardwareMap);
         lift = new Lift(hardwareMap);
 
@@ -43,12 +50,26 @@ public final class Robot {
     }
 
     public void run(boolean feed) {
+        profiler.start("bulkread");
         bulkReader.bulkRead();
+        profiler.end("bulkread");
+
         if (!lift.gearSwitch.isActivated())
+        {
+            profiler.start("dt");
             drivetrain.update();
+            profiler.end("dt");
+        }
+        profiler.start("getcurrentzone");
+        currentZone = NEAR;
+                LaunchZone.getCurrentZone(drivetrain.getPose());
 
         currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
 
+        profiler.end("getcurrentzone");
+
+        profiler.start("setShooterRPMAngle");
+        switch (currentZone) {
         switch (NEAR) {
             case NEAR:
                 shooter.setRPM(RPM_NEAR);
@@ -59,18 +80,30 @@ public final class Robot {
                 shooter.setLaunchAngle(LAUNCH_RAD_FAR);
                 break;
         }
+        profiler.end("setShooterRPMAngle");
 
+        profiler.start("shooter");
+        shooter.run(currentZone != NONE, handler.feedsPending());
+        profiler.end("shooter");
+
+        profiler.start("turret");
         boolean inLaunchZone = true, a = currentZone != NONE;
         shooter.run(inLaunchZone, handler.feedsPending());
         turret.run(handler.feedsPending());
+        profiler.end("turret");
+
+        profiler.start("handler");
         handler.run(
                 inLaunchZone,
                 feed //&&
 //                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) //&&
 //                turret.inTolerance(Turret.TOLERANCE_FEEDING)
         );
+        profiler.end("handler");
 
+        profiler.start("lift");
         lift.run();
+        profiler.end("lift");
     }
 
     public void printTo(Telemetry telemetry) {
