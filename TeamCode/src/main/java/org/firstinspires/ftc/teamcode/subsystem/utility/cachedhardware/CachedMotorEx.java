@@ -23,10 +23,10 @@ public final class CachedMotorEx extends MotorEx {
         super(hMap, id, cpr, rpm);
     }
 
-    private double lastPower = Double.NaN;
+    private double lastPower = 0;
 
     public void set(double power) {
-        if (abs(power - lastPower) > threshold)
+        if ((abs(power - lastPower) > threshold) || (power == 0 && lastPower != 0))
             super.set(lastPower = power);
     }
 }

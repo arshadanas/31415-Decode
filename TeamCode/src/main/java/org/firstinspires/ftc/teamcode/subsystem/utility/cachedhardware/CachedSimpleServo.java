@@ -22,7 +22,7 @@ public class CachedSimpleServo extends SimpleServo {
 
     public void turnToAngle(double degrees) {
         degrees += offset;
-        if (abs(degrees - lastDegrees) > threshold)
+        if (Double.isNaN(lastDegrees) || abs(degrees - lastDegrees) > threshold)
             super.turnToAngle(lastDegrees = degrees);
     }
 }
