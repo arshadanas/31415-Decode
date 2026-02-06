@@ -47,10 +47,9 @@ public final class Robot {
         if (!lift.gearSwitch.isActivated())
             drivetrain.update();
 
-        currentZone = NEAR;
-//                LaunchZone.getCurrentZone(drivetrain.getPose());
+        currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
 
-        switch (currentZone) {
+        switch (NEAR) {
             case NEAR:
                 shooter.setRPM(RPM_NEAR);
                 shooter.setLaunchAngle(LAUNCH_RAD_NEAR);
@@ -61,10 +60,11 @@ public final class Robot {
                 break;
         }
 
-        shooter.run(currentZone != NONE, handler.feedsPending());
+        boolean inLaunchZone = true; // currentZone != NONE;
+        shooter.run(inLaunchZone, handler.feedsPending());
 //        turret.run(handler.feedsPending());
         handler.run(
-                currentZone != NONE,
+                inLaunchZone,
                 feed //&&
 //                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) //&&
 //                turret.inTolerance(Turret.TOLERANCE_FEEDING)
