@@ -17,6 +17,7 @@ public class LEDIndicator {
     }
 
     private final DigitalChannel redLED, greenLED;
+    private LEDColor lastColor;
 
     /**
      * @param greenName Configured name of the EVEN pin
@@ -33,6 +34,9 @@ public class LEDIndicator {
     }
 
     public void setColor(LEDColor color) {
+        if (color == lastColor)
+            return;
+        lastColor = color;
         greenLED.setState(color == GREEN || color == OFF);
         redLED.setState(color == RED || color == OFF);
     }
