@@ -12,16 +12,22 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
+import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
-import dev.nullftc.profiler.Profiler;
+import java.io.File;
+
 import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
 import dev.nullftc.profiler.exporter.CSVProfilerExporter;
 
 @TeleOp
 public final class Tele extends LinearOpMode {
+
+    private dev.nullftc.profiler.Profiler realProfiler;
 
     enum TeleOpConfig {
         EDITING_ALLIANCE;
@@ -39,7 +45,7 @@ public final class Tele extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-
+        initProfiler();
         ElapsedTime matchTimer = new ElapsedTime();
 
         double TELE = 120; // seconds
@@ -48,12 +54,13 @@ public final class Tele extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Robot robot = new Robot(hardwareMap, pose, null);
+        Robot robot = new Robot(hardwareMap, pose);
         robot.drivetrain.startTeleopDrive();
 
         TeleOpConfig selected = EDITING_ALLIANCE;
 
         boolean doTelemetry = false;
+        boolean doProfiling = false;
 
         while (opModeInInit()) {
 
@@ -61,6 +68,10 @@ public final class Tele extends LinearOpMode {
                 selected = selected.plus(-1);
             } else if (gamepad1.dpadDownWasPressed()) {
                 selected = selected.plus(1);
+            }
+
+            if (gamepad1.triangle && gamepad1.square && gamepad1.dpad_left){
+                doProfiling = !doProfiling;
             }
 
             switch (selected) {
@@ -77,80 +88,88 @@ public final class Tele extends LinearOpMode {
             telemetry.addLine( EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
             telemetry.addLine();
             telemetry.addData("Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
+            telemetry.addData("Will run profiler", doProfiling);
 
             telemetry.update();
         }
 
+        if (doProfiling){
+            Profiler.INSTANCE.setProfiler(realProfiler);
+        } else{
+            Profiler.INSTANCE.setProfiler(null);
+        }
+
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+        try {
 
-        robot.setAlliance(isRedAlliance);
+            robot.setAlliance(isRedAlliance);
 
-        matchTimer.reset();
+            matchTimer.reset();
 
-        // Control loop:
-        while (opModeIsActive()) {
-            // Read sensors + gamepads:
-            robot.run(gamepad1.square);
+            // Control loop:
+            while (opModeIsActive()) {
+                // Read sensors + gamepads:
+                robot.run(gamepad1.square);
 
-            float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
+                float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
 
-            if (gamepad1.left_bumper) {
+                if (gamepad1.left_bumper) {
 
-                if (gamepad1.squareWasPressed()) doTelemetry = !doTelemetry;
+                    if (gamepad1.squareWasPressed()) doTelemetry = !doTelemetry;
 
-                robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
+                    robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
 
-                robot.lift.setPower(gamepad1.left_stick_y);
+                    robot.lift.setPower(gamepad1.left_stick_y);
 
-                robot.handler.setFeederManual(gamepad1.left_trigger);
-                robot.shooter.setManual(gamepad1.right_trigger);
+                    robot.handler.setFeederManual(gamepad1.left_trigger);
+                    robot.shooter.setManual(gamepad1.right_trigger);
 
-            } else {
+                } else {
 
-                // tracking classifier ramp (driver 2)
-                if (gamepad2.dpadUpWasPressed())
-                    robot.handler.incrementArtifactsScored();
-                else if (gamepad2.dpadDownWasPressed())
-                    robot.handler.decrementArtifactsScored();
-                else if (gamepad2.dpadLeftWasPressed() || gamepad2.dpadRightWasPressed())
-                    robot.handler.clearRamp();
-
-
-                if (gamepad1.triangleWasPressed())
-                    robot.lift.gearSwitch.toggle();
-
-                if (gamepad1.crossWasPressed())
-                    robot.handler.feedSingle(GREEN);
-
-                if (gamepad1.circleWasPressed())
-                    robot.handler.feedSingle(PURPLE);
-
-                if (gamepad1.dpadRightWasPressed())
-                    robot.handler.feedFastest();
-
-                if (gamepad1.dpadUpWasPressed())
-                    robot.handler.feedMotif();
-
-                if (gamepad1.dpadLeftWasPressed())
-                    robot.handler.motifMode = !robot.handler.motifMode;
+                    // tracking classifier ramp (driver 2)
+                    if (gamepad2.dpadUpWasPressed())
+                        robot.handler.incrementArtifactsScored();
+                    else if (gamepad2.dpadDownWasPressed())
+                        robot.handler.decrementArtifactsScored();
+                    else if (gamepad2.dpadLeftWasPressed() || gamepad2.dpadRightWasPressed())
+                        robot.handler.clearRamp();
 
 
-                robot.handler.setIntake(triggersSum);
+                    if (gamepad1.triangleWasPressed())
+                        robot.lift.gearSwitch.toggle();
 
-                robot.drivetrain.run(
-                        gamepad1.left_stick_x,
-                        gamepad1.left_stick_y,
-                        gamepad1.right_stick_x,
-                        gamepad1.right_bumper /*|| triggersSum > 0 */,
-                        isRedAlliance
-                );
+                    if (gamepad1.crossWasPressed())
+                        robot.handler.feedSingle(GREEN);
 
-            }
+                    if (gamepad1.circleWasPressed())
+                        robot.handler.feedSingle(PURPLE);
 
-            if (doTelemetry) {
-                robot.printTo(telemetry);
-                telemetry.update();
-            }
+                    if (gamepad1.dpadRightWasPressed())
+                        robot.handler.feedFastest();
+
+                    if (gamepad1.dpadUpWasPressed())
+                        robot.handler.feedMotif();
+
+                    if (gamepad1.dpadLeftWasPressed())
+                        robot.handler.motifMode = !robot.handler.motifMode;
+
+
+                    robot.handler.setIntake(triggersSum);
+
+                    robot.drivetrain.run(
+                            gamepad1.left_stick_x,
+                            gamepad1.left_stick_y,
+                            gamepad1.right_stick_x,
+                            gamepad1.right_bumper /*|| triggersSum > 0 */,
+                            isRedAlliance
+                    );
+
+                }
+
+                if (doTelemetry) {
+                    robot.printTo(telemetry);
+                    telemetry.update();
+                }
 
 //            double t = matchTimer.seconds();
 //            indicator.setColor(t >= LIFT_TIME ?
@@ -158,6 +177,54 @@ public final class Tele extends LinearOpMode {
 //                    robot.intake.hasSample() ? GREEN :
 //                            OFF
 //            );
+            }
+        } finally {
+            exportProfiler();
+            Profiler.INSTANCE.setProfiler(null);
+            telemetry.update();
         }
+    }
+
+
+
+    private File profilerOutput;
+
+    private void initProfiler(){
+        // Create profile log folder
+        File logsFolder = new File(AppUtil.FIRST_FOLDER, "logs");
+        if (!logsFolder.exists())
+            logsFolder.mkdirs();
+
+        long timestamp = System.currentTimeMillis();
+        profilerOutput = new File(logsFolder, "profiler-" + timestamp + ".csv");
+
+        realProfiler = dev.nullftc.profiler.Profiler.builder()
+                .factory(new BasicProfilerEntryFactory())
+                .exporter(new CSVProfilerExporter(profilerOutput))
+                .build();
+    }
+
+    /**
+     * Exporting is computationally expensive, and has been optimized to the best it can be,
+     * but to be safe we create a new thread to export on as to not have the program be stuck in stop()
+     */
+    private void exportProfiler() {
+        // Check if we are actually in profile mode
+        if (!Profiler.INSTANCE.active)
+            return;
+
+        RobotLog.i("Starting async profiler export to: " + profilerOutput.getAbsolutePath());
+
+        Thread exportThread = new Thread(() -> {
+            try {
+                realProfiler.export();
+                realProfiler.shutdown();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        exportThread.setDaemon(true);
+        exportThread.start();
     }
 }

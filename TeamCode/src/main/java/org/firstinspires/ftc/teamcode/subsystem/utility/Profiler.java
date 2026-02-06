@@ -1,11 +1,19 @@
 package org.firstinspires.ftc.teamcode.subsystem.utility;
 
-import dev.nullftc.profiler.Profiler;
+public class Profiler {
 
-public class ToggleProfiler {
-    boolean active;
-    Profiler profiler;
-    public ToggleProfiler(Profiler profiler){
+    public static Profiler INSTANCE = new Profiler();
+
+    public boolean active;
+
+    dev.nullftc.profiler.Profiler profiler;
+
+    public Profiler(){
+        this.profiler = null;
+        this.active = false;
+    }
+
+    public void setProfiler(dev.nullftc.profiler.Profiler profiler) {
         this.profiler = profiler;
         this.active = profiler != null;
     }

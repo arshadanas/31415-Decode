@@ -214,7 +214,7 @@ public final class Auto extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot:
-        Robot robot = new Robot(hardwareMap, pose, null);
+        Robot robot = new Robot(hardwareMap, pose);
 //        robot.deposit.claw.turnToAngle(ANGLE_CLAW_SAMPLE);
 
         // Initialize gamepads:

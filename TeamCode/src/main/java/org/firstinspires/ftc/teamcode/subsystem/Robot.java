@@ -12,11 +12,10 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
-import org.firstinspires.ftc.teamcode.subsystem.utility.ToggleProfiler;
-
-import dev.nullftc.profiler.Profiler;
+import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 @Config
 public final class Robot {
@@ -31,14 +30,14 @@ public final class Robot {
     private final ElapsedTime loopTimer = new ElapsedTime();
     private LaunchZone currentZone;
 
-    private final ToggleProfiler profiler;
+    private final Profiler profiler;
 
-    public Robot(HardwareMap hardwareMap, Pose startPose, Profiler profiler) {
-        this.profiler = new ToggleProfiler(profiler);
+    public Robot(HardwareMap hardwareMap, Pose startPose) {
+        this.profiler = Profiler.INSTANCE;
 
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         handler = new Handler(hardwareMap);
-        shooter = new Shooter(hardwareMap, this.profiler);
+        shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         lift = new Lift(hardwareMap);
 
@@ -59,6 +58,19 @@ public final class Robot {
             profiler.start("dt");
             drivetrain.update();
             profiler.end("dt");
+
+            profiler.start("aim_turret");
+
+            Pose currentPose = drivetrain.getPose();
+            Vector2 poseVec = new Vector2(currentPose.getX(), currentPose.getY());
+            Vector2 goalVec = new Vector2(0, 0);
+            Vector2 aimVec = goalVec.difference(poseVec);
+
+            Vector2 robotOrientation = new Vector2(currentPose.getHeading());
+
+            turret.setTarget(robotOrientation.getAngleBetween(aimVec));
+
+            profiler.end("aim_turret");
         }
         profiler.start("GetCurrentZone");
 
