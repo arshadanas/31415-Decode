@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.subsystem.MecanumDrivetrain;
 
 public class Constants {
 
@@ -41,6 +42,7 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
+            .motorCachingThreshold(MecanumDrivetrain.MOTOR_CACHING_THRESHOLD)
     ;
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);

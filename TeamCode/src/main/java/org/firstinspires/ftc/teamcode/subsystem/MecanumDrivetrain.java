@@ -18,11 +18,14 @@ import org.firstinspires.ftc.teamcode.pedropathing.Constants;
 @Config
 public final class MecanumDrivetrain {
 
-    public static double SLOW_FACTOR = 0.3;
+    public static double
+            SLOW_FACTOR = 0.3,
+            MOTOR_CACHING_THRESHOLD = 0.01;
 
     private final Follower drivetrain;
 
     MecanumDrivetrain(HardwareMap hardwareMap, Pose pose) {
+        Constants.mecanumConstants.setMotorCachingThreshold(MOTOR_CACHING_THRESHOLD);
         drivetrain = Constants.createFollower(hardwareMap);
         try {
             drivetrain.getPoseTracker().resetIMU();
