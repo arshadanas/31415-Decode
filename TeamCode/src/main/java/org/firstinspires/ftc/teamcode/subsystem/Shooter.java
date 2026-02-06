@@ -48,7 +48,7 @@ public final class Shooter {
     public static PIDGains pidGains = new PIDGains(0, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(2.9, 0.03),
-            pidFilterGains = new KalmanGains(),
+            kDFilterGains = new KalmanGains(),
             outputFilterGains = new KalmanGains(.02, 5);
 
     public static double
@@ -83,7 +83,7 @@ public final class Shooter {
     private final CoolerKalmanFilter rpmFilter = new CoolerKalmanFilter();
     private final KalmanFilter
 //            rpmFilter = new KalmanFilter(rpmFilterGains),
-            derivFilter = new KalmanFilter(pidFilterGains),
+            derivFilter = new KalmanFilter(kDFilterGains),
             outputFilter = new KalmanFilter(outputFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
 
@@ -131,7 +131,7 @@ public final class Shooter {
 
     void run(boolean inLaunchZone, boolean feedsPending) {
         rpmFilter.setGains(rpmFilterGains);
-        derivFilter.setGains(pidFilterGains);
+        derivFilter.setGains(kDFilterGains);
         outputFilter.setGains(outputFilterGains);
         controller.setGains(pidGains);
 
