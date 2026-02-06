@@ -13,7 +13,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystem.utility.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 import java.util.ArrayList;
 
@@ -21,11 +23,15 @@ import java.util.ArrayList;
 public final class Handler {
 
     public static double
-            TIME_KEEP_FEEDING_AFTER_LAST = 0;
+            TIME_KEEP_FEEDING_AFTER_LAST = 0,
+            ANGLE_PRESSER_RETRACTED = 87,
+            ANGLE_PRESSER_EXTENDED = 211,
+            ANGLE_PRESSER_L_OFFSET = -37;
 
     public final Container container;
     private final CachedMotorEx intake;
     private final CRServo[] feeder;
+    public final SimpleServoPivot presserR, presserL;
 
     public Motif randomization = Motif.PGP;
     /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
@@ -77,6 +83,14 @@ public final class Handler {
                 hardwareMap.get(CRServo.class, "feeder L")
         };
         feeder[0].setDirection(REVERSE);
+
+
+        presserR = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED,
+                new CachedSimpleServo(hardwareMap, "gate R", 0, 300));
+
+        CachedSimpleServo presserLServo = new CachedSimpleServo(hardwareMap, "gate L", 0, 300).reversed();
+        presserLServo.offset = ANGLE_PRESSER_L_OFFSET;
+        presserL = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED, presserLServo);
     }
 
     void run(boolean inLaunchZone, boolean shooterReady) {
@@ -119,6 +133,9 @@ public final class Handler {
         container.run(intakePower, feederPower);
 
         intake.set(container.adaptiveClipIntakePower(intakePower));
+
+        presserR.run();
+        presserL.run();
     }
 
     /**

@@ -6,6 +6,9 @@ import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GEAR_L;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GEAR_R;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.HOOD;
+import static org.firstinspires.ftc.teamcode.subsystem.Handler.ANGLE_PRESSER_EXTENDED;
+import static org.firstinspires.ftc.teamcode.subsystem.Handler.ANGLE_PRESSER_L_OFFSET;
+import static org.firstinspires.ftc.teamcode.subsystem.Handler.ANGLE_PRESSER_RETRACTED;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_ENGAGED;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_INACTIVE;
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_L_OFFSET;
@@ -22,11 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 @Config
 @TeleOp(group = "Testing/tuning")
 public final class TuneServos extends LinearOpMode {
-
-    public static double
-            ANGLE_PRESSER_RETRACTED = 87,
-            ANGLE_PRESSER_EXTENDED = 211,
-            ANGLE_PRESSER_L_OFFSET = -37;
 
     enum TestServo {
         HOOD, GATE_R, GATE_L, GEAR_R, GEAR_L;
