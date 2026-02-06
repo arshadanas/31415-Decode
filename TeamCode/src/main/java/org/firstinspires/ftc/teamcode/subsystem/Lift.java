@@ -80,12 +80,7 @@ public final class Lift {
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("LIFT",
-                Double.compare(motorPower, LIFTING_POWER) == 0 ? "LIFTING" :
-                Double.compare(motorPower, HOLDING_POWER) == 0 ?       "HOLDING POSITION" :
-                motorPower != 0 ?                   "MANUAL" :
-                                                    "inactive"
-        );
+        telemetry.addData("LIFT", motorPower);
         telemetry.addLine();
         telemetry.addData("Gear switch", switchTimer.seconds() >= TIME_GEAR_SWITCH ? "ENGAGED" : gearSwitch.isActivated() ? "MOVING" : "inactive");
         telemetry.addLine();
