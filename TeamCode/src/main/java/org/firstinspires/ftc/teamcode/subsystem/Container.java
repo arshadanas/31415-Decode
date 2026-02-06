@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
 import org.firstinspires.ftc.teamcode.control.motion.State;
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
@@ -85,7 +86,7 @@ public final class Container {
             MAX_VOLTAGE = 13;
 
     // hardware
-    private final CRServo[] servos;
+    private final CachedDcMotor[] servos;
     private final AnalogSensor encoder, front1, back1;
     private final ColorSensor color1, color2;
 //    private final LEDIndicator[] indicators;
@@ -133,9 +134,9 @@ public final class Container {
     }
 
     Container(HardwareMap hardwareMap) {
-        servos = new CRServo[]{
-                hardwareMap.get(CRServo.class, "rotor 1"),
-                hardwareMap.get(CRServo.class, "rotor 2")
+        servos = new CachedDcMotor[]{
+                new CachedDcMotor(hardwareMap.get(CRServo.class, "rotor 1")),
+                new CachedDcMotor(hardwareMap.get(CRServo.class, "rotor 2"))
         };
 
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
@@ -213,7 +214,7 @@ public final class Container {
         double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
                                     POWER_OVERCOME_FRICTION * signum(servoPower) * voltageScalar : 0;
 
-        for (CRServo servo : servos)
+        for (CachedDcMotor servo : servos)
             servo.setPower(servoPower + antiFrictionPower);
     }
 

@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.SimpleServoPivot;
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
@@ -30,7 +31,7 @@ public final class Handler {
 
     public final Container container;
     private final CachedMotorEx intake;
-    private final CRServo[] feeder;
+    private final CachedDcMotor[] feeder;
     public final SimpleServoPivot presserR, presserL;
 
     public Motif randomization = Motif.PGP;
@@ -78,11 +79,11 @@ public final class Handler {
         intake.setInverted(true);
         intake.setZeroPowerBehavior(FLOAT);
 
-        feeder = new CRServo[]{
-                hardwareMap.get(CRServo.class, "feeder R"),
-                hardwareMap.get(CRServo.class, "feeder L")
+        feeder = new CachedDcMotor[]{
+                new CachedDcMotor(hardwareMap.get(CRServo.class, "feeder R")),
+                new CachedDcMotor(hardwareMap.get(CRServo.class, "feeder L"))
         };
-        feeder[0].setDirection(REVERSE);
+        feeder[0].motor.setDirection(REVERSE);
 
 
         presserR = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED,
@@ -127,7 +128,7 @@ public final class Handler {
             timeSinceLastFeed.reset();
         
 
-        for (CRServo servo : feeder)
+        for (CachedDcMotor servo : feeder)
             servo.setPower(feederPower);
 
         container.run(intakePower, feederPower);
