@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware;
 
+import static java.lang.Math.abs;
+
 import com.arcrobotics.ftclib.hardware.SimpleServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -14,16 +16,13 @@ public class CachedSimpleServo extends SimpleServo {
         return this;
     }
 
-    public double offset;
+    public double offset, threshold;
 
     private double lastDegrees = Double.NaN;
 
     public void turnToAngle(double degrees) {
-
         degrees += offset;
-
-        if (degrees == lastDegrees) return;
-
-        super.turnToAngle(lastDegrees = degrees);
+        if (abs(degrees - lastDegrees) > threshold)
+            super.turnToAngle(lastDegrees = degrees);
     }
 }

@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware;
 
+import static java.lang.Math.abs;
+
 import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public final class CachedMotorEx extends MotorEx {
+
+    public double threshold = 0;
 
     public CachedMotorEx(@NonNull HardwareMap hMap, String id) {
         super(hMap, id);
@@ -22,8 +26,7 @@ public final class CachedMotorEx extends MotorEx {
     private double lastPower = Double.NaN;
 
     public void set(double power) {
-        if (power == lastPower) return;
-
-        super.set(lastPower = power);
+        if (abs(power - lastPower) > threshold)
+            super.set(lastPower = power);
     }
 }

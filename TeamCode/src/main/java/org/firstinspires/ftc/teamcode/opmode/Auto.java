@@ -40,11 +40,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.control.vision.detector.SampleDetector;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
-import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotorEx;
-
-import dev.nullftc.profiler.Profiler;
-import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
-import dev.nullftc.profiler.exporter.CSVProfilerExporter;
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 
 @Config
 @Autonomous(preselectTeleOp = "Tele")
@@ -280,7 +276,7 @@ public final class Auto extends LinearOpMode {
 
         Action trajectory;
 
-        CachedDcMotorEx[] dtMotors = {
+        CachedDcMotor[] dtMotors = {
 //                robot.drivetrain.leftFront,
 //                robot.drivetrain.leftBack,
 //                robot.drivetrain.rightBack,
@@ -436,7 +432,7 @@ public final class Auto extends LinearOpMode {
                 int subCycle = 1;
 
                 void stopDt() {
-                    for (CachedDcMotorEx motor : dtMotors) motor.setPower(0);
+                    for (CachedDcMotor motor : dtMotors) motor.setPower(0);
                 }
 
                 public boolean run(@NonNull TelemetryPacket p) {
@@ -701,7 +697,7 @@ public final class Auto extends LinearOpMode {
                 int subCycle = 1, barnacle = 0;
 
                 void stopDt() {
-                    for (CachedDcMotorEx motor : dtMotors) motor.setPower(0);
+                    for (CachedDcMotor motor : dtMotors) motor.setPower(0);
                 }
 
                 public boolean run(@NonNull TelemetryPacket p) {
