@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.PI;
 import static java.lang.Math.atan2;
 import static java.lang.Math.max;
@@ -47,7 +46,7 @@ public final class TuneTurret extends LinearOpMode {
             else if (gamepad1.dpadRightWasPressed())
                 turret.setTarget(-PI/2);
 
-            Thread.sleep((long)(max(30 - loopTimer.milliseconds(),0)));
+            Thread.sleep((long)(max(35 - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());
             loopTimer.reset();
             turret.printTo(telemetry);

@@ -45,7 +45,7 @@ public final class TuneShooter extends LinearOpMode {
             shooter.setRPM(targetRPM);
             shooter.setManual(gamepad1.right_trigger);
 
-            Thread.sleep((long)(max(30 - loopTimer.milliseconds(),0)));
+            Thread.sleep((long)(max(35 - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());
             loopTimer.reset();
             shooter.printTo(telemetry);
