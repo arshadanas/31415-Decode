@@ -45,7 +45,7 @@ public final class Shooter {
         return 0.271632 * preLaunchRPM + 109.1459;
     }
 
-    public static PIDGains pidGains = new PIDGains(0.00022, 0, 0.000015, 1);
+    public static PIDGains pidGains = new PIDGains(0, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(2.9, 0.03),
             pidFilterGains = new KalmanGains(),
