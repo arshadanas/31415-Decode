@@ -27,7 +27,7 @@ public final class KalmanFilter implements Filter {
     private double x = 0; // your initial state
     private double p = 1; // your initial covariance guess
     private double K = 1; // your initial Kalman gain guess
-    private double x_previous = x;
+    public double x_previous = x;
     private double p_previous = p;
     private double u = 0;
     private double z = 0;

@@ -32,14 +32,14 @@ import java.util.Arrays;
 public final class Container {
 
     private final KalmanFilter derivFilter = new KalmanFilter(filterGains, true);
-    public static KalmanGains filterGains = new KalmanGains(5, 0);
+    public static KalmanGains filterGains = new KalmanGains(500, 3000);
 
     private final Differentiator kD = new Differentiator();
 
     private final PIDController controller = new PIDController();
     public static PIDGains
-            pidGainsEmpty = new PIDGains(0, 0, 0, 0),
-            pidGainsFull = new PIDGains(0, 0, 0, 0);
+            pidGainsEmpty = new PIDGains(0.125, 0.35, 0.0075, 0.1),
+            pidGainsFull = new PIDGains(0.175, 0.35, 0.0075, 0.1);
 
     private final PIDGains pidGains = new PIDGains();
 
@@ -69,7 +69,7 @@ public final class Container {
     }
 
     public static double
-            ABS_OFFSET_ROTOR = 0,
+            ABS_OFFSET_ROTOR = 2.882649259112089,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
@@ -156,9 +156,10 @@ public final class Container {
     }
 
     void run(double intakePower, double feederPower) {
-
+        double oldPos = position;
         position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
-        double velocity = kD.getDerivative(derivFilter.calculate(position));
+        double velocity = kD.getDerivative(
+                position == oldPos ? derivFilter.x_previous : derivFilter.calculate(position));
 
         int currentFrontSlot = getSlotAt(Zone.INTAKE_SENSORS);
         if (
