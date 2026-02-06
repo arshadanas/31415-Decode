@@ -40,8 +40,12 @@ public final class Turret {
      * In radians
      */
     private double position, relativeEncoderOffset, target, absolutePosition, output;
-    public void setTarget(double target) {
-        this.target = normalizeRadians(target);
+
+    /**
+     * 0 = turret facing forward
+     */
+    public void setTarget(double radians) {
+        this.target = normalizeRadians(radians + PI);
     }
 
     private final KalmanFilter derivFilter = new KalmanFilter(filterGains, true);
@@ -104,7 +108,7 @@ public final class Turret {
         telemetry.addLine();
         telemetry.addData("Absolute position (deg)", toDegrees(absolutePosition));
         telemetry.addData("Absolute position (rad)", (absolutePosition));
-
+        telemetry.addLine();
         telemetry.addData("Turret motor output power", output);
 
     }
