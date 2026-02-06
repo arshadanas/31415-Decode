@@ -87,7 +87,7 @@ public final class Shooter {
             outputFilter = new KalmanFilter(outputFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
 
-    private double currentRPM, currentRPMPerSec, targetRPM = RPM_ARMING, rawRPM, output, lastOutput;
+    private double currentRPM, currentRPMPerSec, targetRPM = RPM_ARMING, rawRPM, output;
 
     public void setRPM(double rpm) {
         this.targetRPM = rpm;
@@ -137,10 +137,11 @@ public final class Shooter {
 
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
 
-        double[] stateEstimate = rpmFilter.predictAndCalculate(max(rawRPM, 0), 0);
-
-        currentRPM = stateEstimate[0];
-        currentRPMPerSec = stateEstimate[1];
+        try {
+            double[] stateEstimate = rpmFilter.predictAndCalculate(rawRPM, 0);
+            currentRPM = stateEstimate[0];
+            currentRPMPerSec = stateEstimate[1];
+        } catch (Exception ignored) {}
 
         double rpmSetpoint =
                 !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
@@ -154,7 +155,6 @@ public final class Shooter {
         double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
 
-        lastOutput = output;
         output = manualPower != 0 ? manualPower : clip(
                         inTolerance(TOLERANCE_RPM_FILTERING) ?
                                     outputFilter.calculate(pidf) :
