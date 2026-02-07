@@ -3,13 +3,9 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NEAR;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_SHALLOWEST;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_STEEPEST;
 
-import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -24,9 +20,9 @@ public final class AutoAim {
     public static double
             GOAL_OFFSET_Y = -0,
             GOAL_OFFSET_X = 3.5,
-            RPM_NEAR = 5500,
+            LAUNCH_RPM_NEAR = 5500,
             LAUNCH_RAD_NEAR = 1.0776000610289713,
-            RPM_FAR = 6000,
+            LAUNCH_RPM_FAR = 6000,
             LAUNCH_RAD_FAR = 0.7853981633974483,
             TURRET_X_OFFSET = -1.86759;
 
@@ -74,10 +70,10 @@ public final class AutoAim {
 
 
         if (currentZone == NEAR) {
-            launchRPM = RPM_NEAR;
+            launchRPM = LAUNCH_RPM_NEAR;
             launchAngle = LAUNCH_RAD_NEAR;
         } else {
-            launchRPM = RPM_FAR;
+            launchRPM = LAUNCH_RPM_FAR;
             launchAngle = LAUNCH_RAD_FAR;
         }
 
