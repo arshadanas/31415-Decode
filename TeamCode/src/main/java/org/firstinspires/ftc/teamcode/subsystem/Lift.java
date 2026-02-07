@@ -68,7 +68,7 @@ public final class Lift {
         if (!gearSwitch.isActivated())
             switchTimer.reset();
 
-        if (switchTimer.seconds() < TIME_GEAR_SWITCH) {
+        if (!gearSwitch.isActivated() || switchTimer.seconds() < TIME_GEAR_SWITCH) {
             motors[0].encoder.reset();
             setPower(LIFTING_POWER);
             return;
