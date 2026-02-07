@@ -10,6 +10,7 @@ import static java.lang.Math.toDegrees;
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -90,6 +91,12 @@ public final class MecanumDrivetrain {
     }
     public void update() {
         drivetrain.update();
+    }
+    public Vector getVelocity() {
+        return drivetrain.getVelocity();
+    }
+    public double getAngularVel() {
+        return drivetrain.getAngularVelocity();
     }
 
     public void setHeadingWithStick(double x, double y, boolean isRedAlliance) {

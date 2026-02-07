@@ -25,26 +25,6 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 @Config
 public final class Shooter {
 
-    /**
-     * Inverse of {@link #getLaunchVel}
-     * @return Angular velocity of shooter wheel at launch, in rpm
-     */
-    public static double getLaunchRPM(double inPerSec) {
-        return 29.68064 * inPerSec - 0.445157; // TODO Tune empirically
-    }
-
-    /**
-     * Inverse of {@link #getLaunchRPM}
-     * @return Linear velocity of {@link Artifact} at launch, in inches/sec
-     */
-    public static double getLaunchVel(double rpm) {
-        return (rpm + 0.445157) / 29.68064; // TODO Tune empirically
-    }
-
-    public static double getRPMDrop(double preLaunchRPM) {
-        return 0.271632 * preLaunchRPM + 109.1459;
-    }
-
     public static PIDGains pidGains = new PIDGains(0, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(2.9, 0.03),
@@ -71,11 +51,6 @@ public final class Shooter {
             TOLERANCE_RPM_FILTERING = 0.001,
             TOLERANCE_RPM_FEEDING = 10, // TODO increase for faster feeding
 
-            RPM_NEAR = 5500,
-            RPM_FAR = 6000,
-            LAUNCH_RAD_NEAR = LAUNCH_RAD_STEEPEST,
-            LAUNCH_RAD_FAR = toRadians(45),
-
             CACHE_THRESHOLD_HOOD = 0.05,
             CACHE_THRESHOLD_MOTORS = 0.05;
 
@@ -95,8 +70,8 @@ public final class Shooter {
     public void setRPM(double rpm) {
         this.targetRPM = rpm;
     }
-    public void setLaunchVel(double inPerSec) {
-        setRPM(getLaunchRPM(inPerSec));
+    double getCurrentRPM() {
+        return currentRPM;
     }
 
     /**
