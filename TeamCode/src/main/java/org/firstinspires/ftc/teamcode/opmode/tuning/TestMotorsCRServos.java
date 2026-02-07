@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMot
 public final class TestMotorsCRServos extends LinearOpMode {
 
     enum TestMech {
-        ROTOR, FEEDER, SHOOTER, TURRET, INTAKE, FR, FL, BR, BL;
+        ROTOR, FEEDER, SHOOTER, SHOOTER_R, SHOOTER_L, TURRET, INTAKE, FR, FL, BR, BL;
 
         private final static TestMech[] values = values();
 
@@ -99,6 +99,12 @@ public final class TestMotorsCRServos extends LinearOpMode {
                     case SHOOTER:
                         for (CachedMotorEx shooterMotor : shooterMotors)
                             shooterMotor.set(triggersSum);
+                        break;
+                    case SHOOTER_R:
+                        shooterMotors[0].set(triggersSum);
+                        break;
+                    case SHOOTER_L:
+                        shooterMotors[1].set(triggersSum);
                         break;
                     case TURRET:
                         turret.set(triggersSum);
