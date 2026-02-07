@@ -32,7 +32,7 @@ public final class Turret {
             TURRET_ABSOLUTE_OFFSET = 0.12375971059596157,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
             TOLERANCE_NO_RECALIBRATING = toRadians(25),
-            TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
+            TOLERANCE_FEEDING = toRadians(7.5); // TODO can be increased for faster feeds
 
     final CachedMotorEx motor;
     private final AnalogSensor absoluteEnc;
