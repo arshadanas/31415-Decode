@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
-import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NEAR;
-
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -68,13 +66,16 @@ public final class AutoAim {
         Profiler.end("aim_turret");
 
 
-        if (currentZone == NEAR) {
-            launchRPM = LAUNCH_RPM_NEAR;
-            launchAngle = LAUNCH_RAD_NEAR;
-        } else {
-            launchRPM = LAUNCH_RPM_FAR;
-            launchAngle = LAUNCH_RAD_FAR;
-        }
+//        if (currentZone == NEAR) {
+//            launchRPM = LAUNCH_RPM_NEAR;
+//            launchAngle = LAUNCH_RAD_NEAR;
+//        } else {
+//            launchRPM = LAUNCH_RPM_FAR;
+//            launchAngle = LAUNCH_RAD_FAR;
+//        }
+
+        launchRPM = 20.1268*rMag + 3010.61115;
+        launchAngle = -0.00307104*rMag + 1.22222;
 
 
     }
