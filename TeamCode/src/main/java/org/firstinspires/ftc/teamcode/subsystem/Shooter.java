@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 @Config
 public final class Shooter {
 
-    public static PIDGains pidGains = new PIDGains(0, 0, 0, 1);
+    public static PIDGains pidGains = new PIDGains(0.00025, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(2.9, 0.03),
             kDFilterGains = new KalmanGains(),
@@ -34,13 +34,13 @@ public final class Shooter {
     public static double
 
             POWER_A = 0.5,
-            RPM_A = 3500,
+            RPM_A = 3550,
             POWER_B = 1,
-            RPM_B = 7520,
+            RPM_B = 7875,
             MAX_VOLTAGE = 13,
 
             RPM_ARMING = 2700,
-            RPM_IDLE = 1620,
+            RPM_IDLE = 0,
 
             LAUNCH_RAD_SHALLOWEST = toRadians(31.901328),
             LAUNCH_RAD_STEEPEST = toRadians(61.7419355),
@@ -52,7 +52,7 @@ public final class Shooter {
             TOLERANCE_RPM_FEEDING = 10, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_HOOD = 0.05,
-            CACHE_THRESHOLD_MOTORS = 0.05;
+            CACHE_THRESHOLD_MOTORS = 0.001;
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
