@@ -117,8 +117,6 @@ public final class Shooter {
         manualPower = power;
     }
 
-    private final Profiler profiler = Profiler.INSTANCE;
-
     Shooter(HardwareMap hardwareMap) {
         hood = new CachedSimpleServo(hardwareMap, "hood", 0, 360).reversed();
 
@@ -136,40 +134,40 @@ public final class Shooter {
     }
 
     void run(boolean inLaunchZone, boolean feedsPending) {
-        profiler.start("shooter_set_gains");
+        Profiler.start("shooter_set_gains");
         rpmFilter.setGains(rpmFilterGains);
         derivFilter.setGains(kDFilterGains);
         outputFilter.setGains(outputFilterGains);
         controller.setGains(pidGains);
-        profiler.end("shooter_set_gains");
+        Profiler.end("shooter_set_gains");
 
-        profiler.start("shooter_get_encoder_vel");
+        Profiler.start("shooter_get_encoder_vel");
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
-        profiler.end("shooter_get_encoder_vel");
+        Profiler.end("shooter_get_encoder_vel");
 
-        profiler.start("shooter_kalman_predict");
+        Profiler.start("shooter_kalman_predict");
         try {
             double[] stateEstimate = rpmFilter.predictAndCalculate(rawRPM, 0);
             currentRPM = stateEstimate[0];
             currentRPMPerSec = stateEstimate[1];
         } catch (Exception ignored) {}
-        profiler.end("shooter_kalman_predict");
+        Profiler.end("shooter_kalman_predict");
 
-        profiler.start("shooter_set_vars");
+        Profiler.start("shooter_set_vars");
         double rpmSetpoint =
                 !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
                 !inLaunchZone ? RPM_ARMING :
                                 targetRPM;
 
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
-        profiler.end("shooter_set_vars");
+        Profiler.end("shooter_set_vars");
 
-        profiler.start("shooter_set_controller");
+        Profiler.start("shooter_set_controller");
         controller.setTarget(new State(rpmSetpoint));
-        profiler.end("shooter_set_controller");
+        Profiler.end("shooter_set_controller");
 
 
-        profiler.start("shooter_pid_new");
+        Profiler.start("shooter_pid_new");
         double pid = controller.calculate(new State(currentRPM, currentRPMPerSec));
         double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
@@ -180,14 +178,14 @@ public final class Shooter {
                                     pidf
                 , 0, 1);
 
-        profiler.end("shooter_pid_new");
+        Profiler.end("shooter_pid_new");
 
-        profiler.start("shooter_motors");
+        Profiler.start("shooter_motors");
         for (CachedMotorEx motor : motors) {
             motor.threshold = CACHE_THRESHOLD_MOTORS;
             motor.set(output);
         }
-        profiler.end("shooter_motors");
+        Profiler.end("shooter_motors");
     }
 
     boolean inTolerance(double rpmTolerance) {

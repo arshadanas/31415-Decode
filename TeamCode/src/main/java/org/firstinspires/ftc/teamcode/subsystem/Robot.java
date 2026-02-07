@@ -30,11 +30,7 @@ public final class Robot {
     private final ElapsedTime loopTimer = new ElapsedTime();
     private LaunchZone currentZone;
 
-    private final Profiler profiler;
-
     public Robot(HardwareMap hardwareMap, Pose startPose) {
-        this.profiler = Profiler.INSTANCE;
-
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         handler = new Handler(hardwareMap);
         shooter = new Shooter(hardwareMap);
@@ -49,17 +45,16 @@ public final class Robot {
     }
 
     public void run(boolean feed) {
-        profiler.start("Robot_bulkread");
+        Profiler.start("Robot_bulkread");
         bulkReader.bulkRead();
-        profiler.end("Robot_bulkread");
+        Profiler.end("Robot_bulkread");
 
-        if (!lift.gearSwitch.isActivated())
-        {
-            profiler.start("dt");
+        if (!lift.gearSwitch.isActivated()) {
+            Profiler.start("dt");
             drivetrain.update();
-            profiler.end("dt");
+            Profiler.end("dt");
 
-            profiler.start("aim_turret");
+            Profiler.start("aim_turret");
 
             Pose currentPose = drivetrain.getPose();
             Vector2 poseVec = new Vector2(currentPose.getX(), currentPose.getY());
@@ -70,15 +65,14 @@ public final class Robot {
 
             turret.setTarget(robotOrientation.getAngleBetween(aimVec));
 
-            profiler.end("aim_turret");
+            Profiler.end("aim_turret");
         }
-        profiler.start("GetCurrentZone");
-
+        
+        Profiler.start("GetCurrentZone");
         currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
+        Profiler.end("GetCurrentZone");
 
-        profiler.end("GetCurrentZone");
-
-        profiler.start("setShooterRPMAngle");
+        Profiler.start("setShooterRPMAngle");
 //        switch (currentZone) {
         switch (NEAR) {
             case NEAR:
@@ -90,29 +84,29 @@ public final class Robot {
                 shooter.setLaunchAngle(LAUNCH_RAD_FAR);
                 break;
         }
-        profiler.end("setShooterRPMAngle");
+        Profiler.end("setShooterRPMAngle");
 
-        profiler.start("shooter");
+        Profiler.start("shooter");
         boolean inLaunchZone = true, a = currentZone != NONE;
         shooter.run(inLaunchZone, handler.feedsPending());
-        profiler.end("shooter");
+        Profiler.end("shooter");
 
-        profiler.start("turret");
+        Profiler.start("turret");
         turret.run(handler.feedsPending());
-        profiler.end("turret");
+        Profiler.end("turret");
 
-        profiler.start("handler");
+        Profiler.start("handler");
         handler.run(
                 inLaunchZone,
                 feed //&&
 //                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) //&&
 //                turret.inTolerance(Turret.TOLERANCE_FEEDING)
         );
-        profiler.end("handler");
+        Profiler.end("handler");
 
-        profiler.start("lift");
+        Profiler.start("lift");
         lift.run();
-        profiler.end("lift");
+        Profiler.end("lift");
     }
 
     public void printTo(Telemetry telemetry) {

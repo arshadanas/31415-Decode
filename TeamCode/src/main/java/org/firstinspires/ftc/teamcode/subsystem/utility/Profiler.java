@@ -1,30 +1,24 @@
 package org.firstinspires.ftc.teamcode.subsystem.utility;
 
-public class Profiler {
+public final class Profiler {
 
-    public static Profiler INSTANCE = new Profiler();
+    public static boolean enabled = false;
+    private static dev.nullftc.profiler.Profiler profiler = null;
 
-    public boolean active;
+    private Profiler() {}
 
-    dev.nullftc.profiler.Profiler profiler;
-
-    public Profiler(){
-        this.profiler = null;
-        this.active = false;
+    public static void setProfiler(dev.nullftc.profiler.Profiler profiler) {
+        Profiler.profiler = profiler;
+        enabled = profiler != null;
     }
 
-    public void setProfiler(dev.nullftc.profiler.Profiler profiler) {
-        this.profiler = profiler;
-        this.active = profiler != null;
+    public static void start(String type){
+        if (enabled)
+            profiler.start(type);
     }
 
-    public void start(String type){
-        if (active)
-            this.profiler.start(type);
-    }
-
-    public void end(String type){
-        if (active)
-            this.profiler.end(type);
+    public static void end(String type){
+        if (enabled)
+            profiler.end(type);
     }
 }

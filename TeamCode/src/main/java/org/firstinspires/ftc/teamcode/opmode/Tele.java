@@ -93,11 +93,7 @@ public final class Tele extends LinearOpMode {
             telemetry.update();
         }
 
-        if (doProfiling){
-            Profiler.INSTANCE.setProfiler(realProfiler);
-        } else{
-            Profiler.INSTANCE.setProfiler(null);
-        }
+        Profiler.setProfiler(doProfiling ? realProfiler : null);
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
         try {
@@ -180,7 +176,7 @@ public final class Tele extends LinearOpMode {
             }
         } finally {
             exportProfiler();
-            Profiler.INSTANCE.setProfiler(null);
+            Profiler.setProfiler(null);
             telemetry.update();
         }
     }
@@ -210,7 +206,7 @@ public final class Tele extends LinearOpMode {
      */
     private void exportProfiler() {
         // Check if we are actually in profile mode
-        if (!Profiler.INSTANCE.active)
+        if (!Profiler.enabled)
             return;
 
         RobotLog.i("Starting async profiler export to: " + profilerOutput.getAbsolutePath());
