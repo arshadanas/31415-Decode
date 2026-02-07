@@ -16,28 +16,32 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 public final class Lift {
 
     public static double
+            CACHE_THRESHOLD_SWITCH = 0.05,
+            CACHE_THRESHOLD_MOTORS = 0.05,
             ANGLE_SWITCH_INACTIVE = 50,
             ANGLE_SWITCH_ENGAGED = 67,
             ANGLE_SWITCH_L_OFFSET = 4,
             HOLDING_POWER = .8,
-            LIFTING_POWER = 2,
+            LIFTING_POWER = 0, // TODO tune
             HEIGHT_LIFTED = 16,
-            TIME_GEAR_SWITCH = 1,
+            TIME_GEAR_SWITCH = 0, // TODO tune
             INCHES_PER_TICK = 2.8694862032788664 / 384.5397923875433; // circumference of retract spool (in inches) / CPR
 
     private final CachedMotorEx[] motors;
     public final SimpleServoPivot gearSwitch;
-    private final CachedSimpleServo switchL;
+    private final CachedSimpleServo switchL, switchR;
 
     private final ElapsedTime switchTimer = new ElapsedTime();
 
     Lift(HardwareMap hardwareMap) {
+        switchR = new CachedSimpleServo(hardwareMap, "gear R", 0, 1800 / 28.0); // 64.28571428571429
+        switchL = new CachedSimpleServo(hardwareMap, "gear L", 0, 1800 / 28.0);
         gearSwitch = new SimpleServoPivot(
-                ANGLE_SWITCH_INACTIVE,
-                ANGLE_SWITCH_ENGAGED,
-                new CachedSimpleServo(hardwareMap, "gear R", 0, 1800 / 28.0), // 64.28571428571429
-                switchL = new CachedSimpleServo(hardwareMap, "gear L", 0, 1800 / 28.0)
+                ANGLE_SWITCH_INACTIVE, ANGLE_SWITCH_ENGAGED,
+                switchR, switchL
         );
+        switchR.threshold = CACHE_THRESHOLD_SWITCH;
+        switchL.threshold = CACHE_THRESHOLD_SWITCH;
 
         motors = new CachedMotorEx[]{
                 new CachedMotorEx(hardwareMap, "FR", Motor.GoBILDA.RPM_435),
@@ -50,6 +54,9 @@ public final class Lift {
 
         motors[0].encoder.setDirection(REVERSE);
         motors[0].encoder.setDistancePerPulse(INCHES_PER_TICK);
+
+        for (CachedMotorEx motor : motors)
+            motor.threshold = CACHE_THRESHOLD_MOTORS;
     }
 
     void run() {
@@ -67,16 +74,21 @@ public final class Lift {
             return;
         }
 
-        if (motorPower >= 1 && motors[0].encoder.getDistance() > HEIGHT_LIFTED)
-            setPower(HOLDING_POWER);
+//        if (motorPower >= 1 && motors[0].encoder.getDistance() > HEIGHT_LIFTED)
+//            setPower(HOLDING_POWER);
 
         for (CachedMotorEx motor : motors)
-            motor.set(motorPower);
+            motor.set(hold ? HOLDING_POWER : motorPower);
     }
 
     private double motorPower;
     public void setPower(double power) {
         this.motorPower = power;
+    }
+
+    private boolean hold = false;
+    public void toggleHold() {
+        hold = !hold;
     }
 
     void printTo(Telemetry telemetry) {

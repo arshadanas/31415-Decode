@@ -121,7 +121,14 @@ public final class Tele extends LinearOpMode {
 
                 if (gamepad1.left_bumper) {
 
-                    if (gamepad1.squareWasPressed()) doTelemetry = !doTelemetry;
+                    if (gamepad1.squareWasPressed())
+                        doTelemetry = !doTelemetry;
+
+                    if (gamepad1.triangleWasPressed())
+                        robot.lift.toggleHold();
+
+                    if (gamepad1.crossWasPressed())
+                        robot.lift.gearSwitch.toggle();
 
                     robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
 
@@ -140,9 +147,8 @@ public final class Tele extends LinearOpMode {
                     else if (gamepad2.dpadLeftWasPressed() || gamepad2.dpadRightWasPressed())
                         robot.handler.clearRamp();
 
-
                     if (gamepad1.triangleWasPressed())
-                        robot.lift.gearSwitch.toggle();
+                        robot.handler.container.preloadPGP();
 
                     if (gamepad1.crossWasPressed())
                         robot.handler.feedSingle(GREEN);
@@ -181,13 +187,6 @@ public final class Tele extends LinearOpMode {
                 Profiler.end("update_telemetry");
 
                 Profiler.end("Main-robot-loop");
-
-//            double t = matchTimer.seconds();
-//            indicator.setColor(t >= LIFT_TIME ?
-//                    sin(PI * t / TIME_CLIMB_INDICATOR_ON) >= 0 ? GREEN : OFF :
-//                    robot.intake.hasSample() ? GREEN :
-//                            OFF
-//            );
             }
         } finally {
             exportProfiler();
