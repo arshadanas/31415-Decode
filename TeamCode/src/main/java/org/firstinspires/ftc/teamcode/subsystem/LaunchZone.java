@@ -11,6 +11,7 @@ import com.pedropathing.geometry.Pose;
 import org.dyn4j.collision.narrowphase.Gjk;
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Transform;
+import org.firstinspires.ftc.teamcode.opmode.Auto;
 
 public enum LaunchZone {
     NONE,
@@ -20,7 +21,7 @@ public enum LaunchZone {
     private static final double
             FORWARD_OFFSET_IN = 1.45714,
             LENGTH_TOTAL_IN = 17.73172,
-            WIDTH_TOTAL_IN = 15.53937;
+            WIDTH_TOTAL_IN = Auto.WIDTH_DRIVETRAIN;
 
     private static final Transform nearZonePosition;
     private static final Transform farZonePosition;
