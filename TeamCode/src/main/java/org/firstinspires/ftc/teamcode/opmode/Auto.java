@@ -62,10 +62,23 @@ public final class Auto extends LinearOpMode {
         PARKING
     }
 
+    static Pose getStartingPose(boolean isRedAlliance, boolean isGoalSide) {
+        double x = isGoalSide ?
+                1 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0 :
+                2 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0;
+        double y = Auto.LENGTH_DRIVETRAIN / 2.0;
+        return new Pose(
+                isRedAlliance ? (SIZE_FIELD - x) : x,
+                isGoalSide ? (SIZE_FIELD - y) : y,
+                isGoalSide ? -PI / 2 : PI / 2
+        );
+    }
+
     public static double
             DEAD_TIME = 0,
             LENGTH_DRIVETRAIN = 14.81745,
             WIDTH_DRIVETRAIN = 15.53937,
+            WIDTH_INCLUDING_PRESSERS = 17.312992126,
             SIZE_FIELD = 141.5,
             SIZE_TILE = SIZE_FIELD/6,
             DISTANCE_BETWEEN_SPECIMENS = 2,
