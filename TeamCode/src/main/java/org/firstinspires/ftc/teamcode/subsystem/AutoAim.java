@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_STEEPE
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -22,10 +23,10 @@ public final class AutoAim {
     public static double
             GOAL_OFFSET_Y = -0,
             GOAL_OFFSET_X = 3.5,
-            RPM_NEAR = 3000,
-            RPM_FAR = 5000,
+            RPM_NEAR = 5500,
+            RPM_FAR = 6000,
             LAUNCH_RAD_NEAR = LAUNCH_RAD_STEEPEST,
-            LAUNCH_RAD_FAR = LAUNCH_RAD_SHALLOWEST,
+            LAUNCH_RAD_FAR = toRadians(45),
             TURRET_X_OFFSET = -1.86759;
 
     static double launchRPM, launchAngle, turretAngle;

@@ -39,10 +39,7 @@ public final class Robot {
         bulkReader = new BulkReader(hardwareMap);
     }
 
-    boolean isRedAlliance = false;
-
     public void setAlliance(boolean isRedAlliance) {
-        this.isRedAlliance = isRedAlliance;
         AutoAim.isRedAlliance = isRedAlliance;
     }
 
@@ -59,14 +56,6 @@ public final class Robot {
             drivetrain.update();
             Profiler.end("dt");
 
-            Profiler.start("aim_turret");
-
-            Pose currentPose = drivetrain.getPose();
-            Vector2 poseVec = new Vector2(currentPose.getX(), currentPose.getY());
-            Vector2 goalVec = isRedAlliance ?
-                    new Vector2(SIZE_FIELD - 10, SIZE_FIELD) // Red side
-                    : new Vector2(10, SIZE_FIELD); // Blue side
-            Vector2 aimVec = goalVec.difference(poseVec);
             Profiler.start("Auto aim calc");
             AutoAim.update(
                     drivetrain.getPose(),
@@ -82,24 +71,7 @@ public final class Robot {
             shooter.setLaunchAngle(AutoAim.launchAngle);
         }
 
-        Profiler.start("GetCurrentZone");
-        currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
-        Profiler.end("GetCurrentZone");
-
-        Profiler.start("setShooterRPMAngle");
-        switch (currentZone) {
-//        switch (NEAR) {
-            case NEAR:
-                shooter.setRPM(RPM_NEAR);
-                shooter.setLaunchAngle(LAUNCH_RAD_NEAR);
-                break;
-            case FAR:
-                shooter.setRPM(RPM_FAR);
-                shooter.setLaunchAngle(LAUNCH_RAD_FAR);
-                break;
-        }
-        Profiler.end("setShooterRPMAngle");
-        boolean inLaunchZone = true; // = currentZone != NONE; // TODO enable zone checking
+        boolean inLaunchZone = currentZone != NONE;
 
         Profiler.start("shooter");
         shooter.run(inLaunchZone, handler.feedsPending());
