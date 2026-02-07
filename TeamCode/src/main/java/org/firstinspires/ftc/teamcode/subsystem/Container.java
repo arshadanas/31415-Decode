@@ -10,6 +10,7 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static java.lang.Math.toDegrees;
+import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -39,8 +40,8 @@ public final class Container {
 
     private final PIDController controller = new PIDController();
     public static PIDGains
-            pidGainsEmpty = new PIDGains(0.125, 0.35, 0.0075, 0.1),
-            pidGainsFull = new PIDGains(0.175, 0.35, 0.0075, 0.1);
+            pidGainsEmpty = new PIDGains(0.15, 0.1, 0.01, 0.1),
+            pidGainsFull = new PIDGains(0.2, 0.1, 0.01, 0.1);
 
     private final PIDGains pidGains = new PIDGains();
 
