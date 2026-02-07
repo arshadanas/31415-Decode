@@ -123,11 +123,13 @@ public final class AutoSped extends LinearOpMode {
                 else
                     robot.drivetrain.run(
                             0,
-                            MOVE_POWER,
+                            -MOVE_POWER,
                             0,
                             false /*|| triggersSum > 0 */,
                             isRedAlliance
                     );
+
+                pose = robot.drivetrain.getPose();
 
 //                Profiler.start("update_telemetry");
 //                if (doTelemetry) {

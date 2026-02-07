@@ -114,7 +114,8 @@ public final class Tele extends LinearOpMode {
         try {
 
             robot.setAlliance(isRedAlliance);
-            pose = Auto.getStartingPose(isRedAlliance, isGoalSide);
+            if (pose == null)
+                pose = Auto.getStartingPose(isRedAlliance, isGoalSide);
             robot.drivetrain.setStartingPose(pose);
             robot.handler.container.preloadPGP();
 
