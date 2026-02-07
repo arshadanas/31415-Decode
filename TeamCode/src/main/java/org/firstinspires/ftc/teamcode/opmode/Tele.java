@@ -6,11 +6,13 @@ import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_AL
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
+import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -148,6 +150,16 @@ public final class Tele extends LinearOpMode {
 
                     robot.handler.setFeederManual(gamepad1.left_trigger);
                     robot.shooter.setManual(gamepad1.right_trigger);
+
+                    // wall reset
+                    if (gamepad1.dpadRightWasPressed()) {
+                        double x = Auto.WIDTH_INCLUDING_PRESSERS / 2.0;
+                        robot.drivetrain.setPose(new Pose(
+                                isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
+                                Auto.LENGTH_DRIVETRAIN / 2.0,
+                                PI / 2
+                        ));
+                    }
 
                 } else {
 
