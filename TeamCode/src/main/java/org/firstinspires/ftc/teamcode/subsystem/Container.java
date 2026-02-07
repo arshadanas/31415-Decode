@@ -77,7 +77,7 @@ public final class Container {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
-            TOLERANCE_INTAKE_SENSORS = 0.15, // too high => false positives, too low => false negatives (no-detect)
+            TOLERANCE_INTAKE_SENSORS = 0.2, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_FEEDER_SENSORS = 0.05, // too high => false negatives (removals)
             TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
             TOLERANCE_FEEDER_FRICTION = 0.6108652381980153,
