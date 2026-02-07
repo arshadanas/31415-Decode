@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static com.acmerobotics.roadrunner.Math.lerp;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
+import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toRadians;
 
@@ -42,8 +43,8 @@ public final class Shooter {
             RPM_ARMING = 2700,
             RPM_IDLE = 0,
 
-            LAUNCH_RAD_SHALLOWEST = toRadians(31.901328),
-            LAUNCH_RAD_STEEPEST = toRadians(61.7419355),
+            LAUNCH_RAD_SHALLOWEST = 0.5567832093586575, // 31.901328 deg
+            LAUNCH_RAD_STEEPEST = 1.0776000610289713, // 61.7419355 deg
 
             ANGLE_HOOD_SHALLOWEST = 360,
             ANGLE_HOOD_STEEPEST = 10,
