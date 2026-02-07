@@ -124,7 +124,7 @@ public final class Tele extends LinearOpMode {
 
                 Profiler.start("robot.run()");
                 // Read sensors + gamepads:
-                robot.run(gamepad1.square);
+                robot.run(gamepad1.square, gamepad1.dpad_down);
 
                 Profiler.end("robot.run()");
 

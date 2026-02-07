@@ -40,7 +40,7 @@ public final class Robot {
         AutoAim.isRedAlliance = isRedAlliance;
     }
 
-    public void run(boolean feed) {
+    public void run(boolean feed, boolean forceFeed) {
         Profiler.start("Robot_bulkread");
         bulkReader.bulkRead();
         Profiler.end("Robot_bulkread");
@@ -79,11 +79,13 @@ public final class Robot {
         Profiler.end("turret");
 
         Profiler.start("handler");
-        handler.run(// TODO enable rpm + direction tolerance checking
+        handler.run(
                 inLaunchZone,
-                feed //&&
-//                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) //&&
-//                turret.inTolerance(Turret.TOLERANCE_FEEDING)
+                forceFeed || (
+                        feed &&
+                        shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
+                        turret.inTolerance(Turret.TOLERANCE_FEEDING)
+                )
         );
         Profiler.end("handler");
 
