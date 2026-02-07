@@ -10,7 +10,6 @@ import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -24,6 +23,7 @@ import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
 import org.firstinspires.ftc.teamcode.control.motion.State;
+import org.firstinspires.ftc.teamcode.subsystem.utility.LEDIndicator;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
@@ -92,7 +92,7 @@ public final class Container {
     private final CachedDcMotor[] servos;
     private final AnalogSensor encoder, front1, back1;
     private final ColorSensor color1, color2;
-//    private final LEDIndicator[] indicators;
+    private final LEDIndicator[] indicators;
     private final VoltageSensor batteryVoltageSensor;
 
     /**
@@ -150,11 +150,11 @@ public final class Container {
         color1 = new ColorSensor(hardwareMap, "color 1", 1);
         color2 = new ColorSensor(hardwareMap, "color 2", 1);
 
-//        indicators = new LEDIndicator[]{
-//                new LEDIndicator(hardwareMap, "led 1a", "led 1b"),
-//                new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
-//                new LEDIndicator(hardwareMap, "led 3a", "led 3b")
-//        };
+        indicators = new LEDIndicator[]{
+                new LEDIndicator(hardwareMap, "led 1a", "led 1b"),
+                new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
+                new LEDIndicator(hardwareMap, "led 3a", "led 3b")
+        };
 
         batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
@@ -193,16 +193,12 @@ public final class Container {
 
 
         // LEDs
-//        int n = 0;
-//        for (Artifact a : artifacts)
-//            if (a != EMPTY)
-//                indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
-//        while (n < artifacts.length)
-//            indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
-
-//        boolean teegooglycoffemeat = true;
-//        if (teegooglycoffemeat)
-//            return;
+        int n = 0;
+        for (Artifact a : artifacts)
+            if (a != EMPTY)
+                indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
+        while (n < artifacts.length)
+            indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
 
         // run pid
         derivFilter.setGains(filterGains);
