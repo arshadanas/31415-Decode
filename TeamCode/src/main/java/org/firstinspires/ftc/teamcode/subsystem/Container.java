@@ -72,8 +72,8 @@ public final class Container {
 
     public static double
             ABS_OFFSET_ROTOR = 2.882649259112089,
-            THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
-            THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
+            THRESHOLD_FRONT_MM = 95, // start of ramp = ~115
+            THRESHOLD_BACK_MM = 160, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
