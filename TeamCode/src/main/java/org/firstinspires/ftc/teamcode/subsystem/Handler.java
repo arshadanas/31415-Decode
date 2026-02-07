@@ -196,6 +196,7 @@ public final class Handler {
                 "Scoring motifs, " + (allowOneWrongInMotifs ? "up to one incorrect color" : "colors must be gxact"));
         telemetry.addLine();
         telemetry.addData("Feeding order", feedingOrder.toString());
+        telemetry.addData("Randomization", randomization);
         telemetry.addLine();
         telemetry.addLine(numArtifactsScored + String.format(" ARTIFACT%s SCORED", numArtifactsScored == 1 ? "" : "S"));
         telemetry.addLine("\n--------------------------------------\n");
