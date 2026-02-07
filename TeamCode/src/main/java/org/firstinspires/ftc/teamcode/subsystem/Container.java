@@ -178,6 +178,7 @@ public final class Container {
 
             // combine Artifact reading from both color sensors
             artifacts[currentFrontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
+            updateLEDs();
         }
 
 
@@ -188,17 +189,10 @@ public final class Container {
                 currentBackSlot != -1 && // there is a slot near the back feeding zone
                 artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
                 back1.getReading() > THRESHOLD_BACK_MM // distance sensor reports no artifact
-        )
+        ) {
             artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
-
-
-        // LEDs
-        int n = 0;
-        for (Artifact a : artifacts)
-            if (a != EMPTY)
-                indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
-        while (n < artifacts.length)
-            indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
+            updateLEDs();
+        }
 
         // run pid
         derivFilter.setGains(filterGains);
@@ -217,6 +211,15 @@ public final class Container {
             servo.threshold = CACHE_THRESHOLD_ROTOR;
             servo.setPower(servoPower + antiFrictionPower);
         }
+    }
+
+    private void updateLEDs() {
+        int n = 0;
+        for (Artifact a : artifacts)
+            if (a != EMPTY)
+                indicators[n++].setColor(a == GREEN ? LEDIndicator.LEDColor.GREEN : LEDIndicator.LEDColor.RED);
+        while (n < artifacts.length)
+            indicators[n++].setColor(LEDIndicator.LEDColor.OFF);
     }
 
     /**
@@ -259,6 +262,7 @@ public final class Container {
         artifacts[0] = PURPLE;
         artifacts[1] = GREEN;
         artifacts[2] = PURPLE;
+        updateLEDs();
     }
 
     /**
