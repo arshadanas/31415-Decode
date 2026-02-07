@@ -98,6 +98,8 @@ public final class Tele extends LinearOpMode {
             telemetry.update();
         }
 
+        robot.drivetrain.setStartingPose(pose);
+
         Profiler.setProfiler(doProfiling ? realProfiler : null);
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -86,6 +86,9 @@ public final class MecanumDrivetrain {
     public void setPose(Pose pose) {
         drivetrain.setPose(pose);
     }
+    public void setStartingPose(Pose pose) {
+        drivetrain.setStartingPose(pose);
+    }
     public Pose getPose() {
         return drivetrain.getPose();
     }

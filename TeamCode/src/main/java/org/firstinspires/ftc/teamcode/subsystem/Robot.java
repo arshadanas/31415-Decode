@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
-import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NEAR;
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
 
 import static java.lang.Math.PI;
@@ -11,14 +9,13 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 @Config
 public final class Robot {
-// TODO gate pressers
+
     public final BulkReader bulkReader;
     public final MecanumDrivetrain drivetrain;
     public final Handler handler;
