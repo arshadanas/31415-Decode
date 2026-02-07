@@ -29,9 +29,9 @@ public final class Turret {
 
     public static double
             CACHE_THRESHOLD_MOTOR = 0.05,
-            TURRET_ABSOLUTE_OFFSET = 0,
+            TURRET_ABSOLUTE_OFFSET = 0.12375971059596157,
             QUADRATURE_RAD_PER_TICK = 2 * PI / (4 * 145.090909091),
-            TOLERANCE_NO_RECALIBRATING = toRadians(10),
+            TOLERANCE_NO_RECALIBRATING = toRadians(25),
             TOLERANCE_FEEDING = toRadians(3); // TODO can be increased for faster feeds
 
     final CachedMotorEx motor;
