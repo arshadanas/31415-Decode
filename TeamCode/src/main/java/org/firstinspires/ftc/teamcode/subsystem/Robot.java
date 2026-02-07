@@ -68,7 +68,7 @@ public final class Robot {
             shooter.setLaunchAngle(AutoAim.launchAngle);
         }
 
-        boolean inLaunchZone = true; //currentZone != NONE; TODO enable
+        boolean inLaunchZone = currentZone != NONE;
 
         Profiler.start("shooter");
         shooter.run(inLaunchZone, handler.feedsPending());
