@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 public final class Turret {
 
     public static KalmanGains filterGains = new KalmanGains(.5, 50);
-    public static PIDGains pidGains = new PIDGains(0.25, 0, 0.1, 0.25);
+    public static PIDGains pidGains = new PIDGains(0.4, 0.8, 0.03, 0.8);
 
     public static double
             CACHE_THRESHOLD_MOTOR = 0.05,

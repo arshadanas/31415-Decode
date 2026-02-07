@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NEAR;
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
 import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_FAR;
@@ -40,8 +41,10 @@ public final class Robot {
         bulkReader = new BulkReader(hardwareMap);
     }
 
-    public void setAlliance(boolean isRedAlliance) {
+    boolean isRedAlliance = false;
 
+    public void setAlliance(boolean isRedAlliance) {
+        this.isRedAlliance = isRedAlliance;
     }
 
     public void run(boolean feed) {
@@ -58,7 +61,9 @@ public final class Robot {
 
             Pose currentPose = drivetrain.getPose();
             Vector2 poseVec = new Vector2(currentPose.getX(), currentPose.getY());
-            Vector2 goalVec = new Vector2(0, 0);
+            Vector2 goalVec = isRedAlliance ?
+                    new Vector2(SIZE_FIELD - 10, SIZE_FIELD) // Red side
+                    : new Vector2(10, SIZE_FIELD); // Blue side
             Vector2 aimVec = goalVec.difference(poseVec);
 
             Vector2 robotOrientation = new Vector2(currentPose.getHeading());
@@ -73,8 +78,8 @@ public final class Robot {
         Profiler.end("GetCurrentZone");
 
         Profiler.start("setShooterRPMAngle");
-//        switch (currentZone) {
-        switch (NEAR) {
+        switch (currentZone) {
+//        switch (NEAR) {
             case NEAR:
                 shooter.setRPM(RPM_NEAR);
                 shooter.setLaunchAngle(LAUNCH_RAD_NEAR);
