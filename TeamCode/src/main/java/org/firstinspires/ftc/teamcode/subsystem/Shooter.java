@@ -72,9 +72,9 @@ public final class Shooter {
             TOLERANCE_RPM_FEEDING = 10, // TODO increase for faster feeding
 
             RPM_NEAR = 5000,
-            RPM_FAR = 5000,
+            RPM_FAR = 5500,
             LAUNCH_RAD_NEAR = LAUNCH_RAD_STEEPEST,
-            LAUNCH_RAD_FAR = LAUNCH_RAD_SHALLOWEST,
+            LAUNCH_RAD_FAR = toRadians(45),
 
             CACHE_THRESHOLD_HOOD = 0.05,
             CACHE_THRESHOLD_MOTORS = 0.05;
