@@ -17,6 +17,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.subsystem.Motif;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
@@ -146,6 +147,13 @@ public final class Tele extends LinearOpMode {
                         robot.handler.decrementArtifactsScored();
                     else if (gamepad2.dpadLeftWasPressed() || gamepad2.dpadRightWasPressed())
                         robot.handler.clearRamp();
+
+                    if (gamepad2.squareWasPressed())
+                        robot.handler.randomization = Motif.GPP;
+                    else if (gamepad2.triangleWasPressed())
+                        robot.handler.randomization = Motif.PGP;
+                    else if (gamepad2.circleWasPressed())
+                        robot.handler.randomization = Motif.PPG;
 
                     if (gamepad1.triangleWasPressed())
                         robot.handler.container.preloadPGP();
