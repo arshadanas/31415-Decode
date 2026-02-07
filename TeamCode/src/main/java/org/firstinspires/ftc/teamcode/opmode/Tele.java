@@ -118,6 +118,13 @@ public final class Tele extends LinearOpMode {
             robot.drivetrain.setStartingPose(pose);
             robot.handler.container.preloadPGP();
 
+            double x = Auto.WIDTH_INCLUDING_PRESSERS / 2.0;
+            Pose wallResetPose = new Pose(
+                    isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
+                    Auto.LENGTH_DRIVETRAIN / 2.0,
+                    PI / 2
+            );
+
             matchTimer.reset();
 
             // Control loop:
@@ -151,15 +158,8 @@ public final class Tele extends LinearOpMode {
                     robot.handler.setFeederManual(gamepad1.left_trigger);
                     robot.shooter.setManual(gamepad1.right_trigger);
 
-                    // wall reset
-                    if (gamepad1.dpadRightWasPressed()) {
-                        double x = Auto.WIDTH_INCLUDING_PRESSERS / 2.0;
-                        robot.drivetrain.setPose(new Pose(
-                                isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
-                                Auto.LENGTH_DRIVETRAIN / 2.0,
-                                PI / 2
-                        ));
-                    }
+                    if (gamepad1.dpadRightWasPressed())
+                        robot.drivetrain.setPose(wallResetPose);
 
                 } else {
 
