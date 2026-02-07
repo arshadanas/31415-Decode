@@ -63,7 +63,7 @@ public final class Tele extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Robot robot = new Robot(hardwareMap, pose);
+        Robot robot = new Robot(hardwareMap, new Pose());
         robot.drivetrain.startTeleopDrive();
 
         TeleOpConfig selected = EDITING_ALLIANCE;
@@ -115,13 +115,13 @@ public final class Tele extends LinearOpMode {
 
             robot.setAlliance(isRedAlliance);
             if (pose == null)
-                pose = Auto.getStartingPose(isRedAlliance, isGoalSide);
-            robot.drivetrain.setStartingPose(pose);
-            robot.handler.container.preloadPGP();
+                pose = Auto.getStartingPose(isRedAlliance, false);
+            robot.drivetrain.setPose(pose);
+            robot.handler.preloadPGP();
 
             double x = Auto.WIDTH_INCLUDING_PRESSERS / 2.0;
             Pose wallResetPose = new Pose(
-                    isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
+                    !isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
                     Auto.LENGTH_DRIVETRAIN / 2.0,
                     PI / 2
             );
@@ -180,7 +180,7 @@ public final class Tele extends LinearOpMode {
                         robot.handler.randomization = Motif.PPG;
 
                     if (gamepad1.triangleWasPressed())
-                        robot.handler.container.preloadPGP();
+                        robot.handler.preloadPGP();
 
                     if (gamepad1.crossWasPressed())
                         robot.handler.feedSingle(GREEN);

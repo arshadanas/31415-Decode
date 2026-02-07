@@ -3,9 +3,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static com.acmerobotics.roadrunner.Math.lerp;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
-import static java.lang.Math.PI;
 import static java.lang.Math.abs;
-import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -26,7 +24,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 @Config
 public final class Shooter {
 
-    public static PIDGains pidGains = new PIDGains(0.00025, 0, 0, 1);
+    public static PIDGains pidGains = new PIDGains(0, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(2.9, 0.03),
             kDFilterGains = new KalmanGains(),

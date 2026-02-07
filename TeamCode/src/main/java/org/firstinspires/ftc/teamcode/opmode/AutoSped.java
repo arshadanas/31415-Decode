@@ -9,6 +9,7 @@ import static java.lang.Math.toDegrees;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -28,7 +29,7 @@ import dev.nullftc.profiler.exporter.CSVProfilerExporter;
 @Autonomous(preselectTeleOp = "Tele")
 public final class AutoSped extends LinearOpMode {
 
-    public static double MOVE_POWER = 0.5, TIME_MOVE_NEAR = 0.5, TIME_MOVE_FAR = 0.5;
+    public static double MOVE_POWER = 0.5, TIME_MOVE_NEAR = 0.5, TIME_MOVE_FAR = 1;
 
     private dev.nullftc.profiler.Profiler realProfiler;
 
@@ -43,7 +44,7 @@ public final class AutoSped extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Robot robot = new Robot(hardwareMap, pose);
+        Robot robot = new Robot(hardwareMap, new Pose());
         robot.drivetrain.startTeleopDrive();
 
         Tele.TeleOpConfig selected = EDITING_ALLIANCE;
@@ -103,7 +104,7 @@ public final class AutoSped extends LinearOpMode {
             matchTimer.reset();
 
             // Control loop:
-            while (opModeIsActive() && matchTimer.seconds() <= timeMoving) {
+            while (opModeIsActive()) {
                 Profiler.start("Main-robot-loop");
 
                 Profiler.start("robot.run()");
@@ -112,22 +113,25 @@ public final class AutoSped extends LinearOpMode {
 
                 Profiler.end("robot.run()");
 
-                if (isGoalSide)
-                    robot.drivetrain.run(
-                            (isRedAlliance ? 1 : -1) * MOVE_POWER,
-                            0,
-                            0,
-                            false /*|| triggersSum > 0 */,
-                            isRedAlliance
-                    );
-                else
-                    robot.drivetrain.run(
-                            0,
-                            -MOVE_POWER,
-                            0,
-                            false /*|| triggersSum > 0 */,
-                            isRedAlliance
-                    );
+                if (matchTimer.seconds() <= timeMoving) {
+                    if (isGoalSide)
+                        robot.drivetrain.run(
+                                (isRedAlliance ? 1 : -1) * MOVE_POWER,
+                                0,
+                                0,
+                                false /*|| triggersSum > 0 */,
+                                isRedAlliance
+                        );
+                    else
+                        robot.drivetrain.run(
+                                0,
+                                -MOVE_POWER,
+                                0,
+                                false /*|| triggersSum > 0 */,
+                                isRedAlliance
+                        );
+                } else
+                    robot.drivetrain.run(0, 0, 0, false, isRedAlliance);
 
                 pose = robot.drivetrain.getPose();
 

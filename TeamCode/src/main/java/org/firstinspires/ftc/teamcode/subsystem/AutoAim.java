@@ -20,7 +20,7 @@ public final class AutoAim {
     public static double
             GOAL_OFFSET_Y = -0,
             GOAL_OFFSET_X = 3.5,
-            LAUNCH_RPM_NEAR = 5500,
+            LAUNCH_RPM_NEAR = 5000,
             LAUNCH_RAD_NEAR = 1.0776000610289713,
             LAUNCH_RPM_FAR = 6000,
             LAUNCH_RAD_FAR = 0.7853981633974483,
@@ -31,6 +31,10 @@ public final class AutoAim {
     static LaunchZone currentZone;
 
     static void update(Pose pose, Vector velocity, double θ_, double currentRPM) {
+
+        Profiler.start("GetCurrentZone");
+        currentZone = LaunchZone.getCurrentZone(pose);
+        Profiler.end("GetCurrentZone");
 
         Vector2 G = new Vector2(
                 isRedAlliance ? SIZE_FIELD - GOAL_OFFSET_X : GOAL_OFFSET_X,
@@ -62,11 +66,6 @@ public final class AutoAim {
         turretAngle = -rVector.getAngleBetween(θ);
 
         Profiler.end("aim_turret");
-
-
-        Profiler.start("GetCurrentZone");
-        currentZone = NEAR;//LaunchZone.getCurrentZone(pose); TODO enable
-        Profiler.end("GetCurrentZone");
 
 
         if (currentZone == NEAR) {

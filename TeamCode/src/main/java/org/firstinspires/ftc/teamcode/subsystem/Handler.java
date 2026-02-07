@@ -4,6 +4,8 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLO
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -28,6 +30,7 @@ public final class Handler {
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
             ANGLE_PRESSER_L_OFFSET = -37,
+            SPEED_IDLE_FEEDER = 0,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05,
@@ -105,10 +108,7 @@ public final class Handler {
 
         // generate feeding order if intake is running
         if (intakePower != 0)
-            if (motifMode)
-                feedMotif();
-            else
-                feedFastest();
+            generateDefaultFeedingOrder();
 
         // move empty slot to intake
         if (intakePower != 0 && EMPTY.numOccurrencesIn(container.artifacts) > 0)
@@ -126,10 +126,10 @@ public final class Handler {
                             !feedingOrder.isEmpty() && (slotAtFeeder == -1 || slotAtFeeder == feedingOrder.get(0)) ||
                             keepRunningAfterLastFeed()
                         )
-                         ? 1 : 0;
+                         ? 1 : SPEED_IDLE_FEEDER;
 
 
-        if (!feedingOrder.isEmpty() && feederPower != 0)
+        if (!feedingOrder.isEmpty() && feederPower != SPEED_IDLE_FEEDER)
             timeSinceLastFeed.reset();
         
 
@@ -147,6 +147,13 @@ public final class Handler {
         presserLServo.threshold = CACHE_THRESHOLD_PRESSERS;
         presserR.run();
         presserL.run();
+    }
+
+    private void generateDefaultFeedingOrder() {
+        if (motifMode)
+            feedMotif();
+        else
+            feedFastest();
     }
 
     /**
@@ -188,6 +195,17 @@ public final class Handler {
             return;
 
         feedingOrder.add(first);
+    }
+
+    /**
+     * GREEN in slot 1
+     */
+    public void preloadPGP() {
+        container.artifacts[0] = PURPLE;
+        container.artifacts[1] = GREEN;
+        container.artifacts[2] = PURPLE;
+        container.updateLEDs();
+        generateDefaultFeedingOrder();
     }
 
     void printTo(Telemetry telemetry) {

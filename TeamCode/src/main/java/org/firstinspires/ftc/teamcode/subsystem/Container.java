@@ -4,8 +4,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.norm
 import static org.firstinspires.ftc.teamcode.control.Ranges.lerp;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.signum;
@@ -40,8 +38,8 @@ public final class Container {
 
     private final PIDController controller = new PIDController();
     public static PIDGains
-            pidGainsEmpty = new PIDGains(0.15, 0.1, 0.01, 0.1),
-            pidGainsFull = new PIDGains(0.2, 0.1, 0.01, 0.1);
+            pidGainsEmpty = new PIDGains(0.125, 0.1, 0.01, 0.1),
+            pidGainsFull = new PIDGains(0.125, 0.1, 0.01, 0.1);
 
     private final PIDGains pidGains = new PIDGains();
 
@@ -74,12 +72,12 @@ public final class Container {
             ABS_OFFSET_ROTOR = 2.882649259112089,
             THRESHOLD_FRONT_MM = 95, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
-            TIME_BACK_DIST = 0,
+            TIME_BACK_DIST = 0.125,
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
             TOLERANCE_INTAKE_SENSORS = 0.2, // too high => false positives, too low => false negatives (no-detect)
-            TOLERANCE_FEEDER_SENSORS = 0.05, // too high => false negatives (removals)
+            TOLERANCE_FEEDER_SENSORS = 0.15, // too high => false negatives (removals)
             TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
             TOLERANCE_FEEDER_FRICTION = 0.6108652381980153,
             TOLERANCE_INTAKE_OMNI = 0.5235987755982988,
@@ -218,7 +216,7 @@ public final class Container {
         }
     }
 
-    private void updateLEDs() {
+    void updateLEDs() {
 //        int n = 0;
 //        for (Artifact a : artifacts)
 //            if (a != EMPTY)
@@ -258,16 +256,6 @@ public final class Container {
     void moveSlot(int slot, Zone target) {
         this.selectedSlot = wrap(slot, 0, artifacts.length);
         this.target = target;
-    }
-
-    /**
-     * GREEN in slot 1
-     */
-    public void preloadPGP() {
-        artifacts[0] = PURPLE;
-        artifacts[1] = GREEN;
-        artifacts[2] = PURPLE;
-        updateLEDs();
     }
 
     /**
@@ -359,7 +347,7 @@ public final class Container {
         telemetry.addData("CONTAINER", Arrays.toString(artifacts));
         telemetry.addLine();
         telemetry.addData("Position [0] (deg)", toDegrees(position));
-        telemetry.addData("Error (deg)", toDegrees(getError(selectedSlot, target)));
+        telemetry.addData("Rotor error (deg)", toDegrees(getError(selectedSlot, target)));
         telemetry.addData("Filtered error derivative (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
         telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
         telemetry.addLine();
