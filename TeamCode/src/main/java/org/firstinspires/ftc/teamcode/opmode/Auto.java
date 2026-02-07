@@ -191,7 +191,7 @@ public final class Auto extends LinearOpMode {
 
             intakingSpec = new EditablePose(36, -60, PI / 2);
 
-    static Pose pose = new Pose(SIZE_FIELD/2,SIZE_FIELD/2, PI / 2);
+    static Pose pose = null;
     static boolean isRedAlliance = false;
 
     enum AutonConfig {
