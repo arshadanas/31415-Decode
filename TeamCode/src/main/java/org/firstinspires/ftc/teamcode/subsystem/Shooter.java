@@ -76,8 +76,8 @@ public final class Shooter {
             LAUNCH_RAD_NEAR = LAUNCH_RAD_STEEPEST,
             LAUNCH_RAD_FAR = LAUNCH_RAD_SHALLOWEST,
 
-            CACHE_THRESHOLD_HOOD = 0,
-            CACHE_THRESHOLD_MOTORS = 0;
+            CACHE_THRESHOLD_HOOD = 0.05,
+            CACHE_THRESHOLD_MOTORS = 0.05;
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;

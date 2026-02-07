@@ -20,7 +20,7 @@ public final class MecanumDrivetrain {
 
     public static double
             SLOW_FACTOR = 0.3,
-            MOTOR_CACHING_THRESHOLD = 0.01;
+            MOTOR_CACHING_THRESHOLD = 0.05;
 
     private final Follower drivetrain;
 

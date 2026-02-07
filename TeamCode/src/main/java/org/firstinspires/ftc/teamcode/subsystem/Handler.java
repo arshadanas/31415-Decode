@@ -29,9 +29,9 @@ public final class Handler {
             ANGLE_PRESSER_EXTENDED = 211,
             ANGLE_PRESSER_L_OFFSET = -37,
 
-            CACHE_THRESHOLD_INTAKE = 0,
-            CACHE_THRESHOLD_FEEDER = 0,
-            CACHE_THRESHOLD_PRESSERS = 0;
+            CACHE_THRESHOLD_INTAKE = 0.05,
+            CACHE_THRESHOLD_FEEDER = 0.05,
+            CACHE_THRESHOLD_PRESSERS = 0.05;
 
     public final Container container;
     private final CachedMotorEx intake;

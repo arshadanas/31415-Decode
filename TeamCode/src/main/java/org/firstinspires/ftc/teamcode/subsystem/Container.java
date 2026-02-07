@@ -85,7 +85,7 @@ public final class Container {
             POWER_OVERCOME_FRICTION = 0.06,
             MAX_VOLTAGE = 13,
 
-            CACHE_THRESHOLD_ROTOR = 0;
+            CACHE_THRESHOLD_ROTOR = 0.05;
 
     // hardware
     private final CachedDcMotor[] servos;
