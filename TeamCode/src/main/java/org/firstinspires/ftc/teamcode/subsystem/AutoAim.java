@@ -68,7 +68,7 @@ public final class AutoAim {
 
 
         Profiler.start("GetCurrentZone");
-        currentZone = LaunchZone.getCurrentZone(pose);
+        currentZone = NEAR;//LaunchZone.getCurrentZone(pose); TODO enable
         Profiler.end("GetCurrentZone");
 
 
