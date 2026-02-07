@@ -53,7 +53,7 @@ public final class AutoAim {
         double
                 m = S_.getMagnitude(),
                 a = S_.getDirection(),
-                r = rVector.getMagnitude(),
+                r = rMag = rVector.getMagnitude(),
                 b = rVector.getDirection(),
                 g = b - a,
                 r_ = -m*cos(g),
@@ -82,6 +82,7 @@ public final class AutoAim {
 
 
     }
+    static double rMag;
 
     /**
      * Inverse of {@link #getLaunchVel}

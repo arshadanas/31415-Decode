@@ -100,6 +100,7 @@ public final class Robot {
         loopTimer.reset();
         telemetry.addLine();
         telemetry.addData("CURRENT ZONE", currentZone);
+        telemetry.addData("Shooter-goal dist (in)", AutoAim.rMag);
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
