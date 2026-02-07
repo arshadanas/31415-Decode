@@ -42,11 +42,11 @@ public final class TuneTurret extends LinearOpMode {
             if (gamepad1.dpadUpWasPressed())
                 turret.setTarget(0);
             else if (gamepad1.dpadLeftWasPressed())
-                turret.setTarget(toRadians(160));
-//            else if (gamepad1.dpadDownWasPressed())
-//                turret.setTarget(toRadians());
+                turret.setTarget(toRadians(90));
+            else if (gamepad1.dpadDownWasPressed())
+                turret.setTarget(toRadians(0));
             else if (gamepad1.dpadRightWasPressed())
-                turret.setTarget(toRadians(-160));
+                turret.setTarget(toRadians(-90));
 
             Thread.sleep((long)(max(Tele.AVG_LOOP_TIME_MS - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());
