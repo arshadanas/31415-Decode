@@ -1,18 +1,14 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NEAR;
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_FAR;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.LAUNCH_RAD_NEAR;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.RPM_FAR;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.RPM_NEAR;
+
+import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
@@ -41,7 +37,7 @@ public final class Robot {
     }
 
     public void setAlliance(boolean isRedAlliance) {
-
+        AutoAim.isRedAlliance = isRedAlliance;
     }
 
     public void run(boolean feed) {
@@ -49,45 +45,32 @@ public final class Robot {
         bulkReader.bulkRead();
         Profiler.end("Robot_bulkread");
 
-        if (!lift.gearSwitch.isActivated()) {
+        if (lift.gearSwitch.isActivated()) {
+            currentZone = NONE;
+            turret.setTarget(PI);
+        } else {
             Profiler.start("dt");
             drivetrain.update();
             Profiler.end("dt");
 
-            Profiler.start("aim_turret");
+            Profiler.start("Auto aim calc");
+            AutoAim.update(
+                    drivetrain.getPose(),
+                    drivetrain.getVelocity(),
+                    drivetrain.getAngularVel(),
+                    shooter.getCurrentRPM()
+            );
+            Profiler.end("Auto aim calc");
 
-            Pose currentPose = drivetrain.getPose();
-            Vector2 poseVec = new Vector2(currentPose.getX(), currentPose.getY());
-            Vector2 goalVec = new Vector2(0, 0);
-            Vector2 aimVec = goalVec.difference(poseVec);
-
-            Vector2 robotOrientation = new Vector2(currentPose.getHeading());
-
-            turret.setTarget(robotOrientation.getAngleBetween(aimVec));
-
-            Profiler.end("aim_turret");
+            currentZone = AutoAim.currentZone;
+            turret.setTarget(AutoAim.turretAngle);
+            shooter.setRPM(AutoAim.launchRPM);
+            shooter.setLaunchAngle(AutoAim.launchAngle);
         }
-        
-        Profiler.start("GetCurrentZone");
-        currentZone = LaunchZone.getCurrentZone(drivetrain.getPose());
-        Profiler.end("GetCurrentZone");
 
-        Profiler.start("setShooterRPMAngle");
-//        switch (currentZone) {
-        switch (NEAR) {
-            case NEAR:
-                shooter.setRPM(RPM_NEAR);
-                shooter.setLaunchAngle(LAUNCH_RAD_NEAR);
-                break;
-            case FAR:
-                shooter.setRPM(RPM_FAR);
-                shooter.setLaunchAngle(LAUNCH_RAD_FAR);
-                break;
-        }
-        Profiler.end("setShooterRPMAngle");
+        boolean inLaunchZone = true; // = currentZone != NONE; // TODO enable zone checking
 
         Profiler.start("shooter");
-        boolean inLaunchZone = true, a = currentZone != NONE;
         shooter.run(inLaunchZone, handler.feedsPending());
         Profiler.end("shooter");
 
@@ -96,7 +79,7 @@ public final class Robot {
         Profiler.end("turret");
 
         Profiler.start("handler");
-        handler.run(
+        handler.run(// TODO enable rpm + direction tolerance checking
                 inLaunchZone,
                 feed //&&
 //                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) //&&
@@ -110,7 +93,7 @@ public final class Robot {
     }
 
     public void printTo(Telemetry telemetry) {
-        telemetry.addData("LOOP TIME", loopTimer.seconds());
+        telemetry.addData("LOOP TIME (ms)", loopTimer.milliseconds());
         loopTimer.reset();
         telemetry.addLine();
         telemetry.addData("CURRENT ZONE", currentZone);
