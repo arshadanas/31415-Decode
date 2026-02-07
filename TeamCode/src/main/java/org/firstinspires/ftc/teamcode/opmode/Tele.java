@@ -104,9 +104,15 @@ public final class Tele extends LinearOpMode {
 
             // Control loop:
             while (opModeIsActive()) {
+                Profiler.start("Main-robot-loop");
+
+                Profiler.start("robot.run()");
                 // Read sensors + gamepads:
                 robot.run(gamepad1.square);
 
+                Profiler.end("robot.run()");
+
+                Profiler.start("update_controls");
                 float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
 
                 if (gamepad1.left_bumper) {
@@ -161,11 +167,16 @@ public final class Tele extends LinearOpMode {
                     );
 
                 }
+                Profiler.end("update_controls");
 
+                Profiler.start("update_telemetry");
                 if (doTelemetry) {
                     robot.printTo(telemetry);
                     telemetry.update();
                 }
+                Profiler.end("update_telemetry");
+
+                Profiler.end("Main-robot-loop");
 
 //            double t = matchTimer.seconds();
 //            indicator.setColor(t >= LIFT_TIME ?
