@@ -79,7 +79,7 @@ public final class Shooter {
      *                in the range [{@link #LAUNCH_RAD_SHALLOWEST}, {@link #LAUNCH_RAD_STEEPEST}]
      */
     public void setLaunchAngle(double radians) {
-        hood.threshold = CACHE_THRESHOLD_HOOD;
+        hood.threshold = CACHE_THRESHOLD_HOOD; // TODO adjust when hood angle becomes continuous and differentiable
         hood.turnToAngle(lerp(
                 clip(radians, LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST),
                 LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST, // TODO Tune empirically
