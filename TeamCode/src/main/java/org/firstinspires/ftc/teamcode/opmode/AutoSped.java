@@ -29,7 +29,7 @@ import dev.nullftc.profiler.exporter.CSVProfilerExporter;
 @Autonomous(preselectTeleOp = "Tele")
 public final class AutoSped extends LinearOpMode {
 
-    public static double MOVE_POWER = 0.5, TIME_MOVE_NEAR = 0.5, TIME_MOVE_FAR = 1;
+    public static double MOVE_POWER = 0.5, TIME_MOVE_NEAR = 3, TIME_MOVE_FAR = 1;
 
     private dev.nullftc.profiler.Profiler realProfiler;
 

@@ -34,13 +34,16 @@ public final class Handler {
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05,
-            CACHE_THRESHOLD_PRESSERS = 0.05;
+            CACHE_THRESHOLD_PRESSERS = 0.05,
+            INTAKE_CHECKING_TIME = 0.1;
 
     public final Container container;
     private final CachedMotorEx intake;
     private final CachedDcMotor[] feeder;
     public final SimpleServoPivot presserR, presserL;
     private final CachedSimpleServo presserRServo, presserLServo;
+
+    private final ElapsedTime intakeTimer = new ElapsedTime();
 
     public Motif randomization = Motif.PGP;
     /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
@@ -108,6 +111,8 @@ public final class Handler {
 
         // generate feeding order if intake is running
         if (intakePower != 0)
+            intakeTimer.reset();
+        if (intakeTimer.seconds() <= INTAKE_CHECKING_TIME)
             generateDefaultFeedingOrder();
 
         // move empty slot to intake
@@ -204,6 +209,14 @@ public final class Handler {
         container.artifacts[0] = PURPLE;
         container.artifacts[1] = GREEN;
         container.artifacts[2] = PURPLE;
+        container.updateLEDs();
+        generateDefaultFeedingOrder();
+    }
+
+    public void clear() {
+        container.artifacts[0] = EMPTY;
+        container.artifacts[1] = EMPTY;
+        container.artifacts[2] = EMPTY;
         container.updateLEDs();
         generateDefaultFeedingOrder();
     }

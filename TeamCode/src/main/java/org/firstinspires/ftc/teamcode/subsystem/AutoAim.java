@@ -16,13 +16,17 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 public final class AutoAim {
 
     public static double
-            GOAL_OFFSET_Y = -0,
+            GOAL_OFFSET_Y = -5,
             GOAL_OFFSET_X = 3.5,
             LAUNCH_RPM_NEAR = 5000,
             LAUNCH_RAD_NEAR = 1.0776000610289713,
             LAUNCH_RPM_FAR = 6000,
             LAUNCH_RAD_FAR = 0.7853981633974483,
-            TURRET_X_OFFSET = -1.86759;
+            TURRET_X_OFFSET = -1.86759,
+            CURVE_FIT_RPM_MIN = 2916.29066,
+            CURVE_FIT_RPM_SLOPE = 21.27491,
+            CURVE_FIT_ANGLE_SLOPE = -0.00307104,
+            CURVE_FIT_ANGLE_Y_INT = 1.22222;
 
     static double launchRPM, launchAngle, turretAngle;
     static boolean isRedAlliance;
@@ -74,8 +78,8 @@ public final class AutoAim {
 //            launchAngle = LAUNCH_RAD_FAR;
 //        }
 
-        launchRPM = 20.1268*rMag + 3010.61115;
-        launchAngle = -0.00307104*rMag + 1.22222;
+        launchRPM = CURVE_FIT_RPM_SLOPE*rMag + CURVE_FIT_RPM_MIN;
+        launchAngle = CURVE_FIT_ANGLE_SLOPE*rMag + CURVE_FIT_ANGLE_Y_INT;
 
 
     }

@@ -180,7 +180,7 @@ public final class Tele extends LinearOpMode {
                         robot.handler.randomization = Motif.PPG;
 
                     if (gamepad1.triangleWasPressed())
-                        robot.handler.preloadPGP();
+                        robot.handler.clear();
 
                     if (gamepad1.crossWasPressed())
                         robot.handler.feedSingle(GREEN);
