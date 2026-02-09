@@ -4,6 +4,7 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.pose;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PROFILING;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.PI;
@@ -41,7 +42,8 @@ public final class Tele extends LinearOpMode {
 
     enum TeleOpConfig {
         EDITING_ALLIANCE,
-        EDITING_SIDE;
+        EDITING_SIDE,
+        EDITING_PROFILING;
 
         public static final TeleOpConfig[] selections = values();
 
@@ -85,10 +87,6 @@ public final class Tele extends LinearOpMode {
                 selected = selected.plus(1);
             }
 
-            if (gamepad1.triangle && gamepad1.square && gamepad1.dpad_left){
-                doProfiling = !doProfiling;
-            }
-
             switch (selected) {
                 case EDITING_ALLIANCE:
                     if (gamepad1.squareWasPressed())
@@ -97,18 +95,22 @@ public final class Tele extends LinearOpMode {
                 case EDITING_SIDE:
                     if (gamepad1.squareWasPressed())
                         isGoalSide = !isGoalSide;
+                case EDITING_PROFILING:
+                    if (gamepad1.squareWasPressed())
+                        doProfiling = !doProfiling;
             }
 
             robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
             robot.drivetrain.update();
 
             telemetry.addLine();
-            telemetry.addLine( EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
+            telemetry.addLine(EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
             telemetry.addLine();
-            telemetry.addLine( EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "NEAR ZONE (Goal side)" : "FAR ZONE (Audience side)"));
+            telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "NEAR ZONE (Goal side)" : "FAR ZONE (Audience side)"));
+            telemetry.addLine();
+            telemetry.addLine(EDITING_PROFILING.markIf(selected) + "Profiler " + (doProfiling ? "enabled" : "disabled"));
             telemetry.addLine();
             telemetry.addData("Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
-            telemetry.addData("Will run profiler", doProfiling);
 
             telemetry.update();
         }
@@ -230,6 +232,7 @@ public final class Tele extends LinearOpMode {
             Profiler.setProfiler(null);
             telemetry.update();
         }
+        pose = null;
     }
 
 
