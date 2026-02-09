@@ -68,13 +68,14 @@ public final class Robot {
         }
 
         boolean inLaunchZone = currentZone != NONE;
+        boolean feedsPending = handler.feedsPending();
 
         Profiler.start("shooter");
-        shooter.run(inLaunchZone, handler.feedsPending());
+        shooter.run(inLaunchZone, feedsPending);
         Profiler.end("shooter");
 
         Profiler.start("turret");
-        turret.run(handler.feedsPending());
+        turret.run(feedsPending);
         Profiler.end("turret");
 
         Profiler.start("handler");
