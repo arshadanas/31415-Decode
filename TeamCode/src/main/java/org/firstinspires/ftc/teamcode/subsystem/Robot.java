@@ -27,12 +27,13 @@ public final class Robot {
     private LaunchZone currentZone;
 
     public Robot(HardwareMap hardwareMap, Pose startPose) {
-        bulkReader = new BulkReader(hardwareMap);
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         handler = new Handler(hardwareMap);
         shooter = new Shooter(hardwareMap);
         turret = new Turret(hardwareMap);
         lift = new Lift(hardwareMap);
+
+        bulkReader = new BulkReader(hardwareMap);
     }
 
     public void setAlliance(boolean isRedAlliance) {

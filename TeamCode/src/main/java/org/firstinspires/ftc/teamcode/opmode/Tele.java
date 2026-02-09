@@ -13,7 +13,6 @@ import static java.lang.Math.toDegrees;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.outoftheboxrobotics.photoncore.PhotonCore;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -31,7 +30,6 @@ import java.io.File;
 import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
 import dev.nullftc.profiler.exporter.CSVProfilerExporter;
 
-//@Photon
 @Config
 @TeleOp
 public final class Tele extends LinearOpMode {
@@ -77,9 +75,6 @@ public final class Tele extends LinearOpMode {
         boolean isGoalSide = false;
 
         while (opModeInInit()) {
-
-            PhotonCore.CONTROL_HUB.clearBulkCache();
-            PhotonCore.EXPANSION_HUB.clearBulkCache();
 
             if (gamepad1.dpadUpWasPressed()) {
                 selected = selected.plus(-1);
