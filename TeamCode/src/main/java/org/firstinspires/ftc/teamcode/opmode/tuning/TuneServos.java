@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmode.tuning;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GATE_L;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GATE_R;
@@ -15,19 +16,24 @@ import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_L_OFFSE
 import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_SHALLOWEST;
 import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_STEEPEST;
 
+import static java.lang.Math.PI;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystem.Container;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 @Config
 @TeleOp(group = "Testing/tuning")
 public final class TuneServos extends LinearOpMode {
 
+    public static double rotorAngle, rotor2offset;
+
     enum TestServo {
-        HOOD, GATE_R, GATE_L, GEAR_R, GEAR_L;
+        HOOD, GATE_R, GATE_L, GEAR_R, GEAR_L, ROTOR;
 
         private final static TestServo[] values = values();
 
@@ -50,6 +56,8 @@ public final class TuneServos extends LinearOpMode {
         CachedSimpleServo gateL = new CachedSimpleServo(hardwareMap, "gate L", 0, 300).reversed();
         CachedSimpleServo gearR = new CachedSimpleServo(hardwareMap, "gear R", 0, 1800 / 28.0); // 64.28571428571429
         CachedSimpleServo gearL = new CachedSimpleServo(hardwareMap, "gear L", 0, 1800 / 28.0);
+        CachedSimpleServo rotor1 = new CachedSimpleServo(hardwareMap, "rotor 1", -PI, PI);
+        CachedSimpleServo rotor2 = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
 
         boolean
                 hoodMax = false,
@@ -88,6 +96,10 @@ public final class TuneServos extends LinearOpMode {
                     case GEAR_L:
                         gearLMax = !gearLMax;
                         break;
+
+                    case ROTOR:
+                        rotorAngle = normalizeRadians(rotorAngle + PI / 2);
+                        break;
                         
                 }
             }
@@ -101,6 +113,9 @@ public final class TuneServos extends LinearOpMode {
             gearR.turnToAngle(gearRMax ? ANGLE_SWITCH_ENGAGED : ANGLE_SWITCH_INACTIVE);
             gateL.offset = ANGLE_PRESSER_L_OFFSET;
             gearL.turnToAngle(gearLMax ? ANGLE_SWITCH_ENGAGED : ANGLE_SWITCH_INACTIVE);
+
+            rotor1.turnToAngle(normalizeRadians(rotorAngle + Container.ABS_OFFSET_ROTOR));
+            rotor2.turnToAngle(normalizeRadians(rotorAngle + Container.ABS_OFFSET_ROTOR + rotor2offset));
 
             telemetry.addLine(HOOD.markIf(selected) + HOOD.name() + " at " + (hoodMax ? "max" : "min"));
             telemetry.addLine(GATE_R.markIf(selected) + GATE_R.name() + " at " + (gateRMax ? "max" : "min"));
