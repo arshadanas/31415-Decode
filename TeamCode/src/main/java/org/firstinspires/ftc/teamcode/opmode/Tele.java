@@ -12,6 +12,7 @@ import static java.lang.Math.toDegrees;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.outoftheboxrobotics.photoncore.Photon;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -29,6 +30,7 @@ import java.io.File;
 import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
 import dev.nullftc.profiler.exporter.CSVProfilerExporter;
 
+@Photon
 @Config
 @TeleOp
 public final class Tele extends LinearOpMode {

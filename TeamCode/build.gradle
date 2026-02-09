@@ -22,6 +22,9 @@ android {
         jvmTarget = '1.8'
     }
     packagingOptions {
+        jniLibs {
+            pickFirsts += ['**/*.so']
+        }
         jniLibs.useLegacyPackaging true
     }
 }
