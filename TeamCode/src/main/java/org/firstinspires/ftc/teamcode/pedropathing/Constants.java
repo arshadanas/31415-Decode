@@ -4,6 +4,8 @@ import static com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.EncoderDirecti
 import static com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.EncoderDirection.REVERSED;
 import static com.qualcomm.hardware.gobilda.GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD;
 
+import com.pedropathing.control.FilteredPIDFCoefficients;
+import com.pedropathing.control.PIDFCoefficients;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.follower.FollowerConstants;
 import com.pedropathing.ftc.FollowerBuilder;
@@ -30,6 +32,12 @@ public class Constants {
 
     public static FollowerConstants followerConstants = new FollowerConstants()
             .mass(16.782904)
+            .forwardZeroPowerAcceleration(-29.66287519)
+            .lateralZeroPowerAcceleration(-59.382531949)
+            .translationalPIDFCoefficients(new PIDFCoefficients(0.25, 0, 0.025, 0))
+            .headingPIDFCoefficients(new PIDFCoefficients(2, 0, 0.1, 0))
+            .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.04,0.0,0.0005,0.6,0.05))
+            .centripetalScaling(0.0005)
     ;
 
     public static MecanumConstants mecanumConstants = new MecanumConstants()
@@ -43,6 +51,8 @@ public class Constants {
             .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .motorCachingThreshold(MecanumDrivetrain.MOTOR_CACHING_THRESHOLD)
+            .xVelocity(74.66360786)
+            .yVelocity(55.132251168)
     ;
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
