@@ -74,12 +74,8 @@ public final class Handler {
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
     private final ElapsedTime timeSinceLastFeed = new ElapsedTime();
 
-    private boolean keepRunningAfterLastFeed() {
-        return feedingOrder.isEmpty() && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
-    }
-
     boolean feedsPending() {
-        return !feedingOrder.isEmpty() || keepRunningAfterLastFeed();
+        return !feedingOrder.isEmpty() || timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
     }
 
     Handler(HardwareMap hardwareMap) {
@@ -111,33 +107,31 @@ public final class Handler {
 
         // generate feeding order if intake is running
         if (intakePower != 0)
-            intakeTimer.reset();
-        if (intakeTimer.seconds() <= INTAKE_CHECKING_TIME)
             generateDefaultFeedingOrder();
+
+        boolean feedsEmpty = feedingOrder.isEmpty();
+        if (!feedsEmpty)
+            timeSinceLastFeed.reset();
 
         // move empty slot to intake
         if (intakePower != 0 && EMPTY.numOccurrencesIn(container.artifacts) > 0)
             container.moveSlot(container.getNearestIntakeSlot(), Container.Zone.INTAKE_SENSORS);
         // move filled slot to feeder
-        else if (!feedingOrder.isEmpty())
+        else if (!feedsEmpty)
             container.moveSlot(feedingOrder.get(0), Container.Zone.FEEDER_SENSORS);
 
 
         int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_OMNIS);
-        double feederPower =
-                manualFeederPower != 0 ? manualFeederPower : // manual power takes priority
-                        inLaunchZone && shooterReady && // <-- don't feed until we can shoot
-                        (
-                            !feedingOrder.isEmpty() && (slotAtFeeder == -1 || slotAtFeeder == feedingOrder.get(0)) ||
-                            keepRunningAfterLastFeed()
-                        )
-                         ? 1 : SPEED_IDLE_FEEDER;
+        double feederPower = manualFeederPower != 0 ?  manualFeederPower :  // manual power takes priority
+                             inLaunchZone && shooterReady && ( // <-- don't feed until we can shoot
+                                (!feedsEmpty && (
+                                    slotAtFeeder == -1 || 
+                                    container.get(slotAtFeeder) == EMPTY || 
+                                    slotAtFeeder == feedingOrder.get(0)
+                                )) || (feedsEmpty && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST)
+                            ) ? 1 : SPEED_IDLE_FEEDER;
 
-
-        if (!feedingOrder.isEmpty() && feederPower != SPEED_IDLE_FEEDER)
-            timeSinceLastFeed.reset();
         
-
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;
             servo.setPower(feederPower);
