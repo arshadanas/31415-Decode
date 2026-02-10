@@ -35,7 +35,7 @@ public final class Container {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
-            TIME_WRAPAROUND = 0.01,
+            TIME_WRAPAROUND = 0.03,
 
             TOLERANCE_INTAKE_SENSORS = 0.2, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_FEEDER_SENSORS = 0.15, // too high => false negatives (removals)
