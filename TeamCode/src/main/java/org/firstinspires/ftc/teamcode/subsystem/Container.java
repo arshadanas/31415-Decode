@@ -191,6 +191,9 @@ public final class Container {
      */
     void moveSlot(int slot, Zone target) {
         double newRadians = getTargetRadians(slot, target);
+        if (newRadians == lastRadians)
+            return;
+
         double front0 = getTargetRadians(0, Zone.INTAKE_SENSORS);
         double front1 = getTargetRadians(1, Zone.INTAKE_SENSORS);
 
