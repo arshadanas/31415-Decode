@@ -24,11 +24,11 @@ public final class Container {
     public static double
             ROTOR_ENCODER_OFFSET = -1.5742869852988852,
             ROTOR_OUTPUT_OFFSET = -1.7,
-            OFFSET_0_BACK = 0,
-            OFFSET_1_FRONT = 0,
-            OFFSET_1_BACK = 0,
-            OFFSET_2_FRONT = 0,
-            OFFSET_2_BACK = 0,
+            OFFSET_0_BACK = 3.45,
+            OFFSET_1_FRONT = -1.7,
+            OFFSET_1_BACK = 1.175,
+            OFFSET_2_FRONT = 2.35,
+            OFFSET_2_BACK = -1.125,
             THRESHOLD_FRONT_MM = 95, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             TIME_BACK_DIST = 0.125,

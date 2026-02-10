@@ -99,7 +99,8 @@ public final class TuneServos extends LinearOpMode {
                         break;
 
                     case ROTOR:
-                        rotorAngle = normalizeRadians(rotorAngle + PI / 2);
+                        rotorAngle = normalizeRadians(rotorAngle + PI / 3);
+                        rotorAngle = normalizeRadians(rotorAngle - PI / 3);
                         break;
                         
                 }
