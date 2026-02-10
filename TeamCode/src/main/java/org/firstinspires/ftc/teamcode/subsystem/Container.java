@@ -35,6 +35,8 @@ public final class Container {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
+            TIME_WRAPAROUND = 0.01,
+
             TOLERANCE_INTAKE_SENSORS = 0.2, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_FEEDER_SENSORS = 0.15, // too high => false negatives (removals)
             TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
@@ -109,6 +111,11 @@ public final class Container {
 
         position = normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET);
 
+        if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
+            wrapAround = false;
+            servo.turnToAngle(lastRadians);
+        }
+
         int currentFrontSlot = getSlotAt(Zone.INTAKE_SENSORS);
         if (
                 intakePower > 0 && // intake is running
@@ -175,15 +182,36 @@ public final class Container {
         return intakePower;
     }
 
+    private double lastRadians;
+    private final ElapsedTime wrapAroundTimer = new ElapsedTime();
+    private boolean wrapAround = false;
+
     /**
      * @param slot Slot you wish to move (0, 1 or 2)
      */
     void moveSlot(int slot, Zone target) {
-        servo.turnToAngle(normalizeRadians(ROTOR_OUTPUT_OFFSET + (
-                slot == 0 ? target.radians == 0 ?              0 : OFFSET_0_BACK :
+        double newRadians = getTargetRadians(slot, target);
+        double front0 = getTargetRadians(0, Zone.INTAKE_SENSORS);
+        double front1 = getTargetRadians(1, Zone.INTAKE_SENSORS);
+
+        wrapAround = lastRadians == front0 && newRadians == front1 ||
+                    lastRadians == front1 && newRadians == front0;
+
+        lastRadians = newRadians;
+
+        if (wrapAround) {
+            servo.turnToAngle(-PI);
+            wrapAroundTimer.reset();
+        } else
+            servo.turnToAngle(lastRadians);
+    }
+
+    private static double getTargetRadians(int slot, Zone target) {
+        return normalizeRadians(ROTOR_OUTPUT_OFFSET + (
+                slot == 0 ? target.radians == 0 ? 0 : OFFSET_0_BACK :
                 slot == 1 ? target.radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
                             target.radians == 0 ? OFFSET_2_FRONT : OFFSET_2_BACK
-        )));
+        ));
     }
 
     /**
