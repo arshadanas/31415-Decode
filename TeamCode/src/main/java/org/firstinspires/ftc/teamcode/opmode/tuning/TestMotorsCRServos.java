@@ -37,8 +37,8 @@ public final class TestMotorsCRServos extends LinearOpMode {
 
         // pos = CCW
         CRServo[] rotorServos = {
-                hardwareMap.get(CRServo.class, "rotor 1"),
-                hardwareMap.get(CRServo.class, "rotor 2")
+//                hardwareMap.get(CRServo.class, "rotor 1"),
+//                hardwareMap.get(CRServo.class, "rotor 2")
         };
 
         CRServo[] feederServos = {

@@ -7,6 +7,7 @@ import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GEAR_L;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.GEAR_R;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.HOOD;
+import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.ROTOR;
 import static org.firstinspires.ftc.teamcode.subsystem.Handler.ANGLE_PRESSER_EXTENDED;
 import static org.firstinspires.ftc.teamcode.subsystem.Handler.ANGLE_PRESSER_L_OFFSET;
 import static org.firstinspires.ftc.teamcode.subsystem.Handler.ANGLE_PRESSER_RETRACTED;
@@ -114,14 +115,15 @@ public final class TuneServos extends LinearOpMode {
             gateL.offset = ANGLE_PRESSER_L_OFFSET;
             gearL.turnToAngle(gearLMax ? ANGLE_SWITCH_ENGAGED : ANGLE_SWITCH_INACTIVE);
 
-            rotor1.turnToAngle(normalizeRadians(rotorAngle + Container.ABS_OFFSET_ROTOR));
-            rotor2.turnToAngle(normalizeRadians(rotorAngle + Container.ABS_OFFSET_ROTOR + rotor2offset));
+            rotor1.turnToAngle(normalizeRadians(rotorAngle + Container.ROTOR_OUTPUT_OFFSET));
+            rotor2.turnToAngle(normalizeRadians(rotorAngle + Container.ROTOR_OUTPUT_OFFSET + rotor2offset));
 
             telemetry.addLine(HOOD.markIf(selected) + HOOD.name() + " at " + (hoodMax ? "max" : "min"));
             telemetry.addLine(GATE_R.markIf(selected) + GATE_R.name() + " at " + (gateRMax ? "max" : "min"));
             telemetry.addLine(GATE_L.markIf(selected) + GATE_L.name() + " at " + (gateLMax ? "max" : "min"));
             telemetry.addLine(GEAR_R.markIf(selected) + GEAR_R.name() + " at " + (gearRMax ? "max" : "min"));
             telemetry.addLine(GEAR_L.markIf(selected) + GEAR_L.name() + " at " + (gearLMax ? "max" : "min"));
+            telemetry.addLine(ROTOR.markIf(selected) + ROTOR.name());
             telemetry.update();
         }
     }

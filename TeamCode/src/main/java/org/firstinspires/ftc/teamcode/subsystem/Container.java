@@ -1,28 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.control.Ranges.lerp;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
-import static java.lang.Math.signum;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.control.controller.PIDController;
-import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
-import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
-import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
-import org.firstinspires.ftc.teamcode.control.motion.Differentiator;
-import org.firstinspires.ftc.teamcode.control.motion.State;
-import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
+import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
@@ -31,45 +21,9 @@ import java.util.Arrays;
 @Config
 public final class Container {
 
-    private final KalmanFilter derivFilter = new KalmanFilter(filterGains, true);
-    public static KalmanGains filterGains = new KalmanGains(500, 3000);
-
-    private final Differentiator kD = new Differentiator();
-
-    private final PIDController controller = new PIDController();
-    public static PIDGains
-            pidGainsEmpty = new PIDGains(0.125, 0.1, 0.01, 0.1),
-            pidGainsFull = new PIDGains(0.125, 0.1, 0.01, 0.1);
-
-    private final PIDGains pidGains = new PIDGains();
-
-    private PIDGains getPIDGains() {
-        double t = EMPTY.numOccurrencesIn(artifacts) / 3.0;
-        pidGains.kP = lerp(
-                pidGainsFull.kP,
-                pidGainsEmpty.kP,
-                t
-        );
-        pidGains.kI = lerp(
-                pidGainsFull.kI,
-                pidGainsEmpty.kI,
-                t
-        );
-        pidGains.kD = lerp(
-                pidGainsFull.kD,
-                pidGainsEmpty.kD,
-                t
-        );
-        pidGains.maxOutputWithIntegral = lerp(
-                pidGainsFull.maxOutputWithIntegral,
-                pidGainsEmpty.maxOutputWithIntegral,
-                t
-        );
-        return pidGains;
-    }
-
     public static double
-            ABS_OFFSET_ROTOR = 2.882649259112089,
+            ROTOR_ENCODER_OFFSET = 0,
+            ROTOR_OUTPUT_OFFSET = 0,
             THRESHOLD_FRONT_MM = 95, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             TIME_BACK_DIST = 0.125,
@@ -82,17 +36,13 @@ public final class Container {
             TOLERANCE_FEEDER_FRICTION = 0.6108652381980153,
             TOLERANCE_INTAKE_OMNI = 0.5235987755982988,
 
-            POWER_OVERCOME_FRICTION = 0.06,
-            MAX_VOLTAGE = 13,
-
             CACHE_THRESHOLD_ROTOR = 0.05;
 
     // hardware
-    private final CachedDcMotor[] servos;
+    private final CachedSimpleServo[] servos;
     private final AnalogSensor encoder, front1, back1;
     private final ColorSensor color1, color2;
 //    private final LEDIndicator[] indicators;
-    private final VoltageSensor batteryVoltageSensor;
 
     private final ElapsedTime backDistanceTimer = new ElapsedTime();
 
@@ -109,9 +59,6 @@ public final class Container {
     }
 
     final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
-
-    private int selectedSlot = 0;
-    private Zone target = Zone.INTAKE_SENSORS;
 
     enum Zone {
         INTAKE_SENSORS(0),
@@ -138,9 +85,9 @@ public final class Container {
     }
 
     Container(HardwareMap hardwareMap) {
-        servos = new CachedDcMotor[]{
-                new CachedDcMotor(hardwareMap.get(CRServo.class, "rotor 1")),
-                new CachedDcMotor(hardwareMap.get(CRServo.class, "rotor 2"))
+        servos = new CachedSimpleServo[]{
+                new CachedSimpleServo(hardwareMap, "rotor 1", -PI, PI),
+                new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI),
         };
 
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
@@ -156,15 +103,11 @@ public final class Container {
 //                new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
 //                new LEDIndicator(hardwareMap, "led 3a", "led 3b")
 //        };
-
-        batteryVoltageSensor = hardwareMap.voltageSensor.iterator().next();
     }
 
     void run(double intakePower, double feederPower) {
-        double oldPos = position;
-        position = normalizeRadians(encoder.getReading() + ABS_OFFSET_ROTOR);
-        double velocity = kD.getDerivative(
-                position == oldPos ? derivFilter.x_previous : derivFilter.calculate(position));
+
+        position = normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET);
 
         int currentFrontSlot = getSlotAt(Zone.INTAKE_SENSORS);
         if (
@@ -196,24 +139,6 @@ public final class Container {
                 updateLEDs();
             }
         } else backDistanceTimer.reset();
-
-        // run pid
-        derivFilter.setGains(filterGains);
-        controller.setGains(getPIDGains());
-        controller.setTarget(new State(getError(selectedSlot, target)));
-
-        double servoPower = controller.calculate(new State(0, velocity));
-
-        double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
-
-        int frictionSlot = getSlotAt(Zone.FEEDER_FRICTION);
-        double antiFrictionPower = frictionSlot != -1 && artifacts[frictionSlot] != EMPTY ?
-                                    POWER_OVERCOME_FRICTION * signum(servoPower) * voltageScalar : 0;
-
-        for (CachedDcMotor servo : servos) {
-            servo.threshold = CACHE_THRESHOLD_ROTOR;
-            servo.setPower(servoPower + antiFrictionPower);
-        }
     }
 
     void updateLEDs() {
@@ -254,8 +179,10 @@ public final class Container {
      * @param slot Slot you wish to move (0, 1 or 2)
      */
     void moveSlot(int slot, Zone target) {
-        this.selectedSlot = wrap(slot, 0, artifacts.length);
-        this.target = target;
+        for (CachedSimpleServo servo : servos) {
+            servo.threshold = CACHE_THRESHOLD_ROTOR;
+            servo.turnToAngle(normalizeRadians(ROTOR_OUTPUT_OFFSET + target.radians - slot * 2 * PI / 3.0));
+        }
     }
 
     /**
@@ -346,10 +273,7 @@ public final class Container {
     void printTo(Telemetry telemetry) {
         telemetry.addData("CONTAINER", Arrays.toString(artifacts));
         telemetry.addLine();
-        telemetry.addData("Position [0] (deg)", toDegrees(position));
-        telemetry.addData("Rotor error (deg)", toDegrees(getError(selectedSlot, target)));
-        telemetry.addData("Filtered error derivative (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
-        telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
+        telemetry.addData("Slot 0 position (deg)", toDegrees(position));
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", front1.getReading());
         telemetry.addData("Back dist (mm)", back1.getReading());

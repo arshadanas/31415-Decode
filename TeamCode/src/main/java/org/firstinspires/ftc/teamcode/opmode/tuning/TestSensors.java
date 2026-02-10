@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.opmode.tuning;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.pedropathing.Constants.pinpointConstants;
-import static org.firstinspires.ftc.teamcode.subsystem.Container.ABS_OFFSET_ROTOR;
+import static org.firstinspires.ftc.teamcode.subsystem.Container.ROTOR_ENCODER_OFFSET;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
@@ -77,7 +77,7 @@ public final class TestSensors extends LinearOpMode {
             double turretRadQuad = normalizeRadians(turretQuadrature.getPosition() * turretRadPerTick);
             double turretRadPerSec = turretQuadrature.getCorrectedVelocity() * turretRadPerTick;
 
-            double rotorRad = normalizeRadians(rotorEncoder.getReading() + ABS_OFFSET_ROTOR);
+            double rotorRad = normalizeRadians(rotorEncoder.getReading() + ROTOR_ENCODER_OFFSET);
 
             double turretRadAbs = normalizeRadians(-turretAbsolute.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
 
