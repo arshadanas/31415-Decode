@@ -182,9 +182,9 @@ public final class Container {
         return intakePower;
     }
 
-    private double lastRadians;
+    private double lastRadians = getTargetRadians(0, Zone.INTAKE_SENSORS);
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
-    private boolean wrapAround = false;
+    private boolean wrapAround = true;
 
     /**
      * @param slot Slot you wish to move (0, 1 or 2)
