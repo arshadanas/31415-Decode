@@ -22,8 +22,13 @@ import java.util.Arrays;
 public final class Container {
 
     public static double
-            ROTOR_ENCODER_OFFSET = 0,
-            ROTOR_OUTPUT_OFFSET = 0,
+            ROTOR_ENCODER_OFFSET = -1.5742869852988852,
+            ROTOR_OUTPUT_OFFSET = -1.7,
+            OFFSET_0_BACK = 0,
+            OFFSET_1_FRONT = 0,
+            OFFSET_1_BACK = 0,
+            OFFSET_2_FRONT = 0,
+            OFFSET_2_BACK = 0,
             THRESHOLD_FRONT_MM = 95, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             TIME_BACK_DIST = 0.125,
@@ -34,12 +39,10 @@ public final class Container {
             TOLERANCE_FEEDER_SENSORS = 0.15, // too high => false negatives (removals)
             TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
             TOLERANCE_FEEDER_FRICTION = 0.6108652381980153,
-            TOLERANCE_INTAKE_OMNI = 0.5235987755982988,
-
-            CACHE_THRESHOLD_ROTOR = 0.05;
+            TOLERANCE_INTAKE_OMNI = 0.5235987755982988;
 
     // hardware
-    private final CachedSimpleServo[] servos;
+    private final CachedSimpleServo servo;
     private final AnalogSensor encoder, front1, back1;
     private final ColorSensor color1, color2;
 //    private final LEDIndicator[] indicators;
@@ -85,10 +88,7 @@ public final class Container {
     }
 
     Container(HardwareMap hardwareMap) {
-        servos = new CachedSimpleServo[]{
-                new CachedSimpleServo(hardwareMap, "rotor 1", -PI, PI),
-                new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI),
-        };
+        servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
 
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
 
@@ -179,10 +179,11 @@ public final class Container {
      * @param slot Slot you wish to move (0, 1 or 2)
      */
     void moveSlot(int slot, Zone target) {
-        for (CachedSimpleServo servo : servos) {
-            servo.threshold = CACHE_THRESHOLD_ROTOR;
-            servo.turnToAngle(normalizeRadians(ROTOR_OUTPUT_OFFSET + target.radians - slot * 2 * PI / 3.0));
-        }
+        servo.turnToAngle(normalizeRadians(ROTOR_OUTPUT_OFFSET + (
+                slot == 0 ? target.radians == 0 ?              0 : OFFSET_0_BACK :
+                slot == 1 ? target.radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
+                            target.radians == 0 ? OFFSET_2_FRONT : OFFSET_2_BACK
+        )));
     }
 
     /**
