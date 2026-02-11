@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.pose;
+import static org.firstinspires.ftc.teamcode.opmode.Auto.sharedPose;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
 import static java.lang.Math.toDegrees;
@@ -95,8 +95,8 @@ public final class AutoSped extends LinearOpMode {
         try {
 
             robot.setAlliance(isRedAlliance);
-            pose = Auto.getStartingPose(isRedAlliance, isGoalSide);
-            robot.drivetrain.setStartingPose(pose);
+            sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
+            robot.drivetrain.setPose(sharedPose);
 //            robot.handler.container.preloadPGP();
 
             double timeMoving = isGoalSide ? TIME_MOVE_NEAR : TIME_MOVE_FAR;
@@ -133,7 +133,7 @@ public final class AutoSped extends LinearOpMode {
                 } else
                     robot.drivetrain.run(0, 0, 0, false, isRedAlliance);
 
-                pose = robot.drivetrain.getPose();
+                sharedPose = robot.drivetrain.getPose();
 
 //                Profiler.start("update_telemetry");
 //                if (doTelemetry) {

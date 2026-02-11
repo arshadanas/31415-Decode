@@ -1,16 +1,8 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.A;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_DOWN;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.DPAD_UP;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.X;
-import static com.arcrobotics.ftclib.gamepad.GamepadKeys.Button.Y;
-import static org.firstinspires.ftc.teamcode.control.vision.detector.SampleDetector.Pipeline.YELLOW_BLUE;
-import static org.firstinspires.ftc.teamcode.control.vision.detector.SampleDetector.Pipeline.YELLOW_RED;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.AutonConfig.CONFIRMING;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.AutonConfig.EDITING_ALLIANCE;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.AutonConfig.EDITING_CYCLES;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.AutonConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmode.Auto.AutoConfig.CONFIRMING;
+import static org.firstinspires.ftc.teamcode.opmode.Auto.AutoConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmode.Auto.AutoConfig.EDITING_SIDE;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.DRIVING_TO_SUB;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.PARKING;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.SCORING_PRELOAD;
@@ -29,8 +21,6 @@ import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.pedropathing.ftc.FTCCoordinates;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -38,7 +28,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
-import org.firstinspires.ftc.teamcode.control.vision.detector.SampleDetector;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 
@@ -191,22 +180,21 @@ public final class Auto extends LinearOpMode {
 
             intakingSpec = new EditablePose(36, -60, PI / 2);
 
-    static Pose pose = null;
+    static Pose sharedPose = null;
     static boolean isRedAlliance = false;
 
-    enum AutonConfig {
+    enum AutoConfig {
         CONFIRMING,
         EDITING_ALLIANCE,
-        EDITING_SIDE,
-        EDITING_CYCLES;
+        EDITING_SIDE;
 
-        public static final AutonConfig[] selections = values();
+        public static final AutoConfig[] selections = values();
 
-        public AutonConfig plus(int i) {
+        public AutoConfig plus(int i) {
             int max = selections.length;
             return selections[((ordinal() + i) % max + max) % max];
         }
-        public String markIf(AutonConfig s) {
+        public String markIf(AutoConfig s) {
             return this == s ? " <" : "";
         }
     }
@@ -214,78 +202,56 @@ public final class Auto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        intaking1.heading = intaking1.angleTo(sample1);
-        intaking2.heading = intaking2.angleTo(sample2);
-        intaking3.heading = intaking3.angleTo(sample3);
-
-        specIntaking1.heading = specIntaking1.angleTo(specSpike1);
-        specIntaking2.heading = specIntaking2.angleTo(specSpike2);
-        specIntaking3.heading = specIntaking3.angleTo(specSpike3);
-
         // Initialize multiple telemetry outputs:
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot:
-        Robot robot = new Robot(hardwareMap, pose);
-//        robot.deposit.claw.turnToAngle(ANGLE_CLAW_SAMPLE);
+        Robot robot = new Robot(hardwareMap, new Pose()); // TODO copy from AutoSped
 
-        // Initialize gamepads:
-        GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
-
-        AutonConfig selection = EDITING_ALLIANCE;
-
-        boolean specimenSide = false;
-        int cycles = 5;
+        AutoConfig selected = EDITING_ALLIANCE;
+        boolean isGoalSide = false;
 
         ElapsedTime timer = new ElapsedTime();
 
         config:
         while (opModeInInit() && timer.seconds() < 5) {
-            gamepadEx1.readButtons();
 
-            boolean up = gamepadEx1.wasJustPressed(DPAD_UP);
-            boolean down = gamepadEx1.wasJustPressed(DPAD_DOWN);
-            boolean y = gamepadEx1.wasJustPressed(Y);
-            boolean x = gamepadEx1.wasJustPressed(X);
-            boolean a = gamepadEx1.wasJustPressed(A);
+            boolean up = gamepad1.dpadUpWasPressed();
+            boolean down = gamepad1.dpadDownWasPressed();
+            boolean square = gamepad1.squareWasPressed();
 
-            if (up || down || y || a || x) timer.reset();
+            if (up || down || square) timer.reset();
 
             if (up)
-                do selection = selection.plus(-1);
-                while (selection == EDITING_CYCLES && !specimenSide);
+                selected = selected.plus(-1);
             else if (down)
-                do selection = selection.plus(1);
-                while (selection == EDITING_CYCLES && !specimenSide);
+                selected = selected.plus(1);
 
-            switch (selection) {
+            switch (selected) {
                 case CONFIRMING:
-                    if (x) break config;
+                    if (square) break config;
                 case EDITING_ALLIANCE:
-                    if (x) isRedAlliance = !isRedAlliance;
+                    if (square) isRedAlliance = !isRedAlliance;
                     break;
                 case EDITING_SIDE:
-                    if (x) specimenSide = !specimenSide;
-                    break;
-                case EDITING_CYCLES:
-                    if (specimenSide && y) cycles++;
-                    if (specimenSide && a && cycles > 0) cycles--;
+                    if (square) isGoalSide = !isGoalSide;
                     break;
             }
 
-            printConfig(telemetry, false, timer.seconds(), selection, specimenSide, cycles);
+            printConfig(telemetry, false, timer.seconds(), selected, isGoalSide);
         }
 
-        SampleDetector sampleDetector = new SampleDetector(hardwareMap);
-        sampleDetector.setPipeline(
-                specimenSide ?
-                /*specimen*/ isRedAlliance ? SampleDetector.Pipeline.RED : SampleDetector.Pipeline.BLUE :
-                /*sample*/   isRedAlliance ? YELLOW_RED : YELLOW_BLUE
-//                SampleDetector.Pipeline.BLUE_RED
-        );
+//        SampleDetector sampleDetector = new SampleDetector(hardwareMap);
+//        sampleDetector.setPipeline(
+//                isGoalSide ?
+//                /*specimen*/ isRedAlliance ? SampleDetector.Pipeline.RED : SampleDetector.Pipeline.BLUE :
+//                /*sample*/   isRedAlliance ? YELLOW_RED : YELLOW_BLUE
+//        );
 
-//        robot.intake.setAlliance(isRedAlliance);
+        robot.setAlliance(isRedAlliance);
+        sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
+        robot.handler.preloadPGP();
 
         Action trajectory;
 
@@ -296,13 +262,13 @@ public final class Auto extends LinearOpMode {
 //                robot.drivetrain.rightFront,
         };
 
-        if (specimenSide) {
+        if (isGoalSide) {
 
 //            robot.intake.specimenMode = true;
 
 //            robot.deposit.preloadSpecimen();
 
-            pose = new Pose(chamberRight.x, 0.5 * LENGTH_DRIVETRAIN - SIZE_FIELD/2, PI / 2, FTCCoordinates.INSTANCE);
+//            sharedPose = new Pose(chamberRight.x, 0.5 * LENGTH_DRIVETRAIN - SIZE_FIELD/2, PI / 2, FTCCoordinates.INSTANCE);
 
 //            Action scorePreload = robot.drivetrain.actionBuilder(pose)
 //                    .strafeTo(chamberRight.toVector2d())
@@ -1048,50 +1014,39 @@ public final class Auto extends LinearOpMode {
             };
         }
 
-        // Parallel action to bulk read, update trajectory, and update robot (robot.run())
-        ParallelAction auton = new ParallelAction(
+        ParallelAction auto = new ParallelAction(
                 telemetryPacket -> {
-                    robot.bulkReader.bulkRead();
+//                    robot.run();
+                    sharedPose = robot.drivetrain.getPose();
                     return opModeIsActive();
                 },
-                trajectory,
-                telemetryPacket -> {
-//                    pose = robot.drivetrain.pose;
-//                    robot.run();
-                    return opModeIsActive();
-                }
+                trajectory
         );
 
-        printConfig(telemetry, true, 0, selection, specimenSide, cycles);
+        printConfig(telemetry, true, 0, selected, isGoalSide);
         telemetry.update();
 
         waitForStart(); //--------------------------------------------------------------------------------------------------------------------------
 
-//        robot.drivetrain.pinpoint.setPositionRR(pose);
+        robot.drivetrain.setPose(sharedPose);
 
-        Actions.runBlocking(auton);
+        Actions.runBlocking(auto);
 
 //        if (robot.deposit.hasSample()) Tele.holdingSample = true;
 
         Thread.sleep((long) (DEAD_TIME * 1000));
     }
 
-    private static void printConfig(Telemetry telemetry, boolean confirmed, double t, AutonConfig selection, boolean specimenSide, int cycles) {
+    private static void printConfig(Telemetry telemetry, boolean confirmed, double t, AutoConfig selected, boolean isGoalSide) {
         telemetry.addLine(confirmed ?
                 "AUTONOMOUS READY" :
-                "Confirm configuration (confirming in " + (int) ceil(5 - t) + " seconds)" + selection.markIf(CONFIRMING)
+                "Confirm configuration (confirming in " + (int) ceil(5 - t) + " seconds)" + selected.markIf(CONFIRMING)
         );
         telemetry.addLine();
         telemetry.addLine();
-        telemetry.addLine((isRedAlliance ? "RED" : "BLUE") + " alliance" + selection.markIf(EDITING_ALLIANCE));
+        telemetry.addLine(EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
         telemetry.addLine();
-        if (specimenSide) {
-            telemetry.addLine("RIGHT (observation-side)" + selection.markIf(EDITING_SIDE));
-            telemetry.addLine();
-            telemetry.addLine((cycles + 1) + "+0 (" + cycles + " from observation zone)" + selection.markIf(EDITING_CYCLES));
-
-        } else telemetry.addLine("LEFT (basket-side)" + selection.markIf(EDITING_SIDE));
-
+        telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting on " + (isGoalSide ? "Near zone (GOAL SIDE)" : "Far zone (AUDIENCE SIDE)"));
         telemetry.update();
     }
 

@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.pose;
+import static org.firstinspires.ftc.teamcode.opmode.Auto.sharedPose;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PROFILING;
@@ -76,11 +76,10 @@ public final class Tele extends LinearOpMode {
 
         while (opModeInInit()) {
 
-            if (gamepad1.dpadUpWasPressed()) {
+            if (gamepad1.dpadUpWasPressed())
                 selected = selected.plus(-1);
-            } else if (gamepad1.dpadDownWasPressed()) {
+            else if (gamepad1.dpadDownWasPressed())
                 selected = selected.plus(1);
-            }
 
             switch (selected) {
                 case EDITING_ALLIANCE:
@@ -90,6 +89,7 @@ public final class Tele extends LinearOpMode {
                 case EDITING_SIDE:
                     if (gamepad1.squareWasPressed())
                         isGoalSide = !isGoalSide;
+                    break;
                 case EDITING_PROFILING:
                     if (gamepad1.squareWasPressed())
                         doProfiling = !doProfiling;
@@ -101,9 +101,9 @@ public final class Tele extends LinearOpMode {
             telemetry.addLine();
             telemetry.addLine(EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
             telemetry.addLine();
-            telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "NEAR ZONE (Goal side)" : "FAR ZONE (Audience side)"));
+            telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting on " + (isGoalSide ? "Near zone (GOAL SIDE)" : "Far zone (AUDIENCE SIDE)"));
             telemetry.addLine();
-            telemetry.addLine(EDITING_PROFILING.markIf(selected) + "Profiler " + (doProfiling ? "enabled" : "disabled"));
+            telemetry.addLine(EDITING_PROFILING.markIf(selected) + "Profiler " + (doProfiling ? "ENABLED" : "disabled"));
             telemetry.addLine();
             telemetry.addData("Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
 
@@ -116,10 +116,10 @@ public final class Tele extends LinearOpMode {
         try {
 
             robot.setAlliance(isRedAlliance);
-            if (pose == null)
-                pose = Auto.getStartingPose(isRedAlliance, false);
-            robot.drivetrain.setPose(pose);
+            robot.drivetrain.setPose(sharedPose != null ? sharedPose : Auto.getStartingPose(isRedAlliance, isGoalSide));
             robot.handler.preloadPGP();
+
+            sharedPose = null; // expire the shared pose
 
             double x = Auto.WIDTH_INCLUDING_PRESSERS / 2.0;
             Pose wallResetPose = new Pose(
@@ -227,7 +227,6 @@ public final class Tele extends LinearOpMode {
             Profiler.setProfiler(null);
             telemetry.update();
         }
-        pose = null;
     }
 
 
