@@ -47,7 +47,7 @@ public final class Shooter {
             ANGLE_HOOD_SHALLOWEST = 360,
             ANGLE_HOOD_STEEPEST = 10,
 
-            TOLERANCE_RPM_FILTERING = 0.001,
+            TOLERANCE_RPM_FILTERING = -1,
             TOLERANCE_RPM_FEEDING = 100, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_HOOD = 0.05,
@@ -129,7 +129,7 @@ public final class Shooter {
 
         Profiler.start("shooter_set_vars");
         double rpmSetpoint =
-                !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
+//                !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
                 !inLaunchZone ? RPM_ARMING :
                                 targetRPM;
 
@@ -146,11 +146,10 @@ public final class Shooter {
         double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
         double pidf = pid + feedforward;
 
-        output = manualPower != 0 ? manualPower : clip(
-                        inTolerance(TOLERANCE_RPM_FILTERING) ?
-                                    outputFilter.calculate(pidf) :
-                                    pidf
-                , 0, 1);
+        output =
+                manualPower != 0 ?  manualPower :
+                !feedsPending ?     0 :
+                clip(inTolerance(TOLERANCE_RPM_FILTERING) ? outputFilter.calculate(pidf) : pidf, 0, 1);
 
         Profiler.end("shooter_pid_new");
 
