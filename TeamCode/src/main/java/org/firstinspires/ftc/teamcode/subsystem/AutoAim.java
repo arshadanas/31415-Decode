@@ -52,11 +52,11 @@ public final class AutoAim {
         Vector2 S = new Vector2(R.x + k*cos(θ), R.y + k*sin(θ)); // shooter/turret center
         Vector2 S_ = new Vector2(R_.x - θ_*k*sin(θ), R_.y + θ_*k*cos(θ));
         Vector2 rVector = S.to(G);
+        r = rVector.getMagnitude();
 
         double
                 m = S_.getMagnitude(),
                 a = S_.getDirection(),
-                r = rMag = rVector.getMagnitude(),
                 b = rVector.getDirection(),
                 g = b - a,
                 r_ = -m*cos(g),
@@ -78,12 +78,12 @@ public final class AutoAim {
 //            launchAngle = LAUNCH_RAD_FAR;
 //        }
 
-        launchRPM = CURVE_FIT_RPM_SLOPE*rMag + CURVE_FIT_RPM_MIN;
-        launchAngle = CURVE_FIT_ANGLE_SLOPE*rMag + CURVE_FIT_ANGLE_Y_INT;
+        launchRPM = CURVE_FIT_RPM_SLOPE* AutoAim.r + CURVE_FIT_RPM_MIN;
+        launchAngle = CURVE_FIT_ANGLE_SLOPE* AutoAim.r + CURVE_FIT_ANGLE_Y_INT;
 
 
     }
-    static double rMag;
+    static double r;
 
     /**
      * Inverse of {@link #getLaunchVel}
