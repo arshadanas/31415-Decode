@@ -41,7 +41,6 @@ public final class Container {
             TOLERANCE_INTAKE_SENSORS = 0.2, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_FEEDER_SENSORS = 0.15, // too high => false negatives (removals)
             TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
-            TOLERANCE_FEEDER_FRICTION = 0.6108652381980153,
             TOLERANCE_INTAKE_OMNI = 0.5235987755982988;
 
     // hardware
@@ -72,8 +71,7 @@ public final class Container {
         INTAKE_SENSORS(0),
         INTAKE_OMNI(0),
         FEEDER_SENSORS(PI),
-        FEEDER_OMNIS(PI),
-        FEEDER_FRICTION(PI);
+        FEEDER_OMNIS(PI);
 
         private final double radians;
         Zone(double radians) {
@@ -85,7 +83,6 @@ public final class Container {
                 case INTAKE_OMNI:       return TOLERANCE_INTAKE_OMNI;
                 case FEEDER_SENSORS:    return TOLERANCE_FEEDER_SENSORS;
                 case FEEDER_OMNIS:      return TOLERANCE_FEEDER_OMNIS;
-                case FEEDER_FRICTION:   return TOLERANCE_FEEDER_FRICTION;
                 default:                return TOLERANCE_INTAKE_SENSORS;
             }
         }
