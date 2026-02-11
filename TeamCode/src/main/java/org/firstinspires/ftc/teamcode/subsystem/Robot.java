@@ -16,15 +16,15 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 @Config
 public final class Robot {
 
-    public final BulkReader bulkReader;
     public final MecanumDrivetrain drivetrain;
     public final Handler handler;
     public final Shooter shooter;
     public final Turret turret;
     public final Lift lift;
 
+    private final BulkReader bulkReader;
+    private final AutoAim autoAim;
     private final ElapsedTime loopTimer = new ElapsedTime();
-    private LaunchZone currentZone;
 
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
@@ -34,10 +34,11 @@ public final class Robot {
         lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
+        autoAim = new AutoAim();
     }
 
     public void setAlliance(boolean isRedAlliance) {
-        AutoAim.isRedAlliance = isRedAlliance;
+        autoAim.setAlliance(isRedAlliance);
     }
 
     public void run(boolean feed, boolean forceFeed) {
@@ -46,7 +47,7 @@ public final class Robot {
         Profiler.end("Robot_bulkread");
 
         if (lift.gearSwitch.isActivated()) {
-            currentZone = NONE;
+            autoAim.currentZone = NONE;
             turret.setTarget(PI);
         } else {
             Profiler.start("dt");
@@ -54,7 +55,7 @@ public final class Robot {
             Profiler.end("dt");
 
             Profiler.start("Auto aim calc");
-            AutoAim.update(
+            autoAim.update(
                     drivetrain.getPose(),
                     drivetrain.getVelocity(),
                     drivetrain.getAngularVel(),
@@ -62,13 +63,12 @@ public final class Robot {
             );
             Profiler.end("Auto aim calc");
 
-            currentZone = AutoAim.currentZone;
-            turret.setTarget(AutoAim.turretAngle);
-            shooter.setRPM(AutoAim.launchRPM);
-            shooter.setLaunchAngle(AutoAim.launchAngle);
+            turret.setTarget(autoAim.turretAngle);
+            shooter.setRPM(autoAim.launchRPM);
+            shooter.setLaunchAngle(autoAim.launchAngle);
         }
 
-        boolean inLaunchZone = currentZone != NONE;
+        boolean inLaunchZone = autoAim.currentZone != NONE;
         boolean feedsPending = handler.feedsPending();
 
         Profiler.start("shooter");
@@ -99,8 +99,8 @@ public final class Robot {
         telemetry.addData("LOOP TIME (ms)", loopTimer.milliseconds());
         loopTimer.reset();
         telemetry.addLine();
-        telemetry.addData("CURRENT ZONE", currentZone);
-        telemetry.addData("Shooter-goal dist (in)", AutoAim.r);
+        telemetry.addData("Current zone", autoAim.currentZone);
+        telemetry.addData("Shooter-goal dist (in)", autoAim.r);
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");

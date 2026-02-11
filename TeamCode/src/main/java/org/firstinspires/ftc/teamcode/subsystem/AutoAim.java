@@ -28,20 +28,25 @@ public final class AutoAim {
             CURVE_FIT_ANGLE_SLOPE = -0.00307104,
             CURVE_FIT_ANGLE_Y_INT = 1.22222;
 
-    static double launchRPM, launchAngle, turretAngle;
-    static boolean isRedAlliance;
-    static LaunchZone currentZone;
+    double launchRPM, launchAngle, turretAngle, r;
+    LaunchZone currentZone;
 
-    static void update(Pose pose, Vector velocity, double θ_, double currentRPM) {
+    private Vector2 G;
+
+    AutoAim() {}
+
+    void setAlliance(boolean isRedAlliance) {
+        G = new Vector2(
+                isRedAlliance ? SIZE_FIELD - GOAL_OFFSET_X : GOAL_OFFSET_X,
+                SIZE_FIELD + GOAL_OFFSET_Y
+        );
+    }
+
+    void update(Pose pose, Vector velocity, double θ_, double currentRPM) {
 
         Profiler.start("GetCurrentZone");
         currentZone = LaunchZone.getCurrentZone(pose);
         Profiler.end("GetCurrentZone");
-
-        Vector2 G = new Vector2(
-                isRedAlliance ? SIZE_FIELD - GOAL_OFFSET_X : GOAL_OFFSET_X,
-                SIZE_FIELD + GOAL_OFFSET_Y
-        );
 
         double
                 k = TURRET_X_OFFSET,
@@ -69,21 +74,10 @@ public final class AutoAim {
 
         Profiler.end("aim_turret");
 
-
-//        if (currentZone == NEAR) {
-//            launchRPM = LAUNCH_RPM_NEAR;
-//            launchAngle = LAUNCH_RAD_NEAR;
-//        } else {
-//            launchRPM = LAUNCH_RPM_FAR;
-//            launchAngle = LAUNCH_RAD_FAR;
-//        }
-
-        launchRPM = CURVE_FIT_RPM_SLOPE* AutoAim.r + CURVE_FIT_RPM_MIN;
-        launchAngle = CURVE_FIT_ANGLE_SLOPE* AutoAim.r + CURVE_FIT_ANGLE_Y_INT;
-
+        launchRPM = CURVE_FIT_RPM_SLOPE * r + CURVE_FIT_RPM_MIN;
+        launchAngle = CURVE_FIT_ANGLE_SLOPE * r + CURVE_FIT_ANGLE_Y_INT;
 
     }
-    static double r;
 
     /**
      * Inverse of {@link #getLaunchVel}
