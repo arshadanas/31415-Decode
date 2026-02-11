@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
@@ -64,6 +65,8 @@ public final class Container {
     }
 
     final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+    private Artifact a1, a2;
+    private HSV hsv1, hsv2;
 
     enum Zone {
         INTAKE_SENSORS(0),
@@ -126,9 +129,12 @@ public final class Container {
             // read i2c
             color1.update();
             color2.update();
-
+            hsv1 = color1.getHSV();
+            hsv2 = color2.getHSV();
+            a1 = Artifact.fromHSV(hsv1);
+            a2 = Artifact.fromHSV(hsv2);
             // combine Artifact reading from both color sensors
-            artifacts[currentFrontSlot] = Artifact.fromHSV(color1.getHSV()). or (Artifact.fromHSV(color2.getHSV()));
+            artifacts[currentFrontSlot] = a1.or(a2);
             updateLEDs();
         }
 
@@ -306,6 +312,13 @@ public final class Container {
         telemetry.addData("CONTAINER", Arrays.toString(artifacts));
         telemetry.addLine();
         telemetry.addData("Slot 0 position (deg)", toDegrees(position));
+        telemetry.addData("Error (deg)", toDegrees(abs(normalizeRadians(lastRadians - position))));
+        telemetry.addLine();
+        telemetry.addData("Artifact 1", a1);
+        hsv1.printTo(telemetry);
+        telemetry.addLine();
+        telemetry.addData("Artifact 2", a2);
+        hsv2.printTo(telemetry);
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", front1.getReading());
         telemetry.addData("Back dist (mm)", back1.getReading());

@@ -28,7 +28,7 @@ constructor(
         return hueInRange && saturationInRange && valueInRange
     }
 
-    fun print(telemetry: Telemetry) {
+    fun printTo(telemetry: Telemetry) {
         telemetry.addData("Hue", hue)
         telemetry.addData("Saturation", saturation)
         telemetry.addData("Value", value)

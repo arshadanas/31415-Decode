@@ -45,11 +45,11 @@ public final class TuningColors extends LinearOpMode {
             telemetry.addLine();
             telemetry.addData("Color 1", a1);
             telemetry.addData("Distance 1", distance1.getDistance(DistanceUnit.MM));
-            hsv1.print(telemetry);
+            hsv1.printTo(telemetry);
             telemetry.addLine();
             telemetry.addData("Color 2", a2);
             telemetry.addData("Distance 2", distance2.getDistance(DistanceUnit.MM));
-            hsv2.print(telemetry);
+            hsv2.printTo(telemetry);
             telemetry.update();
         }
     }
