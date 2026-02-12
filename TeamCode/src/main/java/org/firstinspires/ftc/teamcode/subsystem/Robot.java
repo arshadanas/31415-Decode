@@ -46,10 +46,11 @@ public final class Robot {
         bulkReader.bulkRead();
         Profiler.end("Robot_bulkread");
 
-        if (lift.gearSwitch.isActivated()) {
-            autoAim.currentZone = NONE;
+        boolean lifting = lift.gearSwitch.isActivated();
+
+        if (lifting)
             turret.setTarget(PI);
-        } else {
+        else {
             Profiler.start("dt");
             drivetrain.update();
             Profiler.end("dt");
@@ -72,22 +73,21 @@ public final class Robot {
         boolean feedsPending = handler.feedsPending();
 
         Profiler.start("shooter");
-        shooter.run(inLaunchZone, feedsPending);
+        shooter.run(inLaunchZone, feedsPending && !lifting);
         Profiler.end("shooter");
 
         Profiler.start("turret");
-        turret.run(feedsPending);
+        turret.run(feedsPending || lifting);
         Profiler.end("turret");
 
         Profiler.start("handler");
-        handler.run(
-                inLaunchZone,
+        handler.run(!lifting && inLaunchZone && (
                 forceFeed || (
                         feed &&
                         shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
                         turret.inTolerance(Turret.TOLERANCE_FEEDING)
                 )
-        );
+        ));
         Profiler.end("handler");
 
         Profiler.start("lift");

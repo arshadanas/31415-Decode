@@ -102,7 +102,7 @@ public final class Handler {
         presserL = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED, presserLServo);
     }
 
-    void run(boolean inLaunchZone, boolean shooterReady) {
+    void run(boolean feed) {
 
         feedingOrder.removeIf(slot -> container.get(slot) == EMPTY);
 
@@ -120,7 +120,7 @@ public final class Handler {
 
         int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_OMNIS);
         double feederPower = manualFeederPower != 0 ?  manualFeederPower :  // manual power takes priority
-                             inLaunchZone && shooterReady && ( // <-- don't feed until we can shoot
+                             feed && (
                                 (!feedsEmpty && (
                                     slotAtFeeder == -1 || 
                                     container.get(slotAtFeeder) == EMPTY || 

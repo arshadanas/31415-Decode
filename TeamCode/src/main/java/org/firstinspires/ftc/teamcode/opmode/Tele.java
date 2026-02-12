@@ -116,7 +116,7 @@ public final class Tele extends LinearOpMode {
             telemetry.addLine();
             telemetry.addLine(EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
             telemetry.addLine();
-            telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting on " + (isGoalSide ? "Near zone (GOAL SIDE)" : "Far zone (AUDIENCE SIDE)"));
+            telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "near zone (GOAL SIDE)" : "far zone (AUDIENCE SIDE)"));
             telemetry.addLine();
             telemetry.addLine(EDITING_PRELOAD.markIf(selected) + "Preloaded: " + Arrays.toString(robot.handler.container.artifacts));
             telemetry.addLine();
