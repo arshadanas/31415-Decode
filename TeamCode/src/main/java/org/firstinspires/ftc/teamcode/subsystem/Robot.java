@@ -98,9 +98,8 @@ public final class Robot {
     public void printTo(Telemetry telemetry) {
         telemetry.addData("LOOP TIME (ms)", loopTimer.milliseconds());
         loopTimer.reset();
-        telemetry.addLine();
-        telemetry.addData("Current zone", autoAim.currentZone);
-        telemetry.addData("Shooter-goal dist (in)", autoAim.r);
+        telemetry.addLine("\n--------------------------------------\n");
+        autoAim.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");

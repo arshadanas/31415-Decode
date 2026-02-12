@@ -11,6 +11,7 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
 
 import org.dyn4j.geometry.Vector2;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 @Config
@@ -27,7 +28,7 @@ public final class AutoAim {
             CURVE_FIT_ANGLE_SLOPE = -0.00307104,
             CURVE_FIT_ANGLE_Y_INT = 1.22222;
 
-    double launchRPM, launchAngle, turretAngle, r;
+    double launchRPM, launchAngle, turretAngle, r, r_t, airtime;
     LaunchZone currentZone;
 
     private Vector2 G;
@@ -66,15 +67,24 @@ public final class AutoAim {
                 r_vel = -m*cos(g),
                 h_vel = m*sin(g);
 
+        Profiler.start("iterate airtime");
+        airtime = getFinalAirtime(S, S_vel, G);
+        Profiler.end("iterate airtime");
+
+        Vector2 S_t = S.sum(S_vel.product(airtime));
+        Vector2 rVector_t = S_t.to(G);
+        r_t = rVector_t.getMagnitude();
 
         Profiler.start("aim_turret");
 
-        turretAngle = -rVector.getAngleBetween(heading);
+        turretAngle = -rVector_t.getAngleBetween(heading);
 
         Profiler.end("aim_turret");
 
-        launchRPM = CURVE_FIT_RPM_SLOPE * r + CURVE_FIT_RPM_MIN;
-        launchAngle = CURVE_FIT_ANGLE_SLOPE * r + CURVE_FIT_ANGLE_Y_INT;
+        launchRPM = CURVE_FIT_RPM_SLOPE * r_t + CURVE_FIT_RPM_MIN;
+        launchAngle = CURVE_FIT_ANGLE_SLOPE * r_t + CURVE_FIT_ANGLE_Y_INT;
+//        launchRPM = LAUNCH_RPM;
+//        launchAngle = LAUNCH_RAD;
 
     }
 
@@ -138,5 +148,12 @@ public final class AutoAim {
         double airtime = getFinalAirtime(S_0, S_vel_0, G);
         System.out.println((System.nanoTime() - a)/1e+6);
         System.out.println(airtime);
+    }
+
+    void printTo(Telemetry telemetry) {
+        telemetry.addData("Current zone", currentZone);
+        telemetry.addData("Shooter-goal dist at 0 (in)", r);
+        telemetry.addData("Shooter-goal dist at t (in)", r_t);
+        telemetry.addData("Computed airtime t", airtime);
     }
 }
