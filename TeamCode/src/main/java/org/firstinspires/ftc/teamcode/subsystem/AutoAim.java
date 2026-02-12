@@ -55,20 +55,20 @@ public final class AutoAim {
                 heading = normalizeRadians(pose.getHeading() + headingChange);
 
         Vector2 R = new Vector2(pose.getX() + xChange, pose.getY() + yChange); // robot center
-        Vector2 R_ = new Vector2(velocity.getXComponent(), velocity.getYComponent());
+        Vector2 R_vel = new Vector2(velocity.getXComponent(), velocity.getYComponent());
 
         Vector2 S = new Vector2(R.x + k*cos(heading), R.y + k*sin(heading)); // shooter/turret center
-        Vector2 S_ = new Vector2(R_.x - angVel*k*sin(heading), R_.y + angVel*k*cos(heading));
+        Vector2 S_vel = new Vector2(R_vel.x - angVel*k*sin(heading), R_vel.y + angVel*k*cos(heading));
         Vector2 rVector = S.to(G);
         r = rVector.getMagnitude();
 
         double
-                m = S_.getMagnitude(),
-                a = S_.getDirection(),
+                m = S_vel.getMagnitude(),
+                a = S_vel.getDirection(),
                 b = rVector.getDirection(),
                 g = b - a,
-                r_ = -m*cos(g),
-                h_ = m*sin(g);
+                r_vel = -m*cos(g),
+                h_vel = m*sin(g);
 
 
         Profiler.start("aim_turret");
