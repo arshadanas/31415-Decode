@@ -40,7 +40,7 @@ public final class AutoAim {
         );
     }
 
-    void update(Pose pose, Vector velocity, double θ_, double currentRPM) {
+    void update(Pose pose, Vector velocity, double angVel, double currentRPM) {
 
         Profiler.start("GetCurrentZone");
         currentZone = LaunchZone.getCurrentZone(pose);
@@ -50,14 +50,15 @@ public final class AutoAim {
                 airtime = 0,
                 xChange = airtime*velocity.getXComponent(),
                 yChange = airtime*velocity.getYComponent(),
-                θChange = airtime*θ_,
+                headingChange = airtime*angVel,
                 k = TURRET_X_OFFSET,
-                θ = normalizeRadians(pose.getHeading() + θChange);
+                heading = normalizeRadians(pose.getHeading() + headingChange);
 
         Vector2 R = new Vector2(pose.getX() + xChange, pose.getY() + yChange); // robot center
         Vector2 R_ = new Vector2(velocity.getXComponent(), velocity.getYComponent());
-        Vector2 S = new Vector2(R.x + k*cos(θ), R.y + k*sin(θ)); // shooter/turret center
-        Vector2 S_ = new Vector2(R_.x - θ_*k*sin(θ), R_.y + θ_*k*cos(θ));
+
+        Vector2 S = new Vector2(R.x + k*cos(heading), R.y + k*sin(heading)); // shooter/turret center
+        Vector2 S_ = new Vector2(R_.x - angVel*k*sin(heading), R_.y + angVel*k*cos(heading));
         Vector2 rVector = S.to(G);
         r = rVector.getMagnitude();
 
@@ -72,7 +73,7 @@ public final class AutoAim {
 
         Profiler.start("aim_turret");
 
-        turretAngle = -rVector.getAngleBetween(θ);
+        turretAngle = -rVector.getAngleBetween(heading);
 
         Profiler.end("aim_turret");
 
