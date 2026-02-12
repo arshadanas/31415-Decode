@@ -12,7 +12,6 @@ import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
-import org.firstinspires.ftc.teamcode.control.filter.CoolerKalmanFilter;
 import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
@@ -27,7 +26,7 @@ public final class Shooter {
     public static PIDGains pidGains = new PIDGains(0, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(2.9, 0.03),
-            kDFilterGains = new KalmanGains(),
+            derivFilterGains = new KalmanGains(3, 0),
             outputFilterGains = new KalmanGains(.02, 5);
 
     public static double
@@ -57,14 +56,13 @@ public final class Shooter {
     private final CachedMotorEx[] motors;
     private final VoltageSensor batteryVoltageSensor;
 
-    private final CoolerKalmanFilter rpmFilter = new CoolerKalmanFilter();
     private final KalmanFilter
-//            rpmFilter = new KalmanFilter(rpmFilterGains),
-            derivFilter = new KalmanFilter(kDFilterGains),
+            rpmFilter = new KalmanFilter(rpmFilterGains),
+            derivFilter = new KalmanFilter(derivFilterGains),
             outputFilter = new KalmanFilter(outputFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
 
-    private double currentRPM, currentRPMPerSec, targetRPM = RPM_ARMING, rawRPM, output;
+    private double currentRPM, targetRPM = RPM_ARMING, rawRPM, output;
 
     public void setRPM(double rpm) {
         this.targetRPM = rpm;
@@ -110,7 +108,7 @@ public final class Shooter {
     void run(boolean inLaunchZone, boolean feedsPending) {
         Profiler.start("shooter_set_gains");
         rpmFilter.setGains(rpmFilterGains);
-        derivFilter.setGains(kDFilterGains);
+        derivFilter.setGains(derivFilterGains);
         outputFilter.setGains(outputFilterGains);
         controller.setGains(pidGains);
         Profiler.end("shooter_set_gains");
@@ -119,39 +117,27 @@ public final class Shooter {
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
         Profiler.end("shooter_get_encoder_vel");
 
-        Profiler.start("shooter_kalman_predict");
-        try {
-            double[] stateEstimate = rpmFilter.predictAndCalculate(rawRPM, 0);
-            currentRPM = stateEstimate[0];
-            currentRPMPerSec = stateEstimate[1];
-        } catch (Exception ignored) {}
-        Profiler.end("shooter_kalman_predict");
+        Profiler.start("rpm kalman");
+        currentRPM = rpmFilter.calculate(rawRPM);
+        Profiler.end("rpm kalman");
 
-        Profiler.start("shooter_set_vars");
-        double rpmSetpoint =
-//                !feedsPending ? RPM_IDLE : // change to EMPTY.numOccurrencesIn(handler.container.artifacts) == 3 ?
-                !inLaunchZone ? RPM_ARMING :
-                                targetRPM;
-
+        Profiler.start("get battery voltage");
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
-        Profiler.end("shooter_set_vars");
+        Profiler.end("get battery voltage");
 
-        Profiler.start("shooter_set_controller");
+        Profiler.start("shooter pidf");
+        double rpmSetpoint = inLaunchZone ? targetRPM : RPM_ARMING;
+
         controller.setTarget(new State(rpmSetpoint));
-        Profiler.end("shooter_set_controller");
-
-
-        Profiler.start("shooter_pid_new");
-        double pid = controller.calculate(new State(currentRPM, currentRPMPerSec));
-        double feedforward = lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar;
-        double pidf = pid + feedforward;
+        double pidf = controller.calculate(new State(currentRPM)) // pid
+                + lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar; // feedforward
 
         output =
                 manualPower != 0 ?  manualPower :
                 !feedsPending ?     0 :
                 clip(inTolerance(TOLERANCE_RPM_FILTERING) ? outputFilter.calculate(pidf) : pidf, 0, 1);
 
-        Profiler.end("shooter_pid_new");
+        Profiler.end("shooter pidf");
 
         Profiler.start("shooter_motors");
         for (CachedMotorEx motor : motors) {
@@ -173,7 +159,6 @@ public final class Shooter {
         );
         telemetry.addLine();
         telemetry.addData("Current vel (rpm)", currentRPM);
-        telemetry.addData("Current accel (rpm/s)", currentRPMPerSec);
         telemetry.addData("Target vel (rpm)", targetRPM);
         telemetry.addData("Raw vel (rpm)", rawRPM);
         telemetry.addData("Output power [0,1]", output);
