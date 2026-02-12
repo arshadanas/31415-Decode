@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
+import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -46,19 +47,14 @@ public final class AutoAim {
         currentZone = LaunchZone.getCurrentZone(pose);
         Profiler.end("GetCurrentZone");
 
-        double
-                airtime = 0,
-                xChange = airtime*velocity.getXComponent(),
-                yChange = airtime*velocity.getYComponent(),
-                headingChange = airtime*angVel,
-                k = TURRET_X_OFFSET,
-                heading = normalizeRadians(pose.getHeading() + headingChange);
+        double heading = normalizeRadians(pose.getHeading());
 
-        Vector2 R = new Vector2(pose.getX() + xChange, pose.getY() + yChange); // robot center
+        Vector2 R = new Vector2(pose.getX(), pose.getY()); // robot center
         Vector2 R_vel = new Vector2(velocity.getXComponent(), velocity.getYComponent());
 
-        Vector2 S = new Vector2(R.x + k*cos(heading), R.y + k*sin(heading)); // shooter/turret center
-        Vector2 S_vel = new Vector2(R_vel.x - angVel*k*sin(heading), R_vel.y + angVel*k*cos(heading));
+        Vector2 S = getTurretCenter(R, heading);
+        Vector2 S_vel = getTurretVel(R_vel, heading, angVel);
+
         Vector2 rVector = S.to(G);
         r = rVector.getMagnitude();
 
@@ -80,6 +76,14 @@ public final class AutoAim {
         launchRPM = CURVE_FIT_RPM_SLOPE * r + CURVE_FIT_RPM_MIN;
         launchAngle = CURVE_FIT_ANGLE_SLOPE * r + CURVE_FIT_ANGLE_Y_INT;
 
+    }
+
+    private static Vector2 getTurretCenter(Vector2 R, double heading) {
+        return R.sum(Vector2.create(TURRET_X_OFFSET, heading));
+    }
+
+    private static Vector2 getTurretVel(Vector2 R_vel, double heading, double angVel) {
+        return R_vel.sum(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI/2));
     }
 
     /**
