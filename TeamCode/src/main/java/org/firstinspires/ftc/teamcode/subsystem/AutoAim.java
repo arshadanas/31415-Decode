@@ -86,6 +86,20 @@ public final class AutoAim {
         return R_vel.sum(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI/2));
     }
 
+    private static double getAirtime(double distToGoal) {
+        return 0;
+    }
+
+    private static double getFinalAirtime(Vector2 S_0, Vector2 S_vel_0, Vector2 G) {
+        double airtime = 0;
+        int iterations = 7;
+        for (int i = 0; i < iterations; i++) {
+            Vector2 S_t = S_0.sum(S_vel_0.product(airtime));
+            airtime = getAirtime(S_t.distance(G));
+        }
+        return airtime;
+    }
+
     /**
      * Inverse of {@link #getLaunchVel}
      * @return Angular velocity of shooter wheel at launch, in rpm
@@ -104,5 +118,25 @@ public final class AutoAim {
 
     private static double getRPMDrop(double preLaunchRPM) {
         return 0.271632 * preLaunchRPM + 109.1459;
+    }
+
+    public static void main(String[] args) {
+
+        Vector2 G = new Vector2(70.75,70.75);
+        Vector2 R_0 = new Vector2(-7.1,0.4);
+        double heading_0 = 0;
+        Vector2 R_vel_0 = new Vector2(44.8,26.4);
+        double angVel_0 = 0;
+
+        double old = TURRET_X_OFFSET;
+        TURRET_X_OFFSET = 0;
+        Vector2 S_0 = getTurretCenter(R_0, heading_0);
+        Vector2 S_vel_0 = getTurretVel(R_vel_0, heading_0, angVel_0);
+        TURRET_X_OFFSET = old;
+
+        double a = System.nanoTime();
+        double airtime = getFinalAirtime(S_0, S_vel_0, G);
+        System.out.println((System.nanoTime() - a)/1e+6);
+        System.out.println(airtime);
     }
 }
