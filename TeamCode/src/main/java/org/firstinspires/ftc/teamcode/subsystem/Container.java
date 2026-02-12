@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
+import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -38,10 +39,10 @@ public final class Container {
 
             TIME_WRAPAROUND = 0.03,
 
-            TOLERANCE_INTAKE_SENSORS = 0.2, // too high => false positives, too low => false negatives (no-detect)
-            TOLERANCE_FEEDER_SENSORS = 0.15, // too high => false negatives (removals)
-            TOLERANCE_FEEDER_OMNIS = 0.6108652381980153,
-            TOLERANCE_INTAKE_OMNI = 0.5235987755982988;
+            TOLERANCE_INTAKE_SENSORS_DEG = 11.46, // too high => false positives, too low => false negatives (no-detect)
+            TOLERANCE_FEEDER_SENSORS_DEG = 8.6, // too high => false negatives (removals)
+            TOLERANCE_FEEDER_OMNIS_DEG = 35,
+            TOLERANCE_INTAKE_OMNI_DEG = 30;
 
     // hardware
     private final CachedSimpleServo servo;
@@ -92,10 +93,10 @@ public final class Container {
 
         private double getTolerance() {
             switch (this) {
-                case INTAKE_OMNI:       return TOLERANCE_INTAKE_OMNI;
-                case FEEDER_SENSORS:    return TOLERANCE_FEEDER_SENSORS;
-                case FEEDER_OMNIS:      return TOLERANCE_FEEDER_OMNIS;
-                default:                return TOLERANCE_INTAKE_SENSORS;
+                case INTAKE_OMNI:       return toRadians(TOLERANCE_INTAKE_OMNI_DEG);
+                case FEEDER_SENSORS:    return toRadians(TOLERANCE_FEEDER_SENSORS_DEG);
+                case FEEDER_OMNIS:      return toRadians(TOLERANCE_FEEDER_OMNIS_DEG);
+                default:                return toRadians(TOLERANCE_INTAKE_SENSORS_DEG);
             }
         }
 
