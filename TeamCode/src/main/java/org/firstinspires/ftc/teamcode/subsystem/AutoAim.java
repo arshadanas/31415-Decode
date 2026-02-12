@@ -18,10 +18,8 @@ public final class AutoAim {
     public static double
             GOAL_OFFSET_Y = -5,
             GOAL_OFFSET_X = 3.5,
-            LAUNCH_RPM_NEAR = 5000,
-            LAUNCH_RAD_NEAR = 1.0776000610289713,
-            LAUNCH_RPM_FAR = 6000,
-            LAUNCH_RAD_FAR = 0.7853981633974483,
+            LAUNCH_RPM = 5000,
+            LAUNCH_RAD = 1.0776000610289713,
             TURRET_X_OFFSET = -1.86759,
             CURVE_FIT_RPM_MIN = 2916.29066,
             CURVE_FIT_RPM_SLOPE = 21.27491,
@@ -49,10 +47,14 @@ public final class AutoAim {
         Profiler.end("GetCurrentZone");
 
         double
+                airtime = 0,
+                xChange = airtime*velocity.getXComponent(),
+                yChange = airtime*velocity.getYComponent(),
+                θChange = airtime*θ_,
                 k = TURRET_X_OFFSET,
-                θ = normalizeRadians(pose.getHeading());
+                θ = normalizeRadians(pose.getHeading() + θChange);
 
-        Vector2 R = new Vector2(pose.getX(), pose.getY()); // robot center
+        Vector2 R = new Vector2(pose.getX() + xChange, pose.getY() + yChange); // robot center
         Vector2 R_ = new Vector2(velocity.getXComponent(), velocity.getYComponent());
         Vector2 S = new Vector2(R.x + k*cos(θ), R.y + k*sin(θ)); // shooter/turret center
         Vector2 S_ = new Vector2(R_.x - θ_*k*sin(θ), R_.y + θ_*k*cos(θ));
