@@ -41,7 +41,7 @@ public final class Container {
 
             TOLERANCE_INTAKE_SENSORS_DEG = 11.46, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_FEEDER_SENSORS_DEG = 8.6, // too high => false negatives (removals)
-            TOLERANCE_FEEDER_OMNIS_DEG = 35,
+            TOLERANCE_FEEDER_OMNIS_DEG = 30,
             TOLERANCE_INTAKE_OMNI_DEG = 30;
 
     // hardware
