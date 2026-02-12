@@ -76,7 +76,7 @@ public final class Container {
     }
 
     private Artifact a1, a2;
-    private HSV hsv1, hsv2;
+    private HSV hsv1 = new HSV(), hsv2 = new HSV();
 
     private final Runnable genFeedingOrder;
 
