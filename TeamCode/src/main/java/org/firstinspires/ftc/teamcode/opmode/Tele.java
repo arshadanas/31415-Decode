@@ -3,8 +3,9 @@ package org.firstinspires.ftc.teamcode.opmode;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.sharedPose;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
-import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PRELOAD;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PROFILING;
+import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.PI;
@@ -21,11 +22,13 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
+import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.Motif;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 import java.io.File;
+import java.util.Arrays;
 
 import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
 import dev.nullftc.profiler.exporter.CSVProfilerExporter;
@@ -41,6 +44,7 @@ public final class Tele extends LinearOpMode {
     enum TeleOpConfig {
         EDITING_ALLIANCE,
         EDITING_SIDE,
+        EDITING_PRELOAD,
         EDITING_PROFILING;
 
         public static final TeleOpConfig[] selections = values();
@@ -68,11 +72,16 @@ public final class Tele extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, new Pose());
         robot.drivetrain.startTeleopDrive();
 
+        robot.handler.container.setArtifacts(Auto.artifacts);
+        // expire the shared artifacts
+        System.arraycopy(Artifact.EMPTY_ARRAY, 0, Auto.artifacts, 0, 3);
+
         TeleOpConfig selected = EDITING_ALLIANCE;
 
         boolean doTelemetry = false;
         boolean doProfiling = false;
         boolean isGoalSide = false;
+        boolean preload = false;
 
         while (opModeInInit()) {
 
@@ -90,6 +99,12 @@ public final class Tele extends LinearOpMode {
                     if (gamepad1.squareWasPressed())
                         isGoalSide = !isGoalSide;
                     break;
+                case EDITING_PRELOAD:
+                    if (gamepad1.squareWasPressed()) {
+                        preload = !preload;
+                        robot.handler.container.setArtifacts(preload ? Motif.PGP.artifacts : Artifact.EMPTY_ARRAY);
+                    }
+                    break;
                 case EDITING_PROFILING:
                     if (gamepad1.squareWasPressed())
                         doProfiling = !doProfiling;
@@ -103,10 +118,11 @@ public final class Tele extends LinearOpMode {
             telemetry.addLine();
             telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting on " + (isGoalSide ? "Near zone (GOAL SIDE)" : "Far zone (AUDIENCE SIDE)"));
             telemetry.addLine();
+            telemetry.addLine(EDITING_PRELOAD.markIf(selected) + "Preloaded: " + Arrays.toString(robot.handler.container.artifacts));
+            telemetry.addLine();
             telemetry.addLine(EDITING_PROFILING.markIf(selected) + "Profiler " + (doProfiling ? "ENABLED" : "disabled"));
             telemetry.addLine();
-            telemetry.addData("Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
-
+            telemetry.addData("  Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
             telemetry.update();
         }
 
@@ -117,7 +133,6 @@ public final class Tele extends LinearOpMode {
 
             robot.setAlliance(isRedAlliance);
             robot.drivetrain.setPose(sharedPose != null ? sharedPose : Auto.getStartingPose(isRedAlliance, isGoalSide));
-            robot.handler.preloadPGP();
 
             sharedPose = null; // expire the shared pose
 
@@ -182,7 +197,7 @@ public final class Tele extends LinearOpMode {
                         robot.handler.randomization = Motif.PPG;
 
                     if (gamepad1.triangleWasPressed())
-                        robot.handler.clear();
+                        robot.handler.container.setArtifacts(Artifact.EMPTY_ARRAY);
 
                     if (gamepad1.crossWasPressed())
                         robot.handler.feedSingle(GREEN);

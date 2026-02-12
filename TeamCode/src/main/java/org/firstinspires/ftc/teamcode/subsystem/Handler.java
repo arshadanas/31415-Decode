@@ -4,8 +4,6 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLO
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -80,7 +78,10 @@ public final class Handler {
 
     Handler(HardwareMap hardwareMap) {
 
-        container = new Container(hardwareMap);
+        container = new Container(hardwareMap, () -> {
+            if (motifMode) feedMotif();
+            else feedFastest();
+        });
 
         intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
         intake.setInverted(true);
@@ -104,10 +105,6 @@ public final class Handler {
     void run(boolean inLaunchZone, boolean shooterReady) {
 
         feedingOrder.removeIf(slot -> container.get(slot) == EMPTY);
-
-        // generate feeding order if intake is running
-        if (intakePower != 0)
-            generateDefaultFeedingOrder();
 
         boolean feedsEmpty = feedingOrder.isEmpty();
         if (!feedsEmpty)
@@ -148,13 +145,6 @@ public final class Handler {
         presserL.run();
     }
 
-    private void generateDefaultFeedingOrder() {
-        if (motifMode)
-            feedMotif();
-        else
-            feedFastest();
-    }
-
     /**
      * Generate the most efficient feeding order
      */
@@ -190,29 +180,8 @@ public final class Handler {
         feedingOrder.clear();
 
         int first = container.getNearestFeedSlot(color);
-        if (first == -1) // no Artifacts in the container
-            return;
-
-        feedingOrder.add(first);
-    }
-
-    /**
-     * GREEN in slot 1
-     */
-    public void preloadPGP() {
-        container.artifacts[0] = PURPLE;
-        container.artifacts[1] = GREEN;
-        container.artifacts[2] = PURPLE;
-        container.updateLEDs();
-        generateDefaultFeedingOrder();
-    }
-
-    public void clear() {
-        container.artifacts[0] = EMPTY;
-        container.artifacts[1] = EMPTY;
-        container.artifacts[2] = EMPTY;
-        container.updateLEDs();
-        generateDefaultFeedingOrder();
+        if (first != -1) // no Artifacts in the container
+            feedingOrder.add(first);
     }
 
     void printTo(Telemetry telemetry) {

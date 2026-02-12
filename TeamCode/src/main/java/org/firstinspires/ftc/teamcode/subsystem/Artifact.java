@@ -12,6 +12,8 @@ public enum Artifact {
     GREEN,
     EMPTY;
 
+    public static final Artifact[] EMPTY_ARRAY = {EMPTY, EMPTY, EMPTY};
+
     public static HSV
             minPurple = new HSV(
                     175,

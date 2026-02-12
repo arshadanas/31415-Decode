@@ -6,6 +6,7 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.AutoConfig.EDITING_SIDE
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.DRIVING_TO_SUB;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.PARKING;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.SCORING_PRELOAD;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static java.lang.Math.PI;
 import static java.lang.Math.ceil;
 import static java.lang.Math.toRadians;
@@ -28,6 +29,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
+import org.firstinspires.ftc.teamcode.subsystem.Artifact;
+import org.firstinspires.ftc.teamcode.subsystem.Motif;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 
@@ -182,6 +185,7 @@ public final class Auto extends LinearOpMode {
 
     static Pose sharedPose = null;
     static boolean isRedAlliance = false;
+    static final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
 
     enum AutoConfig {
         CONFIRMING,
@@ -207,7 +211,7 @@ public final class Auto extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot:
-        Robot robot = new Robot(hardwareMap, new Pose()); // TODO copy from AutoSped
+        Robot robot = new Robot(hardwareMap, new Pose());
 
         AutoConfig selected = EDITING_ALLIANCE;
         boolean isGoalSide = false;
@@ -251,7 +255,7 @@ public final class Auto extends LinearOpMode {
 
         robot.setAlliance(isRedAlliance);
         sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
-        robot.handler.preloadPGP();
+        robot.handler.container.setArtifacts(Motif.PGP.artifacts);
 
         Action trajectory;
 
@@ -1018,6 +1022,7 @@ public final class Auto extends LinearOpMode {
                 telemetryPacket -> {
 //                    robot.run();
                     sharedPose = robot.drivetrain.getPose();
+                    System.arraycopy(robot.handler.container.artifacts, 0, Auto.artifacts, 0, 3);
                     return opModeIsActive();
                 },
                 trajectory

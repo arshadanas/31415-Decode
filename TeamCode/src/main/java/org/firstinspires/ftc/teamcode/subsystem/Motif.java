@@ -15,7 +15,7 @@ public enum Motif {
     PGP(PURPLE, GREEN, PURPLE),
     PPG(PURPLE, PURPLE, GREEN);
 
-    private final Artifact[] artifacts;
+    public final Artifact[] artifacts;
 
     private static final Motif[] motifs = values();
 

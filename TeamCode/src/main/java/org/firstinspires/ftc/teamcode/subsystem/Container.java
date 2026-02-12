@@ -63,9 +63,21 @@ public final class Container {
         return normalizeRadians(position + wrap(slot, 0, artifacts.length) * 2 * PI / 3.0);
     }
 
-    final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+    public final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+    public void setArtifacts(Artifact[] artifacts) {
+        assert artifacts.length == 3;
+        if (Arrays.equals(this.artifacts, artifacts))
+            return;
+
+        System.arraycopy(artifacts, 0, this.artifacts, 0, 3);
+        updateLEDs();
+        genFeedingOrder.run();
+    }
+
     private Artifact a1, a2;
     private HSV hsv1, hsv2;
+
+    private final Runnable genFeedingOrder;
 
     enum Zone {
         INTAKE_SENSORS(0),
@@ -89,7 +101,7 @@ public final class Container {
 
     }
 
-    Container(HardwareMap hardwareMap) {
+    Container(HardwareMap hardwareMap, Runnable genFeedingOrder) {
         servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
 
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
@@ -105,6 +117,8 @@ public final class Container {
 //                new LEDIndicator(hardwareMap, "led 2a", "led 2b"),
 //                new LEDIndicator(hardwareMap, "led 3a", "led 3b")
 //        };
+
+        this.genFeedingOrder = genFeedingOrder;
     }
 
     void run(double intakePower, double feederPower) {
@@ -133,6 +147,9 @@ public final class Container {
             // combine Artifact reading from both color sensors
             artifacts[currentFrontSlot] = a1.or(a2);
             updateLEDs();
+
+            if (artifacts[currentFrontSlot] != EMPTY)
+                genFeedingOrder.run();
         }
 
 
