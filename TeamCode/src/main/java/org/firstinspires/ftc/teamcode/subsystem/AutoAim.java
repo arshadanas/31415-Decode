@@ -5,8 +5,6 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static java.lang.Math.max;
-import static java.lang.Math.round;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -136,19 +134,11 @@ public final class AutoAim {
     public static void main(String[] args) {
 
         Vector2 G = new Vector2(70.75,70.75);
-        Vector2 R_0 = new Vector2(-7.1,0.4);
-        double heading_0 = 0;
-        Vector2 R_vel_0 = new Vector2(44.8,26.4);
-        double angVel_0 = 0;
-
-        double old = TURRET_X_OFFSET;
-        TURRET_X_OFFSET = 0;
-        Vector2 S_0 = getTurretCenter(R_0, heading_0);
-        Vector2 S_vel_0 = getTurretVel(R_vel_0, heading_0, angVel_0);
-        TURRET_X_OFFSET = old;
+        Vector2 R_0 = new Vector2(-70.75,-70.75);
+        Vector2 R_vel_0 = new Vector2(-63.4788154,-63.8);
 
         double a = System.nanoTime();
-        double airtime = getFinalAirtime(S_0, S_vel_0, G);
+        double airtime = getFinalAirtime(R_0, R_vel_0, G);
         System.out.println((System.nanoTime() - a)/1e+6);
         System.out.println(airtime);
     }
