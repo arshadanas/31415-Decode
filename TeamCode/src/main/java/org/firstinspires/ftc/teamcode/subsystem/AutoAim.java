@@ -107,7 +107,7 @@ public final class AutoAim {
             double distToGoal = S_t.distance(G);
             airtime = 0; // TODO curve fit airtime
         }
-        return Ranges.clip(airtime, 0, 3); // airtime in [0,3] seconds
+        return Ranges.clip(airtime, 0, 3); // TODO set maximum airtime
     }
 
     /**
