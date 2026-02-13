@@ -146,6 +146,9 @@ public final class Shooter {
         Profiler.end("shooter_motors");
     }
 
+    /**
+     * <a href="https://www.desmos.com/calculator/b3jnyqoqyv">Desmos curve fit</a>
+     */
     private static double getFeedForward(double rpmSetpoint) {
         return rpmSetpoint / 8367.27273 + 0.04718383310065716;
     }
