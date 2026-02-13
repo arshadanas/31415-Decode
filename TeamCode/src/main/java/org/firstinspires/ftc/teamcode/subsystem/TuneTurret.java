@@ -44,7 +44,7 @@ public final class TuneTurret extends LinearOpMode {
             else if (gamepad1.dpadLeftWasPressed())
                 turret.setTarget(toRadians(90));
             else if (gamepad1.dpadDownWasPressed())
-                turret.setTarget(toRadians(0));
+                turret.setTarget(toRadians(180));
             else if (gamepad1.dpadRightWasPressed())
                 turret.setTarget(toRadians(-90));
 
