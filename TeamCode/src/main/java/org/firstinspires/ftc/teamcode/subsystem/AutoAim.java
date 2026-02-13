@@ -5,6 +5,8 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static java.lang.Math.max;
+import static java.lang.Math.round;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -13,6 +15,7 @@ import com.pedropathing.math.Vector;
 import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
+import org.firstinspires.ftc.teamcode.control.Ranges;
 
 @Config
 public final class AutoAim {
@@ -96,18 +99,15 @@ public final class AutoAim {
         return R_vel.sum(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI/2));
     }
 
-    private static double getAirtime(double distToGoal) {
-        return 0;
-    }
-
     private static double getFinalAirtime(Vector2 S_0, Vector2 S_vel_0, Vector2 G) {
         double airtime = 0;
-        int iterations = 7;
+        int iterations = 7; // TODO vary iterations based on |S_vel_0|
         for (int i = 0; i < iterations; i++) {
             Vector2 S_t = S_0.sum(S_vel_0.product(airtime));
-            airtime = getAirtime(S_t.distance(G));
+            double distToGoal = S_t.distance(G);
+            airtime = 0; // TODO curve fit airtime
         }
-        return airtime;
+        return Ranges.clip(airtime, 0, 3); // airtime in [0,3] seconds
     }
 
     /**
