@@ -98,7 +98,10 @@ public final class AutoAim {
     private static Vector2 getTurretVel(Vector2 R_vel, double heading, double angVel) {
         return R_vel.sum(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI/2));
     }
-
+    
+    /**
+     * https://www.desmos.com/calculator/akmmitciiz
+     */
     private static double getFinalAirtime(Vector2 S_0, Vector2 S_vel_0, Vector2 G) {
         double airtime = 0;
         int iterations = 7; // TODO vary iterations based on |S_vel_0|
