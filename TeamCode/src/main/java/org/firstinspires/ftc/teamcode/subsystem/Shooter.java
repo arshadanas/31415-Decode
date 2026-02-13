@@ -31,10 +31,6 @@ public final class Shooter {
 
     public static double
 
-            POWER_A = 0.5,
-            RPM_A = 3550,
-            POWER_B = 1,
-            RPM_B = 7875,
             MAX_VOLTAGE = 13,
 
             RPM_ARMING = 2700,
@@ -126,15 +122,18 @@ public final class Shooter {
         Profiler.end("get battery voltage");
 
         Profiler.start("shooter pidf");
-        double rpmSetpoint = inLaunchZone ? targetRPM : RPM_ARMING;
+        double rpmSetpoint =
+                !feedsPending ? RPM_IDLE :
+                !inLaunchZone ? RPM_ARMING :
+                                targetRPM;
 
         controller.setTarget(new State(rpmSetpoint));
         double pidf = controller.calculate(new State(currentRPM)) // pid
-                + lerp(rpmSetpoint, RPM_A, RPM_B, POWER_A, POWER_B) * voltageScalar; // feedforward
+                + getFeedForward(rpmSetpoint) * voltageScalar; // feedforward
 
         output =
                 manualPower != 0 ?  manualPower :
-                !feedsPending ?     0 :
+                rpmSetpoint == 0 ? 0 :
                 clip(inTolerance(TOLERANCE_RPM_FILTERING) ? outputFilter.calculate(pidf) : pidf, 0, 1);
 
         Profiler.end("shooter pidf");
@@ -145,6 +144,10 @@ public final class Shooter {
             motor.set(output);
         }
         Profiler.end("shooter_motors");
+    }
+
+    private static double getFeedForward(double rpmSetpoint) {
+        return rpmSetpoint / 8478.72727 + 0.0405957154935118;
     }
 
     boolean inTolerance(double rpmTolerance) {

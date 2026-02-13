@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
-
 import static java.lang.Math.max;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -13,7 +12,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.opmode.Tele;
-import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 @Config
 @TeleOp(group = "Testing/tuning")
