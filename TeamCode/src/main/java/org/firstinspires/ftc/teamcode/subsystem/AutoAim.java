@@ -18,8 +18,8 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 public final class AutoAim {
 
     public static double
-            GOAL_OFFSET_Y = -5,
-            GOAL_OFFSET_X = 3.5,
+            GOAL_OFFSET_Y = 0,
+            GOAL_OFFSET_X = 0,
             LAUNCH_RPM = 5000,
             LAUNCH_RAD = 1.0776000610289713,
             TURRET_X_OFFSET = -1.86759,
