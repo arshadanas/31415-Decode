@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSim
 @Config
 public final class Shooter {
 
-    public static PIDGains pidGains = new PIDGains(0, 0, 0, 1);
+    public static PIDGains pidGains = new PIDGains(0.0005, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(1, 2),
             derivFilterGains = new KalmanGains(3, 0),
@@ -50,7 +50,7 @@ public final class Shooter {
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
-    private final VoltageSensor batteryVoltageSensor;
+    final VoltageSensor batteryVoltageSensor;
 
     private final KalmanFilter
             rpmFilter = new KalmanFilter(rpmFilterGains),
@@ -147,7 +147,7 @@ public final class Shooter {
     }
 
     private static double getFeedForward(double rpmSetpoint) {
-        return rpmSetpoint / 8478.72727 + 0.0405957154935118;
+        return rpmSetpoint / 8367.27273 + 0.04718383310065716;
     }
 
     boolean inTolerance(double rpmTolerance) {
