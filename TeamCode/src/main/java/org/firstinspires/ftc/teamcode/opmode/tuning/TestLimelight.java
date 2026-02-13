@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.pedropathing.Constants;
 
@@ -32,7 +33,9 @@ public class TestLimelight extends LinearOpMode {
         limelight.pipelineSwitch(0);
 
         pinpoint = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
-        pinpoint.setOffsets(Constants.pinpointConstants.forwardPodY, Constants.pinpointConstants.strafePodX, DistanceUnit.INCH);
+        pinpoint.setOffsets(
+                Constants.pinpointConstants.forwardPodY,
+                Constants.pinpointConstants.strafePodX, DistanceUnit.INCH);
 
         pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
 
@@ -60,15 +63,16 @@ public class TestLimelight extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            limelight.updateRobotOrientation(pinpoint.getHeading(AngleUnit.DEGREES));
+            limelight.updateRobotOrientation(pinpoint.getHeading(AngleUnit.RADIANS));
             LLResult result = limelight.getLatestResult();
             if (result != null) {
                 if (result.isValid()) {
-                    Pose3D botpose = result.getBotpose_MT2();
-                    // Use botpose data
+                    Pose3D pose = result.getBotpose_MT2();
+                    Position botPosition = pose.getPosition().toUnit(DistanceUnit.INCH);
+
                     telemetry.addData("tx", result.getTx());
                     telemetry.addData("ty", result.getTy());
-                    telemetry.addData("Botpose", botpose.toString());
+                    telemetry.addData("Botpose", botPosition.toString());
                 }
             }
             pinpoint.update();
