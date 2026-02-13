@@ -40,30 +40,26 @@ public final class Auto extends LinearOpMode {
 
     enum State {
         SCORING_PRELOAD,
-        INTAKING_PARTNER_SAMPLE,
-        SCORING_PARTNER_SAMPLE,
-        INTAKING_1,
-        SCORING_1,
         INTAKING_2,
-        SCORING_2,
-        INTAKING_3,
         SCORING,
-        DRIVING_TO_SUB,
-        TAKING_PICTURE,
-        SUB_INTAKING,
-        PARKING
+        INTAKING_GATE,
+        PARKING,
     }
 
     static Pose getStartingPose(boolean isRedAlliance, boolean isGoalSide) {
-        double x = isGoalSide ?
-                1 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0 :
-                2 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0;
-        double y = Auto.LENGTH_DRIVETRAIN / 2.0;
-        return new Pose(
-                isRedAlliance ? (SIZE_FIELD - x) : x,
-                isGoalSide ? (SIZE_FIELD - y) : y,
-                isGoalSide ? -PI / 2 : PI / 2
-        );
+        Pose pose = isGoalSide ?
+                new Pose(
+                        17.306, // 1 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0,
+                        120.3163, // SIZE_FIELD - Auto.LENGTH_DRIVETRAIN / 2.0,
+                        toRadians(-37.9624)
+                ) :
+                new Pose(
+                        2 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0,
+                        Auto.LENGTH_DRIVETRAIN / 2.0,
+                        PI / 2
+                );
+
+        return isRedAlliance ? pose.mirror() : pose;
     }
 
     public static double
@@ -73,115 +69,30 @@ public final class Auto extends LinearOpMode {
             WIDTH_INCLUDING_PRESSERS = 17.312992126,
             SIZE_FIELD = 141.5,
             SIZE_TILE = SIZE_FIELD/6,
-            DISTANCE_BETWEEN_SPECIMENS = 2,
 
-            WAIT_BARNACLE_DETECT = 0.5,
+            TIME_MAX_SPIKE = 1.5,
+            TIME_MAX_GATE = 1.5,
+            TIME_MAX_SCORE = 1.5;
 
-            LL_ANGLE_BUCKET_INCREMENT = 50,
-            LL_DISTANCE_START_LOWERING = 13,
-            LL_EXTEND_OFFSET = -9.5,
-            LL_MAX_PICTURE_TIME = 3,
-            LL_MIN_PICTURE_TIME = 0.5,
-            LL_SPEED_MAX_EXTENDO = 1,
-            LL_SWEEP_SPEED = 0.5,
-            LL_TURN_MULTIPLIER = 1.25,
-            LL_WAIT_INTAKE = 1,
-
-            WAIT_MAX_INTAKE = 1,
-
-            ANGLE_PITCH_SPIKES = 0.5,
-            ANGLE_PITCH_FROM_SUB = 0.5,
-
-            EXTEND_SAMPLE_1 = 21,
-            EXTEND_SAMPLE_2 = 20,
-            EXTEND_SAMPLE_3 = 24,
-
-            PRE_EXTEND = 12,
-
-            VEL_INCHING = 5,
-            VEL_ANG_INCHING = 0.75,
-            VEL_ANG_INTAKING_3 = 2,
-
-            WAIT_MAX_BEFORE_RE_SEARCH = 1,
-            WAIT_BEFORE_SCORING_PRELOAD = 0.8,
-            WAIT_APPROACH_WALL = 0,
-            WAIT_APPROACH_BASKET = 0,
-            WAIT_APPROACH_CHAMBER = 0,
-            WAIT_SCORE_BASKET = 0.2,
-            WAIT_SCORE_CHAMBER = 0.1,
-            WAIT_INTAKE_RETRACT_POST_SUB = 0,
-            WAIT_EXTEND_MAX_SPIKE = 2,
-
-            LIFT_HEIGHT_TOLERANCE = 3.75,
-
-            X_OFFSET_CHAMBER_1 = 1,
-            X_OFFSET_CHAMBER_2 = -1,
-            X_OFFSET_CHAMBER_3 = -2,
-            X_OFFSET_CHAMBER_4 = -3,
-            X_OFFSET_CHAMBER_5 = -4,
-
-            SPEED_DELIVERY = -0.75,
-            TIME_DELIVERY = 0.5,
-
-            WAIT_BEFORE_EXTENDING_FROM_SUB = 1,
-            WAIT_EXTEND_MAX_SPEC_INTAKE = 2,
-            WAIT_EXTEND_MAX_DELIVERY = 2,
-
-            EXTEND_SUB_DELIVERY = 20,
-            PRE_EXTEND_SPEC_1 = 12,
-            EXTEND_SPEC_1 = 20,
-            PRE_EXTEND_SPEC_2 = 12,
-            EXTEND_SPEC_2 = 20,
-            PRE_EXTEND_SPEC_3 = 12,
-            EXTEND_SPEC_3 = 20,
-
-            Y_INCHING_FORWARD_WHEN_INTAKING = 10,
-
-            TIME_CYCLE = 5.5,
-            TIME_PARK = 2.5,
-
-            DEG_SPIKE_1 = 8.16,
-            DEG_CENTER = -1.83,
-            DEG_SPIKE_2 = -12.17;
-
-    /// <a href="https:///www.desmos.com/calculator/l8pl2gf1mb">Adjust spikes 1 and 2</a>
-    /// <a href="https://www.desmos.com/calculator/sishohvpwc">Visualize spike samples</a>
     public static EditablePose
             admissibleError = new EditablePose(1, 1, 0.05),
             admissibleVel = new EditablePose(25, 25, toRadians(30)),
 
-            intaking1 = new EditablePose(-61, -54, PI/3),
-            intaking2 = new EditablePose(-62, -51.5, 1.4632986527692424),
-            intaking3 = new EditablePose(-58, -50, 2 * PI / 3),
+            scoringPreload = new EditablePose(48.7669, 89.8697, toRadians(-43.3712)),
 
-            snapshotPos = new EditablePose(-25, -10, toRadians(20)),
+            startSpike2 = new EditablePose(40, 57.6353, PI),
+            intaked2 = new EditablePose(20, 57.6353, PI),
 
-            scoring = new EditablePose(-56, -56, PI / 4),
-            scoringFromSub = new EditablePose(-57.25, -57.25, PI/4),
+            startSpike3 = new EditablePose(40, 35.0474, PI),
+            intaked3 = new EditablePose(20, 35.0474, PI),
 
-            avoidBarnacle1 = new EditablePose(-1.5 * SIZE_TILE, -SIZE_TILE - 1.75, PI / 2.5),
+            startSpike1 = new EditablePose(40, 82.76, PI),
+            intaked1 = new EditablePose(27, 82.76, PI),
 
-            sample1 = new EditablePose(-48, -26.8, PI / 2),
-            sample2 = new EditablePose(-60, -27.4, PI / 2),
-            sample3 = new EditablePose(-69, -27.8, PI / 2),
+            intakingGate = new EditablePose(16, 58, toRadians(167.4)),
+            scoring = new EditablePose(-56, 77, toRadians(-130)),
 
-            park1 = new EditablePose(-0.5 * SIZE_TILE, -2 * SIZE_TILE, PI),
-            park2 = new EditablePose(-1.5 * SIZE_TILE, -2 * SIZE_TILE, PI / 2),
-            park3 = new EditablePose(-2.5 * SIZE_TILE, -2 * SIZE_TILE, PI / 2),
-
-            chamberRight = new EditablePose(0.5 * WIDTH_DRIVETRAIN + 0.375, -33, PI / 2),
-
-            specSpike1 = new EditablePose(48, -26.8, PI / 2),
-            specSpike2 = new EditablePose(60, -27.4, PI / 2),
-            specSpike3 = new EditablePose(69, -27.8, PI / 2),
-
-            specIntaking1 = new EditablePose(23, -48, toRadians(-80)),
-            specIntaking2 = new EditablePose(24, -48, toRadians(-70)),
-            specIntaking3 = new EditablePose(25, -48, - PI / 2),
-
-            deliveryPos = new EditablePose(36, -50, 0),
-
-            intakingSpec = new EditablePose(36, -60, PI / 2);
+            park = new EditablePose(2 * SIZE_TILE, 3 * SIZE_TILE, toRadians(-130));
 
     static Pose sharedPose = null;
     static boolean isRedAlliance = false;
@@ -232,26 +143,19 @@ public final class Auto extends LinearOpMode {
             else if (down)
                 selected = selected.plus(1);
 
-            switch (selected) {
+            if (square) switch (selected) {
                 case CONFIRMING:
-                    if (square) break config;
+                    break config;
                 case EDITING_ALLIANCE:
-                    if (square) isRedAlliance = !isRedAlliance;
+                    isRedAlliance = !isRedAlliance;
                     break;
                 case EDITING_SIDE:
-                    if (square) isGoalSide = !isGoalSide;
+                    isGoalSide = !isGoalSide;
                     break;
             }
 
             printConfig(telemetry, false, timer.seconds(), selected, isGoalSide);
         }
-
-//        SampleDetector sampleDetector = new SampleDetector(hardwareMap);
-//        sampleDetector.setPipeline(
-//                isGoalSide ?
-//                /*specimen*/ isRedAlliance ? SampleDetector.Pipeline.RED : SampleDetector.Pipeline.BLUE :
-//                /*sample*/   isRedAlliance ? YELLOW_RED : YELLOW_BLUE
-//        );
 
         robot.setAlliance(isRedAlliance);
         sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
@@ -259,150 +163,7 @@ public final class Auto extends LinearOpMode {
 
         Action trajectory;
 
-        CachedDcMotor[] dtMotors = {
-//                robot.drivetrain.leftFront,
-//                robot.drivetrain.leftBack,
-//                robot.drivetrain.rightBack,
-//                robot.drivetrain.rightFront,
-        };
-
         if (isGoalSide) {
-
-//            robot.intake.specimenMode = true;
-
-//            robot.deposit.preloadSpecimen();
-
-//            sharedPose = new Pose(chamberRight.x, 0.5 * LENGTH_DRIVETRAIN - SIZE_FIELD/2, PI / 2, FTCCoordinates.INSTANCE);
-
-//            Action scorePreload = robot.drivetrain.actionBuilder(pose)
-//                    .strafeTo(chamberRight.toVector2d())
-//                    .stopAndAdd(scoreSpecimen(robot))
-//                    .build();
-
-//            Action deliverSub = robot.drivetrain.actionBuilder(chamberRight.toPose2d())
-//                    .afterTime(WAIT_BEFORE_EXTENDING_FROM_SUB, () -> {
-//                        robot.intake.extendo.setTarget(EXTEND_SUB_DELIVERY);
-//                        robot.intake.setRollerAndAngle(1);
-//                        robot.intake.doTransfer = false;
-//                        robot.intake.retractBucketBeforeExtendo = true;
-//                    })
-//                    .strafeToLinearHeading(specIntaking1.toVector2d(), specIntaking1.angleTo(deliveryPos))
-//                    .stopAndAdd(new FirstTerminateAction(
-//                            t -> !robot.intake.extendo.atPosition(EXTEND_SUB_DELIVERY),
-//                            new SleepAction(WAIT_EXTEND_MAX_DELIVERY)
-//                    ))
-//                    .stopAndAdd(() -> robot.intake.setRoller(SPEED_DELIVERY))
-//                    .waitSeconds(TIME_DELIVERY)
-//                    .stopAndAdd(() -> robot.intake.setRollerAndAngle(1))
-//                    .build();
-//
-//            Action intake1 = robot.drivetrain.actionBuilder(new Pose2d(specIntaking1.toVector2d(), specIntaking1.angleTo(deliveryPos)))
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(PRE_EXTEND_SPEC_1))
-//                    .turnTo(specIntaking1.heading)
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(EXTEND_SPEC_1))
-//                    .stopAndAdd(new FirstTerminateAction(
-//                            t -> !(robot.intake.hasSample() || robot.intake.extendo.atPosition(EXTEND_SPEC_1)),
-//                            new SleepAction(WAIT_EXTEND_MAX_SPEC_INTAKE)
-//                    ))
-//                    .waitSeconds(WAIT_MAX_INTAKE)
-//                    .build();
-//
-//            Action deliver1 = robot.drivetrain.actionBuilder(specIntaking1.toPose2d())
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(PRE_EXTEND_SPEC_2))
-//                    .strafeToLinearHeading(specIntaking2.toVector2d(), specIntaking2.angleTo(deliveryPos))
-//                    .stopAndAdd(new FirstTerminateAction(
-//                            t -> !robot.intake.extendo.atPosition(PRE_EXTEND_SPEC_2),
-//                            new SleepAction(WAIT_EXTEND_MAX_DELIVERY)
-//                    ))
-//                    .stopAndAdd(() -> robot.intake.setRoller(SPEED_DELIVERY))
-//                    .waitSeconds(TIME_DELIVERY)
-//                    .stopAndAdd(() -> robot.intake.setRollerAndAngle(1))
-//                    .build();
-//
-//            Action intake2 = robot.drivetrain.actionBuilder(new Pose2d(specIntaking2.toVector2d(), specIntaking2.angleTo(deliveryPos)))
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(PRE_EXTEND_SPEC_2))
-//                    .turnTo(specIntaking2.heading)
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(EXTEND_SPEC_2))
-//                    .stopAndAdd(new FirstTerminateAction(
-//                            t -> !(robot.intake.hasSample() || robot.intake.extendo.atPosition(EXTEND_SPEC_2)),
-//                            new SleepAction(WAIT_EXTEND_MAX_SPEC_INTAKE)
-//                    ))
-//                    .waitSeconds(WAIT_MAX_INTAKE)
-//                    .build();
-//
-//            Action deliver2 = robot.drivetrain.actionBuilder(specIntaking2.toPose2d())
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(PRE_EXTEND_SPEC_3))
-//                    .strafeToLinearHeading(specIntaking3.toVector2d(), specIntaking3.angleTo(deliveryPos))
-//                    .stopAndAdd(new FirstTerminateAction(
-//                            t -> !robot.intake.extendo.atPosition(PRE_EXTEND_SPEC_3),
-//                            new SleepAction(WAIT_EXTEND_MAX_DELIVERY)
-//                    ))
-//                    .stopAndAdd(() -> robot.intake.setRoller(SPEED_DELIVERY))
-//                    .waitSeconds(TIME_DELIVERY)
-//                    .stopAndAdd(() -> robot.intake.setRollerAndAngle(1))
-//                    .build();
-//
-//            Action intake3 = robot.drivetrain.actionBuilder(new Pose2d(specIntaking3.toVector2d(), specIntaking3.angleTo(deliveryPos)))
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(PRE_EXTEND_SPEC_3))
-//                    .turnTo(specIntaking3.heading)
-//                    .stopAndAdd(() -> {
-//                        robot.intake.extendo.setTarget(EXTEND_SPEC_3);
-//                        robot.deposit.nextState();
-//                    })
-//                    .stopAndAdd(new FirstTerminateAction(
-//                            t -> !(robot.intake.hasSample() || robot.intake.extendo.atPosition(EXTEND_SPEC_3)),
-//                            new SleepAction(WAIT_EXTEND_MAX_SPEC_INTAKE)
-//                    ))
-//                    .waitSeconds(WAIT_MAX_INTAKE)
-//                    .build();
-//
-//            TrajectoryActionBuilder builder = robot.drivetrain.actionBuilder(specIntaking2.toPose2d())
-//                    .stopAndAdd(() -> robot.intake.extendo.setTarget(PRE_EXTEND_SPEC_3))
-//                    .turnTo(specIntaking3.angleTo(deliveryPos))
-//                    .stopAndAdd(new FirstTerminateAction(
-//                            t -> !robot.intake.extendo.atPosition(PRE_EXTEND_SPEC_3),
-//                            new SleepAction(WAIT_EXTEND_MAX_DELIVERY)
-//                    ))
-//                    .stopAndAdd(() -> robot.intake.setRoller(SPEED_DELIVERY))
-//                    .waitSeconds(TIME_DELIVERY)
-//                    .stopAndAdd(() -> robot.intake.setRollerAndAngle(0));
-
-//            /// Push samples
-//            builder = builder
-//                    .setTangent(-PI / 2);
-
-            double[] chamberXs = {
-                    X_OFFSET_CHAMBER_1,
-                    X_OFFSET_CHAMBER_2,
-                    X_OFFSET_CHAMBER_3,
-                    X_OFFSET_CHAMBER_4,
-                    X_OFFSET_CHAMBER_5,
-            };
-
-//            /// Cycle specimens
-//            for (int i = 0; i < min(chamberXs.length, cycles); i++) {
-//                if (i > 0) builder = builder
-//                        .afterTime(0, new SequentialAction(
-//                                t -> robot.deposit.state != Deposit.State.STANDBY,
-//                                new InstantAction(robot.deposit::nextState)
-//                        ))
-//                        .setTangent(- PI / 2)
-//                        .splineToConstantHeading(intakingSpec.toVector2d(), - PI / 2)
-//                ;
-//                builder = builder
-//                        .waitSeconds(WAIT_APPROACH_WALL)
-//                        .afterTime(0, robot.deposit::nextState)
-//                        .stopAndAdd(telemetryPacket -> !robot.deposit.specGrabbed())
-//                        .setTangent(PI / 2)
-//                        .splineToConstantHeading(new Vector2d(chamberRight.x + chamberXs[i] * DISTANCE_BETWEEN_SPECIMENS, chamberRight.y), PI / 2)
-//                        .stopAndAdd(scoreSpecimen(robot))
-//                ;
-//            }
-
-            /// Park in observation zone
-//            builder = builder.strafeTo(intakingSpec.toVector2d());
-
-//            Action scoreAll = builder.build();
 
             trajectory = new Action() {
 
@@ -413,10 +174,6 @@ public final class Auto extends LinearOpMode {
 //                Action activeTraj = scorePreload;
 
                 int subCycle = 1;
-
-                void stopDt() {
-                    for (CachedDcMotor motor : dtMotors) motor.setPower(0);
-                }
 
                 public boolean run(@NonNull TelemetryPacket p) {
                     if (matchTimer == null) matchTimer = new ElapsedTime();
@@ -989,7 +746,7 @@ public final class Auto extends LinearOpMode {
                 private void barnaclePark() {
 //                    Pose2d current = robot.drivetrain.pose;
 
-                    EditablePose zone = barnacle == 1 ? park1 :
+                    EditablePose zone = barnacle == 1 ? park :
                                         barnacle == 2 ? park2 :
                                                         park3;
 
