@@ -5,6 +5,7 @@ import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorRangefinder;
 
 @Config
@@ -23,15 +24,15 @@ public class ConfigureColorRangefinder extends LinearOpMode {
 //        double scale = 255 / 360.0;
         for (int x = 0; x < crfs.length; x++) {
             crfs[x].setPin0Digital(ColorRangefinder.DigitalMode.HSV,
-                    60 / 360.0 * 255,
-                    160 / 360.0 * 255
+                    Artifact.minGreen.hue / 360.0 * 255,
+                    Artifact.maxGreen.hue / 360.0 * 255
             ); // green
             crfs[x].setPin0DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 85); // 20mm or closer requirement
             Thread.sleep(3000);
 
             crfs[x].setPin1Digital(ColorRangefinder.DigitalMode.HSV,
-                    175 / 360.0 * 255,
-                    350 / 360.0 * 255
+                    Artifact.minPurple.hue / 360.0 * 255,
+                    Artifact.maxPurple.hue / 360.0 * 255
             ); // purple
             crfs[x].setPin1DigitalMaxDistance(ColorRangefinder.DigitalMode.HSV, 85); // 20mm or closer
             Thread.sleep(3000);
