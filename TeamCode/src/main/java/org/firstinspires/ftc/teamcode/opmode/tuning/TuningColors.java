@@ -19,6 +19,7 @@ public final class TuningColors extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+        telemetry.setMsTransmissionInterval(20);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         ColorSensor color1 = new ColorSensor(hardwareMap, "color 1", 1);
