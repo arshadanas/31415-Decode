@@ -212,8 +212,9 @@ public final class Container {
                 intakePower >= 0 &&
                 intakePower < INTAKE_POWER_OMNI_CONTACT &&
                 (
-                        omniSlot != -1 && artifacts[omniSlot] != EMPTY ||
-                        slotToFront != -1 && artifacts[slotToFront] != EMPTY
+                        omniSlot != -1 && artifacts[omniSlot] != EMPTY
+//                                ||
+//                        slotToFront != -1 && artifacts[slotToFront] != EMPTY
                 ) // artifact touching omni wheel
         )
             return INTAKE_POWER_OMNI_CONTACT;
