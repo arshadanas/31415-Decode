@@ -39,6 +39,8 @@ public final class Container {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
+            TIME_FRONT_DIST_RESET = 0.05,
+
             TIME_WRAPAROUND = 0.03,
 
             TOLERANCE_INTAKE_SENSORS_DEG = 11.46, // too high => false positives, too low => false negatives (no-detect)
@@ -52,7 +54,7 @@ public final class Container {
     private final ColorSensor color1, color2;
 //    private final LEDIndicator[] indicators;
 
-    private final ElapsedTime backDistanceTimer = new ElapsedTime();
+    private final ElapsedTime backDistanceTimer = new ElapsedTime(), frontDistanceTimer = new ElapsedTime();
 
     /**
      * Position of slot 0, in radians
@@ -138,7 +140,8 @@ public final class Container {
                 intakePower > 0 && // intake is running
                 currentFrontSlot != -1 &&   // there is a slot near the front intaking zone
                 artifacts[currentFrontSlot] == EMPTY && // the slot was previously empty
-                front1.getReading() < THRESHOLD_FRONT_MM // there is something in front of the distance sensor
+                front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
+                frontDistanceTimer.seconds() >= TIME_FRONT_DIST_RESET
         ) {
             // read i2c
             color1.update();
@@ -149,6 +152,7 @@ public final class Container {
             a2 = Artifact.fromHSV(hsv2);
 
             artifacts[currentFrontSlot] = (a1 == GREEN || a2 == GREEN) ? GREEN : PURPLE;
+            frontDistanceTimer.reset();
 
             // combine Artifact reading from both color sensors
 //            artifacts[currentFrontSlot] = a1.or(a2);
