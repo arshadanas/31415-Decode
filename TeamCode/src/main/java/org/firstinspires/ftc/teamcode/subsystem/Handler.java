@@ -28,7 +28,7 @@ public final class Handler {
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
             ANGLE_PRESSER_L_OFFSET = -37,
-            SPEED_IDLE_FEEDER = 0,
+            SPEED_IDLE_FEEDER = -0.3,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05,
@@ -119,6 +119,7 @@ public final class Handler {
 
 
         int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_OMNIS);
+        boolean artifactTouchingFeeder = slotAtFeeder != -1 && container.get(slotAtFeeder) != EMPTY;
         double feederPower = manualFeederPower != 0 ?  manualFeederPower :  // manual power takes priority
                              feed && (
                                 (!feedsEmpty && (
@@ -126,7 +127,8 @@ public final class Handler {
                                     container.get(slotAtFeeder) == EMPTY || 
                                     slotAtFeeder == feedingOrder.get(0)
                                 )) || (feedsEmpty && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST)
-                            ) ? 1 : SPEED_IDLE_FEEDER;
+                            ) ? 1 :
+                                     artifactTouchingFeeder ? SPEED_IDLE_FEEDER : 0;
 
         
         for (CachedDcMotor servo : feeder) {
