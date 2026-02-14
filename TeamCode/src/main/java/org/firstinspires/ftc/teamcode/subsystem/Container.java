@@ -40,6 +40,7 @@ public final class Container {
             INTAKE_POWER_IDLE = 0,
 
             TIME_FRONT_DIST_RESET = 0.05,
+            TIME_MAX_FEEDING = 0.2,
 
             TIME_WRAPAROUND = 0.03,
 
@@ -54,7 +55,10 @@ public final class Container {
     private final ColorSensor color1, color2;
 //    private final LEDIndicator[] indicators;
 
-    private final ElapsedTime backDistanceTimer = new ElapsedTime(), frontDistanceTimer = new ElapsedTime();
+    private final ElapsedTime backDistanceTimer = new ElapsedTime(), frontDistanceTimer = new ElapsedTime(),
+                                feedingTimeoutTimer = new ElapsedTime();
+
+    boolean feeding;
 
     /**
      * Position of slot 0, in radians
@@ -162,11 +166,18 @@ public final class Container {
                 genFeedingOrder.run();
         }
 
+        if (feederPower > 0) {
+            feeding = true;
+            feedingTimeoutTimer.reset();
+        }
+
+        if (feedingTimeoutTimer.seconds() >= TIME_MAX_FEEDING)
+            feeding = false;
 
         // check back slot sensors
         int currentBackSlot = getSlotAt(Zone.FEEDER_SENSORS);
         if (
-                feederPower > 0 &&  // the feeder is running
+                feeding &&  // the feeder is running
                 currentBackSlot != -1 && // there is a slot near the back feeding zone
                 artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
                 back1.getReading() > THRESHOLD_BACK_MM // distance sensor reports no artifact
@@ -174,6 +185,7 @@ public final class Container {
             if (backDistanceTimer.seconds() >= TIME_BACK_DIST) {
                 artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
                 updateLEDs();
+                feeding = false;
             }
         } else backDistanceTimer.reset();
     }
