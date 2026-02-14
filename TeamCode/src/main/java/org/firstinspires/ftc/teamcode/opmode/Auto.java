@@ -212,12 +212,7 @@ public final class Auto extends LinearOpMode {
                                 .addPath(new BezierLine(sharedPose, scoringPreload))
                                 .setLinearHeadingInterpolation(sharedPose.getHeading(), scoringPreload.getHeading())
                                 .build(), true),
-                        new InstantAction(() -> feed = true),
-                        new FirstTerminateAction(
-                                t -> robot.hasArtifacts(),
-                                new SleepAction(TIME_MAX_SCORE)
-                        ),
-                        new InstantAction(() -> feed = false)
+                        shoot3(robot)
                 );
 
                 public boolean run(@NonNull TelemetryPacket p) {
@@ -266,12 +261,7 @@ public final class Auto extends LinearOpMode {
                                                 .addPath(new BezierCurve(sharedPose, control, scoring))
                                                 .setTangentHeadingInterpolation()
                                                 .build(), true),
-                                        new InstantAction(() -> feed = true),
-                                        new FirstTerminateAction(
-                                                t -> robot.hasArtifacts(),
-                                                new SleepAction(TIME_MAX_SCORE)
-                                        ),
-                                        new InstantAction(() -> feed = false)
+                                        shoot3(robot)
                                 );
                             }
                             break;
@@ -313,6 +303,17 @@ public final class Auto extends LinearOpMode {
         ));
 
         Thread.sleep((long) (DEAD_TIME * 1000));
+    }
+
+    private static Action shoot3(Robot robot) {
+        return new SequentialAction(
+                new InstantAction(() -> feed = true),
+                new FirstTerminateAction(
+                        t -> robot.hasArtifacts(),
+                        new SleepAction(TIME_MAX_SCORE)
+                ),
+                new InstantAction(() -> feed = false)
+        );
     }
 
     private static void printConfig(Telemetry telemetry, boolean confirmed, double t, AutoConfig selected, boolean isGoalSide) {
