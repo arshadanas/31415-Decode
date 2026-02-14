@@ -174,19 +174,6 @@ public final class Auto extends LinearOpMode {
 
         Follower f = robot.drivetrain.drivetrain;
 
-        Pose
-                scoringPreload = isRedAlliance ? Auto.scoringPreload.toPose().mirror() : Auto.scoringPreload.toPose(),
-                toSpike2Control = isRedAlliance ? Auto.toSpike2Control.toPose().mirror() : Auto.toSpike2Control.toPose(),
-                startSpike2 = isRedAlliance ? Auto.startSpike2.toPose().mirror() : Auto.startSpike2.toPose(),
-                intaked2 = isRedAlliance ? Auto.intaked2.toPose().mirror() : Auto.intaked2.toPose(),
-                startSpike3 = isRedAlliance ? Auto.startSpike3.toPose().mirror() : Auto.startSpike3.toPose(),
-                intaked3 = isRedAlliance ? Auto.intaked3.toPose().mirror() : Auto.intaked3.toPose(),
-                startSpike1 = isRedAlliance ? Auto.startSpike1.toPose().mirror() : Auto.startSpike1.toPose(),
-                intaked1 = isRedAlliance ? Auto.intaked1.toPose().mirror() : Auto.intaked1.toPose(),
-                intakingGate = isRedAlliance ? Auto.intakingGate.toPose().mirror() : Auto.intakingGate.toPose(),
-                scoring = isRedAlliance ? Auto.scoring.toPose().mirror() : Auto.scoring.toPose(),
-                park = isRedAlliance ? Auto.park.toPose().mirror() : Auto.park.toPose();
-
         Action auto;
 
         if (!isGoalSide) {
@@ -194,6 +181,19 @@ public final class Auto extends LinearOpMode {
             auto = new NullAction();
 
         } else {
+
+            Pose
+                    scoringPreload = Auto.scoringPreload.toPose(isRedAlliance),
+                    toSpike2Control = Auto.toSpike2Control.toPose(isRedAlliance),
+                    startSpike2 = Auto.startSpike2.toPose(isRedAlliance),
+                    intaked2 = Auto.intaked2.toPose(isRedAlliance),
+                    startSpike3 = Auto.startSpike3.toPose(isRedAlliance),
+                    intaked3 = Auto.intaked3.toPose(isRedAlliance),
+                    startSpike1 = Auto.startSpike1.toPose(isRedAlliance),
+                    intaked1 = Auto.intaked1.toPose(isRedAlliance),
+                    intakingGate = Auto.intakingGate.toPose(isRedAlliance),
+                    scoring = Auto.scoring.toPose(isRedAlliance),
+                    park = Auto.parkNear.toPose(isRedAlliance);
 
             auto = new Action() {
 

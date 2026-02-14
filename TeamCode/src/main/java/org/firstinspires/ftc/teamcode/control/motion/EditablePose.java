@@ -5,7 +5,6 @@ import static java.lang.Math.hypot;
 import static java.lang.Math.toDegrees;
 
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.Vector;
 
 public final class EditablePose {
 
@@ -25,12 +24,9 @@ public final class EditablePose {
         return new EditablePose(x, y, heading);
     }
 
-    public Pose toPose() {
-        return new Pose(x, y, heading);
-    }
-
-    public Vector toVector() {
-        return new Vector(toPose());
+    public Pose toPose(boolean isRedAlliance) {
+        Pose pose = new Pose(x, y, heading);
+        return isRedAlliance ? pose.mirror() : pose;
     }
 
     public double angleTo(EditablePose target) {
