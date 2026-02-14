@@ -13,9 +13,7 @@ import static java.lang.Math.toRadians;
 
 import androidx.annotation.NonNull;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
@@ -55,12 +53,12 @@ public final class Auto extends LinearOpMode {
                 new Pose(
                         17.306, // 1 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0,
                         120.3163, // SIZE_FIELD - Auto.LENGTH_DRIVETRAIN / 2.0,
-                        toRadians(-37.9624)
+                        toRadians(-38)
                 ) :
                 new Pose(
                         2 * SIZE_TILE + SIZE_TAB / 2 + Auto.LENGTH_DRIVETRAIN / 2,
                         Auto.WIDTH_INCLUDING_PRESSERS / 2,
-                        PI / 2
+                        PI
                 );
 
         return isRedAlliance ? pose.mirror() : pose;
@@ -77,31 +75,33 @@ public final class Auto extends LinearOpMode {
 
             TIME_MAX_SPIKE = 1.5,
             TIME_MAX_GATE = 1.5,
-            TIME_MAX_SCORE = 3;
+            TIME_MAX_SCORE = 6,
+
+            SPEED_INTAKING = 40;
 
     public static EditablePose
             admissibleError = new EditablePose(1, 1, 0.05),
             admissibleVel = new EditablePose(25, 25, toRadians(30)),
 
-            scoringPreload = new EditablePose(48.7669, 89.8697, toRadians(-43.3712)),
+            scoringPreload = new EditablePose(48.7669, 89.8697, -PI/2),
 
             toSpike2Control = new EditablePose(58.51446945337619, 60.19614147909965, 0),
             startSpike2 = new EditablePose(40, 57.6353, PI),
-            intaked2 = new EditablePose(20, 57.6353, PI),
+            intaked2 = new EditablePose(13, 57.6353, PI),
 
             toSpike3Control = new EditablePose(58.51446945337619, 60.19614147909965, 0),
             startSpike3 = new EditablePose(40, 35.0474, PI),
-            intaked3 = new EditablePose(20, 35.0474, PI),
+            intaked3 = new EditablePose(13, 35.0474, PI),
 
             toSpike1Control = new EditablePose(58.51446945337619, 60.19614147909965, 0),
             startSpike1 = new EditablePose(40, 82.76, PI),
             intaked1 = new EditablePose(20, 82.76, PI),
 
             intakingGate = new EditablePose(16, 58, toRadians(167.4)),
-            scoring = new EditablePose(-56, 77, toRadians(-130)),
+            scoring = new EditablePose(48.7669, 89.8697, toRadians(-130)),
 
             parkNear = new EditablePose(2 * SIZE_TILE, 3 * SIZE_TILE, toRadians(-130)),
-            parkFar = new EditablePose(1.5 * SIZE_TILE, 0.5 * SIZE_TILE, PI/2);
+            parkFar = new EditablePose(1.5 * SIZE_TILE, 0.5 * SIZE_TILE, PI);
 
     static Pose sharedPose = null;
     static boolean isRedAlliance = false;
@@ -119,7 +119,7 @@ public final class Auto extends LinearOpMode {
             return selections[((ordinal() + i) % max + max) % max];
         }
         public String markIf(AutoConfig s) {
-            return this == s ? " <" : "";
+            return this == s ? "> " : "  ";
         }
     }
 
@@ -130,7 +130,6 @@ public final class Auto extends LinearOpMode {
 
         // Initialize multiple telemetry outputs:
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
-        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize robot:
         Robot robot = new Robot(hardwareMap, new Pose());
@@ -166,7 +165,6 @@ public final class Auto extends LinearOpMode {
             }
 
             printConfig(telemetry, false, timer.seconds(), selected, isGoalSide);
-            telemetry.update();
         }
 
         robot.setAlliance(isRedAlliance);
@@ -191,6 +189,9 @@ public final class Auto extends LinearOpMode {
             );
 
         } else {
+
+            if (isRedAlliance)  robot.handler.presserL.setActivated(true);
+            else                robot.handler.presserR.setActivated(true);
 
             Pose
                     scoringPreload = Auto.scoringPreload.toPose(isRedAlliance),
@@ -221,7 +222,7 @@ public final class Auto extends LinearOpMode {
                         new FollowPathAction(f, f.pathBuilder()
                                 .addPath(new BezierLine(sharedPose, scoringPreload))
                                 .setLinearHeadingInterpolation(sharedPose.getHeading(), scoringPreload.getHeading())
-                                .build(), true),
+                                .build(), false),
                         shoot3(robot)
                 );
 
@@ -247,6 +248,7 @@ public final class Auto extends LinearOpMode {
                                                     .setLinearHeadingInterpolation(sharedPose.getHeading(), startSpike2.getHeading())
                                                     .addPath(new BezierLine(startSpike2, intaked2))
                                                     .setConstantHeadingInterpolation(intaked2.getHeading())
+                                                    .setVelocityConstraint(SPEED_INTAKING)
                                                     .build(), true),
                                             new InstantAction(() -> robot.handler.setIntake(0))
                                     );
@@ -270,7 +272,8 @@ public final class Auto extends LinearOpMode {
                                         new FollowPathAction(f, f.pathBuilder()
                                                 .addPath(new BezierCurve(sharedPose, control, scoring))
                                                 .setTangentHeadingInterpolation()
-                                                .build(), true),
+                                                .setReversed()
+                                                .build(), false),
                                         shoot3(robot)
                                 );
                             }
@@ -296,7 +299,6 @@ public final class Auto extends LinearOpMode {
         }
 
         printConfig(telemetry, true, 0, selected, isGoalSide);
-        telemetry.update();
 
         waitForStart(); //--------------------------------------------------------------------------------------------------------------------------
 
@@ -328,14 +330,15 @@ public final class Auto extends LinearOpMode {
 
     private static void printConfig(Telemetry telemetry, boolean confirmed, double t, AutoConfig selected, boolean isGoalSide) {
         telemetry.addLine(confirmed ?
-                "AUTONOMOUS READY" :
-                "Confirm configuration (confirming in " + (int) ceil(5 - t) + " seconds)" + selected.markIf(CONFIRMING)
+                "  AUTONOMOUS READY" :
+                CONFIRMING.markIf(selected) + "Confirm (" + (int) ceil(5 - t) + " seconds remaining)"
         );
         telemetry.addLine();
         telemetry.addLine();
-        telemetry.addLine(EDITING_ALLIANCE.markIf(selected) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
+        telemetry.addLine((confirmed ? "  " : EDITING_ALLIANCE.markIf(selected)) + (isRedAlliance ? "RED" : "BLUE") + " alliance");
         telemetry.addLine();
-        telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "near zone (GOAL SIDE)" : "far zone (AUDIENCE SIDE)"));
+        telemetry.addLine((confirmed ? "  " : EDITING_SIDE.markIf(selected)) + "Starting in " + (isGoalSide ? "near zone (GOAL SIDE)" : "far zone (AUDIENCE SIDE)"));
+        telemetry.update();
     }
 
 }
