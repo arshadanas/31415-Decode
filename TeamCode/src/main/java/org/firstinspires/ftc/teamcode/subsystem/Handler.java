@@ -120,14 +120,24 @@ public final class Handler {
 
         int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_OMNIS);
         boolean artifactTouchingFeeder = slotAtFeeder != -1 && container.get(slotAtFeeder) != EMPTY;
-        double feederPower = manualFeederPower != 0 ?  manualFeederPower :  // manual power takes priority
-                             feed && (
-                                (!feedsEmpty && (
-                                    slotAtFeeder == -1 || 
-                                    container.get(slotAtFeeder) == EMPTY || 
-                                    slotAtFeeder == feedingOrder.get(0)
-                                )) || (feedsEmpty && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST)
-                            ) ? 1 : SPEED_IDLE_FEEDER;
+
+        double feederPower;
+        if (manualFeederPower != 0){
+            feederPower = manualFeederPower;
+
+        }else{
+            boolean shouldFeed = feed && (
+                    (!feedsEmpty && (
+                            slotAtFeeder == -1 ||
+                            container.get(slotAtFeeder) == EMPTY ||
+                            slotAtFeeder == feedingOrder.get(0)
+                    )) || (feedsEmpty && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST)
+            );
+            feederPower = shouldFeed ? 1 : SPEED_IDLE_FEEDER;
+        }
+//
+//        double feederPower = manualFeederPower != 0 ?  manualFeederPower :  // manual power takes priority
+//                              ? 1 : SPEED_IDLE_FEEDER;
 
         
         for (CachedDcMotor servo : feeder) {
