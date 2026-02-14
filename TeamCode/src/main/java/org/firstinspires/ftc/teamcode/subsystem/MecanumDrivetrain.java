@@ -23,7 +23,7 @@ public final class MecanumDrivetrain {
             SLOW_FACTOR = 0.3,
             MOTOR_CACHING_THRESHOLD = 0.05;
 
-    private final Follower drivetrain;
+    public final Follower drivetrain;
 
     MecanumDrivetrain(HardwareMap hardwareMap, Pose pose) {
         Constants.mecanumConstants.setMotorCachingThreshold(MOTOR_CACHING_THRESHOLD);

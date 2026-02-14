@@ -37,6 +37,10 @@ public final class Robot {
         autoAim = new AutoAim();
     }
 
+    public boolean hasArtifacts() {
+        return Artifact.EMPTY.numOccurrencesIn(handler.container.artifacts) < 3;
+    }
+
     public void setAlliance(boolean isRedAlliance) {
         autoAim.setAlliance(isRedAlliance);
     }
