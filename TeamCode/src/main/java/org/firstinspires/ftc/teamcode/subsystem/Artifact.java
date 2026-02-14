@@ -16,23 +16,23 @@ public enum Artifact {
 
     public static HSV
             minPurple = new HSV(
-                    175,
+                    165,
                     0.4,
                     0
             ),
             maxPurple = new HSV(
-                    350,
+                    200,
                     1,
                     1
             ),
 
             minGreen = new HSV(
-                    60,
-                    0.65,
+                    135,
+                    0.7,
                     0
             ),
             maxGreen = new HSV(
-                    160,
+                    150,
                     1,
                     1
             );
