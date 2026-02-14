@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
@@ -145,11 +147,14 @@ public final class Container {
             hsv2 = color2.getHSV();
             a1 = Artifact.fromHSV(hsv1);
             a2 = Artifact.fromHSV(hsv2);
+
+            artifacts[currentFrontSlot] = (a1 == GREEN || a2 == GREEN) ? GREEN : PURPLE;
+
             // combine Artifact reading from both color sensors
-            artifacts[currentFrontSlot] = a1.or(a2);
+//            artifacts[currentFrontSlot] = a1.or(a2);
             updateLEDs();
 
-            if (artifacts[currentFrontSlot] != EMPTY)
+//            if (artifacts[currentFrontSlot] != EMPTY)
                 genFeedingOrder.run();
         }
 
