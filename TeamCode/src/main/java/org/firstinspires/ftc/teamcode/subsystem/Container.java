@@ -33,7 +33,7 @@ public final class Container {
             OFFSET_1_BACK = 1.175,
             OFFSET_2_FRONT = 2.35,
             OFFSET_2_BACK = -1.125,
-            THRESHOLD_FRONT_MM = 95, // start of ramp = ~115
+            THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             TIME_BACK_DIST = 0.125,
             INTAKE_POWER_OMNI_CONTACT = 0.4,
@@ -109,7 +109,7 @@ public final class Container {
 
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
 
-        front1 = new AnalogSensor(hardwareMap, "front 1", 1300);
+        front1 = new AnalogSensor(hardwareMap, "front 1", 4000);
         back1 = new AnalogSensor(hardwareMap, "back 1", 1000);
 
         color1 = new ColorSensor(hardwareMap, "color 1", 1);
@@ -191,10 +191,14 @@ public final class Container {
      */
     double adaptiveClipIntakePower(double intakePower) {
         int omniSlot = getSlotAt(Zone.INTAKE_OMNI);
+        int slotToFront = slotGoingToFront();
         if (
                 intakePower >= 0 &&
                 intakePower < INTAKE_POWER_OMNI_CONTACT &&
-                omniSlot != -1 && artifacts[omniSlot] != EMPTY // artifact touching omni wheel
+                (
+                        omniSlot != -1 && artifacts[omniSlot] != EMPTY ||
+                        slotToFront != -1 && artifacts[slotToFront] != EMPTY
+                ) // artifact touching omni wheel
         )
             return INTAKE_POWER_OMNI_CONTACT;
 
@@ -212,10 +216,14 @@ public final class Container {
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
     private boolean wrapAround = true;
 
+    private double realTarget;
+
     /**
      * @param slot Slot you wish to move (0, 1 or 2)
      */
     void moveSlot(int slot, Zone target) {
+        realTarget = target.radians - 2 * PI / 3 * slot;
+
         double newRadians = getTargetRadians(slot, target);
         if (newRadians == lastRadians)
             return;
@@ -310,6 +318,14 @@ public final class Container {
     int getSlotAt(Zone target) {
         for (int i = 0; i < artifacts.length; i++)
             if (atPosition(i, target))
+                return i;
+        return -1;
+    }
+
+    int slotGoingToFront() {
+        double slotID = normalizeRadians(Zone.INTAKE_SENSORS.radians - realTarget) / (2 * PI / 3);
+        for (int i = 0; i < artifacts.length; i++)
+            if (abs(i - slotID) <= 0.1)
                 return i;
         return -1;
     }
