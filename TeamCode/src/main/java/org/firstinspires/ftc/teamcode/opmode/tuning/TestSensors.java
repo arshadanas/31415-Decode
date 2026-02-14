@@ -51,7 +51,7 @@ public final class TestSensors extends LinearOpMode {
                 rotorEncoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI),
                 turretAbsolute = new AnalogSensor(hardwareMap, "elc", 2 * PI),
                 frontDistance1 = new AnalogSensor(hardwareMap, "front 1", 4000),
-                backDistance1 = new AnalogSensor(hardwareMap, "back 1", 1000);
+                backDistance1 = new AnalogSensor(hardwareMap, "back 1", 4000);
 
         DigitalArtifactColor color1 = new DigitalArtifactColor(hardwareMap, "color 1a", "color 1b"); // TODO CONFIGURE
         DigitalArtifactColor color2 = new DigitalArtifactColor(hardwareMap, "color 2a", "color 2b"); // TODO CONFIGURE

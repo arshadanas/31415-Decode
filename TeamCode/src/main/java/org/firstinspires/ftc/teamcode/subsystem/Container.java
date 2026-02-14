@@ -116,7 +116,7 @@ public final class Container {
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
 
         front1 = new AnalogSensor(hardwareMap, "front 1", 4000);
-        back1 = new AnalogSensor(hardwareMap, "back 1", 1000);
+        back1 = new AnalogSensor(hardwareMap, "back 1", 4000);
 
         color1 = new ColorSensor(hardwareMap, "color 1", 1);
         color2 = new ColorSensor(hardwareMap, "color 2", 1);
