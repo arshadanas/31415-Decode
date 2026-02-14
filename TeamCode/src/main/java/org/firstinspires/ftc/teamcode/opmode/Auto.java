@@ -100,6 +100,9 @@ public final class Auto extends LinearOpMode {
             intakingGate = new EditablePose(16, 58, toRadians(167.4)),
             scoring = new EditablePose(48.7669, 89.8697, toRadians(-130)),
 
+            cornerIntaking = new EditablePose(SIZE_TILE / 2, SIZE_TILE / 2, PI),
+            farZoneShooting = new EditablePose(2 * SIZE_TILE, SIZE_TILE/2, PI),
+
             parkNear = new EditablePose(2 * SIZE_TILE, 3 * SIZE_TILE, toRadians(-130)),
             parkFar = new EditablePose(1.5 * SIZE_TILE, 0.5 * SIZE_TILE, PI);
 
@@ -178,15 +181,73 @@ public final class Auto extends LinearOpMode {
         if (!isGoalSide) {
 
             Pose
-                    park = parkFar.toPose(isRedAlliance);
+                    park = parkFar.toPose(isRedAlliance),
+                    cornerIntaking = Auto.cornerIntaking.toPose(isRedAlliance),
+                    farZoneShooting = Auto.farZoneShooting.toPose(isRedAlliance);
 
-            auto = new SequentialAction(
-                    shoot3(robot),
-                    new FollowPathAction(f, f.pathBuilder()
-                            .addPath(new BezierLine(sharedPose, park))
-                            .setConstantHeadingInterpolation(park.getHeading())
-                            .build(), true)
-            );
+            auto = new Action() {
+
+                private int timesScored = 0;
+
+                private State state = SCORING;
+
+                private ElapsedTime matchTimer = null;
+
+                // Run the preload action first
+                private Action path = shoot3(robot);
+
+                public boolean run(@NonNull TelemetryPacket p) {
+                    if (matchTimer == null) matchTimer = new ElapsedTime();
+
+                    double remaining = (30 - DEAD_TIME) - matchTimer.seconds();
+                    boolean pathDone = !path.run(p);
+
+                    switch (state) {
+
+                        case SCORING:
+
+                            if (pathDone) {
+                                timesScored++;
+
+                                if (timesScored >= 5) {
+                                    state = PARKING;
+                                    path = new FollowPathAction(f, f.pathBuilder()
+                                            .addPath(new BezierLine(sharedPose, park))
+                                            .setConstantHeadingInterpolation(park.getHeading())
+                                            .build(), true);
+                                } else {
+                                    state = INTAKING_SPIKE;
+                                    path = new SequentialAction(
+                                            new InstantAction(() -> robot.handler.setIntake(1)),
+                                            new FollowPathAction(f, f.pathBuilder()
+                                                    .addPath(new BezierLine(sharedPose, cornerIntaking))
+                                                    .setConstantHeadingInterpolation(cornerIntaking.getHeading())
+                                                    .addPath(new BezierLine(cornerIntaking, farZoneShooting))
+                                                    .setConstantHeadingInterpolation(farZoneShooting.getHeading())
+                                                    .build(), true),
+                                            new InstantAction(() -> robot.handler.setIntake(-0.3))
+                                    );
+                                }
+                            }
+                            break;
+
+                        case INTAKING_SPIKE:
+
+                            if (pathDone) {
+                                state = SCORING;
+                                path = shoot3(robot);
+                            }
+                            break;
+
+                        case PARKING:
+                            if (pathDone)
+                                return false;
+                            break;
+                    }
+
+                    return true;
+                }
+            };
 
         } else {
 
