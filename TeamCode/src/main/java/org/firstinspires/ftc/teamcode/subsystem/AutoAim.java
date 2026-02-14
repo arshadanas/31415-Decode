@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static java.lang.Math.PI;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -73,15 +74,11 @@ public final class AutoAim {
         Profiler.end("iterate airtime");
 
         Vector2 S_t = S.sum(S_vel.product(airtime));
+        double heading_t = heading + angVel * airtime;
         Vector2 rVector_t = S_t.to(G);
         r_t = rVector_t.getMagnitude();
 
-        Profiler.start("aim_turret");
-
-        turretAngle = -rVector_t.getAngleBetween(heading);
-
-        Profiler.end("aim_turret");
-
+        turretAngle = -rVector_t.getAngleBetween(heading_t);
         launchRPM = CURVE_FIT_RPM_SLOPE * r_t + CURVE_FIT_RPM_MIN;
         launchAngle = CURVE_FIT_ANGLE_SLOPE * r_t + CURVE_FIT_ANGLE_Y_INT;
 //        launchRPM = LAUNCH_RPM;
@@ -145,8 +142,12 @@ public final class AutoAim {
 
     void printTo(Telemetry telemetry) {
         telemetry.addData("Current zone", currentZone);
+        telemetry.addLine();
         telemetry.addData("Shooter-goal dist at 0 (in)", r);
         telemetry.addData("Shooter-goal dist at t (in)", r_t);
+        telemetry.addLine();
+        telemetry.addData("Turret angle at 0 (deg)", toDegrees(turretAngle));
+        telemetry.addLine();
         telemetry.addData("Computed airtime t", airtime);
     }
 }
