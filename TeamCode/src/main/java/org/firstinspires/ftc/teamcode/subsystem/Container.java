@@ -35,12 +35,13 @@ public final class Container {
             OFFSET_2_BACK = -1.125,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
-            TIME_BACK_DIST = 0.125,
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
-            TIME_FRONT_DIST_RESET = 0.05,
-            TIME_MAX_FEEDING = 0.2,
+            TIME_FRONT_DIST_COOLDOWN = 0.05,
+            TIME_BACK_DIST_COOLDOWN = 0.05,
+            TIME_BACK_DIST_FLUCTUATION = 0.1,
+            TIME_FEEDER_FLUCTUATION = 0.05,
 
             TIME_WRAPAROUND = 0.03,
 
@@ -55,10 +56,11 @@ public final class Container {
     private final ColorSensor color1, color2;
 //    private final LEDIndicator[] indicators;
 
-    private final ElapsedTime backDistanceTimer = new ElapsedTime(), frontDistanceTimer = new ElapsedTime(),
-                                feedingTimeoutTimer = new ElapsedTime();
-
-    boolean feeding;
+    private final ElapsedTime
+            backDistFluctuationTimer = new ElapsedTime(),
+            frontDistCooldownTimer = new ElapsedTime(),
+            backDistCooldownTimer = new ElapsedTime(),
+            feederFlucutationTimer = new ElapsedTime();
 
     /**
      * Position of slot 0, in radians
@@ -146,7 +148,7 @@ public final class Container {
                 currentFrontSlot != -1 &&   // there is a slot near the front intaking zone
                 artifacts[currentFrontSlot] == EMPTY && // the slot was previously empty
                 front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
-                frontDistanceTimer.seconds() >= TIME_FRONT_DIST_RESET
+                frontDistCooldownTimer.seconds() >= TIME_FRONT_DIST_COOLDOWN
         ) {
             // read i2c
             color1.update();
@@ -157,7 +159,7 @@ public final class Container {
             a2 = Artifact.fromHSV(hsv2);
 
             artifacts[currentFrontSlot] = (a1 == GREEN || a2 == GREEN) ? GREEN : PURPLE;
-            frontDistanceTimer.reset();
+            frontDistCooldownTimer.reset();
 
             // combine Artifact reading from both color sensors
 //            artifacts[currentFrontSlot] = a1.or(a2);
@@ -167,29 +169,26 @@ public final class Container {
                 genFeedingOrder.run();
         }
 
-        if (feederPower > 0) {
-            feeding = true;
-            feedingTimeoutTimer.reset();
-        }
+        if (feederPower > 0)
+            feederFlucutationTimer.reset();
 
-        if (feedingTimeoutTimer.seconds() >= TIME_MAX_FEEDING)
-            feeding = false;
+        if (back1.getReading() <= THRESHOLD_BACK_MM)
+            backDistFluctuationTimer.reset();
 
         // check back slot sensors
         int currentBackSlot = getSlotAt(Zone.FEEDER_SENSORS);
         if (
-                feeding &&  // the feeder is running
+                (feederPower > 0 || feederFlucutationTimer.seconds() <= TIME_FEEDER_FLUCTUATION) &&  // the feeder is running
                 currentBackSlot != -1 && // there is a slot near the back feeding zone
                 artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
-                back1.getReading() > THRESHOLD_BACK_MM // distance sensor reports no artifact
+                backDistFluctuationTimer.seconds() >= TIME_BACK_DIST_FLUCTUATION && // distance sensor reports no artifact
+                backDistCooldownTimer.seconds() >= TIME_BACK_DIST_COOLDOWN
         ) {
-            if (backDistanceTimer.seconds() >= TIME_BACK_DIST) {
-                artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
-                updateLEDs();
-                feeding = false;
-                boostRPM.run();
-            }
-        } else backDistanceTimer.reset();
+            artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
+            updateLEDs();
+            boostRPM.run();
+            backDistCooldownTimer.reset();
+        }
     }
 
     void updateLEDs() {
