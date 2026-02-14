@@ -18,7 +18,7 @@ public enum LaunchZone {
     NEAR,
     FAR;
 
-    private static final double
+    public static final double
             FORWARD_OFFSET_IN = 1.45714,
             LENGTH_TOTAL_IN = 17.73172,
             WIDTH_TOTAL_IN = Auto.WIDTH_DRIVETRAIN;
