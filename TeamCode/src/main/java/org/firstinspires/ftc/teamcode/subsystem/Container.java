@@ -88,7 +88,7 @@ public final class Container {
 
     private final Runnable genFeedingOrder, boostRPM;
 
-    enum Zone {
+    public enum Zone {
         INTAKE_SENSORS(0),
         INTAKE_OMNI(0),
         FEEDER_SENSORS(PI),
@@ -240,7 +240,7 @@ public final class Container {
     /**
      * @param slot Slot you wish to move (0, 1 or 2)
      */
-    void moveSlot(int slot, Zone target) {
+    public void moveSlot(int slot, Zone target) {
         realTarget = target.radians - 2 * PI / 3 * slot;
 
         double newRadians = getTargetRadians(slot, target);
