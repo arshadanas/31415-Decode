@@ -23,6 +23,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.subsystem.Artifact;
+import org.firstinspires.ftc.teamcode.subsystem.Container;
 import org.firstinspires.ftc.teamcode.subsystem.Motif;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
@@ -142,6 +143,7 @@ public final class Tele extends LinearOpMode {
                     Auto.LENGTH_DRIVETRAIN / 2.0,
                     PI / 2
             );
+            int i = 0;
 
             matchTimer.reset();
 
@@ -197,7 +199,7 @@ public final class Tele extends LinearOpMode {
                         robot.handler.randomization = Motif.PPG;
 
                     if (gamepad1.triangleWasPressed())
-                        robot.handler.container.setArtifacts(Artifact.EMPTY_ARRAY);
+                        robot.handler.container.moveSlot(i++, Container.Zone.FEEDER_SENSORS);
 
                     if (gamepad1.crossWasPressed())
                         robot.handler.feedSingle(GREEN);
