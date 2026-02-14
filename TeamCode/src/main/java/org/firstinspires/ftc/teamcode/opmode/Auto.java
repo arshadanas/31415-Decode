@@ -19,7 +19,6 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
-import com.acmerobotics.roadrunner.NullAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
@@ -59,8 +58,8 @@ public final class Auto extends LinearOpMode {
                         toRadians(-37.9624)
                 ) :
                 new Pose(
-                        2 * SIZE_TILE + Auto.WIDTH_DRIVETRAIN / 2.0,
-                        Auto.LENGTH_DRIVETRAIN / 2.0,
+                        2 * SIZE_TILE + SIZE_TAB / 2 + Auto.LENGTH_DRIVETRAIN / 2,
+                        Auto.WIDTH_INCLUDING_PRESSERS / 2,
                         PI / 2
                 );
 
@@ -74,6 +73,7 @@ public final class Auto extends LinearOpMode {
             WIDTH_INCLUDING_PRESSERS = 17.312992126,
             SIZE_FIELD = 141.5,
             SIZE_TILE = SIZE_FIELD/6,
+            SIZE_TAB = 0.8,
 
             TIME_MAX_SPIKE = 1.5,
             TIME_MAX_GATE = 1.5,
@@ -100,7 +100,8 @@ public final class Auto extends LinearOpMode {
             intakingGate = new EditablePose(16, 58, toRadians(167.4)),
             scoring = new EditablePose(-56, 77, toRadians(-130)),
 
-            park = new EditablePose(2 * SIZE_TILE, 3 * SIZE_TILE, toRadians(-130));
+            parkNear = new EditablePose(2 * SIZE_TILE, 3 * SIZE_TILE, toRadians(-130)),
+            parkFar = new EditablePose(1.5 * SIZE_TILE, 0.5 * SIZE_TILE, PI/2);
 
     static Pose sharedPose = null;
     static boolean isRedAlliance = false;
@@ -177,8 +178,17 @@ public final class Auto extends LinearOpMode {
         Action auto;
 
         if (!isGoalSide) {
-            // If on far side, do nothing
-            auto = new NullAction();
+
+            Pose
+                    park = parkFar.toPose(isRedAlliance);
+
+            auto = new SequentialAction(
+                    shoot3(robot),
+                    new FollowPathAction(f, f.pathBuilder()
+                            .addPath(new BezierLine(sharedPose, park))
+                            .setConstantHeadingInterpolation(park.getHeading())
+                            .build(), true)
+            );
 
         } else {
 
