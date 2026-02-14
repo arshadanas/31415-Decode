@@ -43,7 +43,7 @@ public final class Shooter {
             ANGLE_HOOD_STEEPEST = 10,
 
             TOLERANCE_RPM_FILTERING = -1,
-            TOLERANCE_RPM_FEEDING = 50, // TODO increase for faster feeding
+            TOLERANCE_RPM_FEEDING = 80, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_HOOD = 0.05,
             CACHE_THRESHOLD_MOTORS = 0.001;
