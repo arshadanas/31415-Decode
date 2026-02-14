@@ -124,7 +124,7 @@ public final class AutoAim {
         return (rpm + 0.445157) / 29.68064; // TODO Tune empirically
     }
 
-    private static double getRPMDrop(double preLaunchRPM) {
+    static double getRPMDrop(double preLaunchRPM) {
         return 0.271632 * preLaunchRPM + 109.1459;
     }
 

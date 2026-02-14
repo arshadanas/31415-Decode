@@ -9,6 +9,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.controller.PIDController;
@@ -46,7 +47,13 @@ public final class Shooter {
             TOLERANCE_RPM_FEEDING = 80, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_HOOD = 0.05,
-            CACHE_THRESHOLD_MOTORS = 0.001;
+            CACHE_THRESHOLD_MOTORS = 0.001,
+
+            DROP_RECOVERY_SCALAR = 0,
+            DROP_RECOVERY_WAIT = 0.1,
+            DROP_RECOVERY_TIME = 0.1;
+
+    private final ElapsedTime rpmDropTimer = new ElapsedTime();
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
@@ -66,6 +73,13 @@ public final class Shooter {
     double getCurrentRPM() {
         return currentRPM;
     }
+    Runnable boostRPM() {
+        return () -> {
+            boosting = true;
+            rpmDropTimer.reset();
+        };
+    }
+    private boolean boosting = false;
 
     /**
      * @param radians Launch angle (in radians, where 0 is horizontal, parallel to the floor)
@@ -130,6 +144,14 @@ public final class Shooter {
         controller.setTarget(new State(rpmSetpoint));
         double pidf = controller.calculate(new State(currentRPM)) // pid
                 + getFeedForward(rpmSetpoint) * voltageScalar; // feedforward
+
+        if (boosting) {
+            double shootTime = rpmDropTimer.seconds();
+            if (shootTime > DROP_RECOVERY_WAIT + DROP_RECOVERY_TIME)
+                boosting = false;
+            else if (shootTime >= DROP_RECOVERY_WAIT)
+                pidf += getFeedForward(AutoAim.getRPMDrop(currentRPM)) * voltageScalar * DROP_RECOVERY_SCALAR;
+        }
 
         output =
                 manualPower != 0 ?  manualPower :

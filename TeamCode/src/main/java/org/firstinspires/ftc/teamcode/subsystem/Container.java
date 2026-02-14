@@ -86,7 +86,7 @@ public final class Container {
     private Artifact a1, a2;
     private HSV hsv1 = new HSV(), hsv2 = new HSV();
 
-    private final Runnable genFeedingOrder;
+    private final Runnable genFeedingOrder, boostRPM;
 
     enum Zone {
         INTAKE_SENSORS(0),
@@ -110,7 +110,7 @@ public final class Container {
 
     }
 
-    Container(HardwareMap hardwareMap, Runnable genFeedingOrder) {
+    Container(HardwareMap hardwareMap, Runnable genFeedingOrder, Runnable boostRPM) {
         servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
 
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
@@ -128,6 +128,7 @@ public final class Container {
 //        };
 
         this.genFeedingOrder = genFeedingOrder;
+        this.boostRPM = boostRPM;
     }
 
     void run(double intakePower, double feederPower) {
@@ -186,6 +187,7 @@ public final class Container {
                 artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
                 updateLEDs();
                 feeding = false;
+                boostRPM.run();
             }
         } else backDistanceTimer.reset();
     }

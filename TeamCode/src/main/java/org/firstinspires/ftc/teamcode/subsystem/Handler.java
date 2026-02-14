@@ -76,12 +76,12 @@ public final class Handler {
         return !feedingOrder.isEmpty() || timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
     }
 
-    Handler(HardwareMap hardwareMap) {
+    Handler(HardwareMap hardwareMap, Runnable boostRPM) {
 
         container = new Container(hardwareMap, () -> {
             if (motifMode) feedMotif();
             else feedFastest();
-        });
+        }, boostRPM);
 
         intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
         intake.setInverted(true);

@@ -24,7 +24,7 @@ public final class TuneContainer extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Container container = new Container(hardwareMap, () -> {});
+        Container container = new Container(hardwareMap, () -> {}, () -> {});
 
         waitForStart();
 
