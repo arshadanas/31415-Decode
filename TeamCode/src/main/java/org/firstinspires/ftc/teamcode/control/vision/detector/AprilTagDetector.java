@@ -52,7 +52,7 @@ public class AprilTagDetector {
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
             public void onOpened() {
-                camera.startStreaming(800, 448, cameraRotation);
+                camera.startStreaming(1280, 800, cameraRotation);
                 isOpen = true;
             }
 
@@ -74,11 +74,11 @@ public class AprilTagDetector {
      */
     public void run() {
         detections = pipeline.getLatestDetections();
-        detections.removeIf(tag -> {
-            for (int ids : targetIDs)
-                if (tag.id == ids) return false; // don't remove from detections
-            return true; // remove from detections, this tag isn't one of our targets
-        });
+//        detections.removeIf(tag -> {
+//            for (int ids : targetIDs)
+//                if (tag.id == ids) return false; // don't remove from detections
+//            return true; // remove from detections, this tag isn't one of our targets
+//        });
     }
 
     public boolean isTagVisible() {

@@ -22,22 +22,20 @@
 package org.firstinspires.ftc.teamcode.opmode.tuning;
 
 
-import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.control.vision.detector.AprilTagDetector;
+import org.firstinspires.ftc.teamcode.subsystem.Motif;
+import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
-@Disabled
 @TeleOp(group = "Testing/tuning")
 public final class TestAprilTagDetector extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
 
-        telemetry = new MultipleTelemetry(telemetry);
         AprilTagDetector camera = new AprilTagDetector(
                 hardwareMap,
                 OpenCvCameraRotation.UPRIGHT,
@@ -48,8 +46,18 @@ public final class TestAprilTagDetector extends LinearOpMode {
 
         while (opModeInInit()) {
             camera.run();
-            camera.printTagIsVisible(telemetry);
             camera.printDetections(telemetry);
+
+            Motif m = Motif.PGP;
+            if (camera.isTagVisible()) for (AprilTagDetection a : camera.getDetections()) {
+                if (a.id == 21 || a.id == 22 || a.id == 23) {
+                    m = Motif.fromGreenIndex(camera.getDetections().get(0).id - 21);
+                    break;
+                }
+            }
+
+            telemetry.addLine();
+            telemetry.addData("Randomization", m);
             telemetry.update();
         }
 
