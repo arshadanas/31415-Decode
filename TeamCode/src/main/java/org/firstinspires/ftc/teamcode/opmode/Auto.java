@@ -249,8 +249,14 @@ public final class Auto extends LinearOpMode {
 
         } else {
 
-//            if (isRedAlliance)  robot.handler.presserL.setActivated(true);
-//            else                robot.handler.presserR.setActivated(true);
+//            AprilTagDetector camera = new AprilTagDetector(
+//                    hardwareMap,
+//                    OpenCvCameraRotation.UPRIGHT,
+//                    "camera back",
+//                    0.165,
+//                    21, 22, 23
+//            );
+//            boolean cameraRunning = true;
 
             Pose
                     toSpike2Control = Auto.toSpike2Control.toPose(isRedAlliance),
