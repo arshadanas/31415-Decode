@@ -185,7 +185,7 @@ public final class Handler {
         int slotAtFeeder = rotor.getSlotAt(Rotor.Zone.FEEDER_OMNIS);
         boolean noBallOrCorrectBallAtFeeder =
                         slotAtFeeder == -1 ||
-                        artifacts[slotAtFeeder] == EMPTY ||
+//                        artifacts[slotAtFeeder] == EMPTY ||
                         !feedingOrder.isEmpty() && slotAtFeeder == feedingOrder.get(0)
         ;
 

@@ -76,6 +76,8 @@ public final class Auto extends LinearOpMode {
             TIME_MAX_GATE = 1.5,
             TIME_MAX_SCORE = 30,
 
+            WAIT_CORNER_INTAKING = 2,
+            WAIT_MIDDLE_INTAKING = 0.5,
             SPEED_INTAKING = 40;
 
     public static EditablePose
@@ -93,13 +95,15 @@ public final class Auto extends LinearOpMode {
 
             toSpike3Control = new EditablePose(46.0128617363344, 34.06430868167202, 0),
             startSpike3 = new EditablePose(28.887459807073956, 35.27891125401929, PI),
-            intaked3 = new EditablePose(20, 35.0474, PI),
+            intaked3 = new EditablePose(22, 35.0474, PI),
 
             intakingGate = new EditablePose(16, 58, toRadians(167.4)),
             scoring = new EditablePose(48.7669, 89.8697, -PI/2),
 
-            cornerIntaking = new EditablePose(SIZE_TILE / 2, SIZE_TILE / 2, PI),
+            cornerIntaking = new EditablePose(SIZE_TILE / 2, Auto.WIDTH_DRIVETRAIN / 2, PI),
             farZoneShooting = new EditablePose(2 * SIZE_TILE, SIZE_TILE/2, PI),
+
+            weirdMiddleIntaking = new EditablePose(SIZE_TILE, SIZE_TILE, 3 * PI / 4),
 
             parkNear = new EditablePose(2 * SIZE_TILE, 3 * SIZE_TILE, toRadians(-130)),
             parkFar = new EditablePose(1.5 * SIZE_TILE, 0.5 * SIZE_TILE, PI);
@@ -181,7 +185,9 @@ public final class Auto extends LinearOpMode {
             Pose
                     park = parkFar.toPose(isRedAlliance),
                     cornerIntaking = Auto.cornerIntaking.toPose(isRedAlliance),
-                    farZoneShooting = Auto.farZoneShooting.toPose(isRedAlliance);
+                    farZoneShooting = Auto.farZoneShooting.toPose(isRedAlliance),
+                    startSpike3 = Auto.startSpike3.toPose(isRedAlliance),
+                    intaked3 = Auto.intaked3.toPose(isRedAlliance);
 
             auto = new Action() {
 
@@ -207,12 +213,26 @@ public final class Auto extends LinearOpMode {
                             if (pathDone) {
                                 timesScored++;
 
-                                if (timesScored >= 5) {
+                                if (timesScored >= 3) {
                                     state = PARKING;
                                     path = new FollowPathAction(f, f.pathBuilder()
                                             .addPath(new BezierLine(startPose, park))
                                             .setConstantHeadingInterpolation(park.getHeading())
                                             .build(), true);
+                                } else if (timesScored == 2) {
+                                    state = INTAKING_SPIKE;
+                                    path = new SequentialAction(
+                                            new InstantAction(() -> robot.handler.setIntake(1)),
+                                            new FollowPathAction(f, f.pathBuilder()
+                                                    .addPath(new BezierLine(farZoneShooting, startSpike3))
+                                                    .setConstantHeadingInterpolation(startSpike3.getHeading())
+                                                    .addPath(new BezierLine(startSpike3, intaked3))
+                                                    .setConstantHeadingInterpolation(intaked3.getHeading())
+                                                    .addPath(new BezierLine(intaked3, farZoneShooting))
+                                                    .setLinearHeadingInterpolation(intaked3.getHeading(), farZoneShooting.getHeading())
+                                                    .build(), true),
+                                            new InstantAction(() -> robot.handler.setIntake(0))
+                                    );
                                 } else {
                                     state = INTAKING_SPIKE;
                                     path = new SequentialAction(
@@ -220,16 +240,22 @@ public final class Auto extends LinearOpMode {
                                             new FollowPathAction(f, f.pathBuilder()
                                                     .addPath(new BezierLine(startPose, cornerIntaking))
                                                     .setConstantHeadingInterpolation(cornerIntaking.getHeading())
+                                                    .build(), true),
+                                            new SleepAction(WAIT_CORNER_INTAKING),
+                                            new FollowPathAction(f, f.pathBuilder()
                                                     .addPath(new BezierLine(cornerIntaking, farZoneShooting))
                                                     .setConstantHeadingInterpolation(farZoneShooting.getHeading())
                                                     .build(), true),
-                                            new InstantAction(() -> robot.handler.setIntake(-0.3))
+                                            new InstantAction(() -> robot.handler.setIntake(0))
                                     );
                                 }
                             }
                             break;
 
                         case INTAKING_SPIKE:
+
+                            if (robot.handler.isFull())
+                                robot.handler.setIntake(0);
 
                             if (pathDone) {
                                 state = SCORING;
