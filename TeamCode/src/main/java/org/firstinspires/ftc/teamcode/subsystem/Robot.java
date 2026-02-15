@@ -38,7 +38,7 @@ public final class Robot {
     }
 
     public boolean hasArtifacts() {
-        return Artifact.EMPTY.numOccurrencesIn(handler.container.artifacts) < 3;
+        return 3 - Artifact.EMPTY.numOccurrencesIn(handler.container.artifacts) > 0;
     }
 
     public void setAlliance(boolean isRedAlliance) {

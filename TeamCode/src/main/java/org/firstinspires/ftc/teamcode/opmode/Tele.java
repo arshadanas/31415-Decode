@@ -135,7 +135,7 @@ public final class Tele extends LinearOpMode {
             robot.setAlliance(isRedAlliance);
             robot.drivetrain.setPose(sharedPose != null ? sharedPose : Auto.getStartingPose(isRedAlliance, isGoalSide));
 
-            sharedPose = null; // expire the shared pose
+            // sharedPose = null; // expire the shared pose
 
             double x = Auto.WIDTH_INCLUDING_PRESSERS / 2.0;
             Pose wallResetPose = new Pose(
@@ -180,6 +180,8 @@ public final class Tele extends LinearOpMode {
 
                     if (gamepad1.dpadRightWasPressed())
                         robot.drivetrain.setPose(wallResetPose);
+                    else if (gamepad1.dpadDownWasPressed() && sharedPose != null)
+                        robot.drivetrain.setPose(sharedPose);
 
                 } else {
 
@@ -239,6 +241,7 @@ public final class Tele extends LinearOpMode {
 
                 Profiler.end("Main-robot-loop");
             }
+            sharedPose = null; // expire the shared pose
         } finally {
             exportProfiler();
             Profiler.setProfiler(null);

@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.control.Ranges;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
@@ -36,11 +37,11 @@ public final class Container {
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
             THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
-            INTAKE_POWER_IDLE = 0,
+            INTAKE_POWER_IDLE = -0.2,
 
             TIME_FRONT_DIST_COOLDOWN = 0.05,
             TIME_BACK_DIST_COOLDOWN = 0.05,
-            TIME_BACK_DIST_FLUCTUATION = 0.1,
+            TIME_BACK_DIST_FLUCTUATION = 0.15,
             TIME_FEEDER_FLUCTUATION = 0.05,
 
             TIME_WRAPAROUND = 0.03,
@@ -240,6 +241,7 @@ public final class Container {
      * @param slot Slot you wish to move (0, 1 or 2)
      */
     public void moveSlot(int slot, Zone target) {
+        slot = Ranges.wrap(slot, 0, 3);
         realTarget = target.radians - 2 * PI / 3 * slot;
 
         double newRadians = getTargetRadians(slot, target);

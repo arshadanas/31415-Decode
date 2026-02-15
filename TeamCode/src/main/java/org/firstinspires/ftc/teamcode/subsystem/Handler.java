@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public final class Handler {
 
     public static double
-            TIME_KEEP_FEEDING_AFTER_LAST = 0.5,
+            TIME_KEEP_FEEDING_AFTER_LAST = 1,
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
             ANGLE_PRESSER_L_OFFSET = -37,

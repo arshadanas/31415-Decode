@@ -75,7 +75,7 @@ public final class Auto extends LinearOpMode {
 
             TIME_MAX_SPIKE = 1.5,
             TIME_MAX_GATE = 1.5,
-            TIME_MAX_SCORE = 6,
+            TIME_MAX_SCORE = 30,
 
             SPEED_INTAKING = 40;
 
@@ -83,22 +83,21 @@ public final class Auto extends LinearOpMode {
             admissibleError = new EditablePose(1, 1, 0.05),
             admissibleVel = new EditablePose(25, 25, toRadians(30)),
 
-            scoringPreload = new EditablePose(48.7669, 89.8697, -PI/2),
-
-            toSpike2Control = new EditablePose(58.51446945337619, 60.19614147909965, 0),
+            toSpike2Control = new EditablePose(51.33762057877812, 56.26045016077167, 0),
             startSpike2 = new EditablePose(40, 57.6353, PI),
             intaked2 = new EditablePose(13, 57.6353, PI),
 
-            toSpike3Control = new EditablePose(58.51446945337619, 60.19614147909965, 0),
-            startSpike3 = new EditablePose(40, 35.0474, PI),
+            startSpike1 = new EditablePose(40, 82.76, PI),
+            intaked1 = new EditablePose(16.990353697749192, 83.45453376205788, PI),
+            openGateControl = new EditablePose(24.901134887459808, 78.59137733118973, 0),
+            openGate = new EditablePose(15.892301929260448, 70.65426591639871, PI/2),
+
+            toSpike3Control = new EditablePose(46.0128617363344, 34.06430868167202, 0),
+            startSpike3 = new EditablePose(28.887459807073956, 35.27891125401929, PI),
             intaked3 = new EditablePose(13, 35.0474, PI),
 
-            toSpike1Control = new EditablePose(58.51446945337619, 60.19614147909965, 0),
-            startSpike1 = new EditablePose(40, 82.76, PI),
-            intaked1 = new EditablePose(20, 82.76, PI),
-
             intakingGate = new EditablePose(16, 58, toRadians(167.4)),
-            scoring = new EditablePose(48.7669, 89.8697, toRadians(-130)),
+            scoring = new EditablePose(48.7669, 89.8697, -PI/2),
 
             cornerIntaking = new EditablePose(SIZE_TILE / 2, SIZE_TILE / 2, PI),
             farZoneShooting = new EditablePose(2 * SIZE_TILE, SIZE_TILE/2, PI),
@@ -171,7 +170,7 @@ public final class Auto extends LinearOpMode {
         }
 
         robot.setAlliance(isRedAlliance);
-        sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
+        Pose startPose = sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
         robot.handler.container.setArtifacts(Motif.PGP.artifacts);
 
         Follower f = robot.drivetrain.drivetrain;
@@ -194,7 +193,7 @@ public final class Auto extends LinearOpMode {
                 private ElapsedTime matchTimer = null;
 
                 // Run the preload action first
-                private Action path = shoot3(robot);
+                private Action path = shootAll(robot);
 
                 public boolean run(@NonNull TelemetryPacket p) {
                     if (matchTimer == null) matchTimer = new ElapsedTime();
@@ -212,7 +211,7 @@ public final class Auto extends LinearOpMode {
                                 if (timesScored >= 5) {
                                     state = PARKING;
                                     path = new FollowPathAction(f, f.pathBuilder()
-                                            .addPath(new BezierLine(sharedPose, park))
+                                            .addPath(new BezierLine(startPose, park))
                                             .setConstantHeadingInterpolation(park.getHeading())
                                             .build(), true);
                                 } else {
@@ -220,7 +219,7 @@ public final class Auto extends LinearOpMode {
                                     path = new SequentialAction(
                                             new InstantAction(() -> robot.handler.setIntake(1)),
                                             new FollowPathAction(f, f.pathBuilder()
-                                                    .addPath(new BezierLine(sharedPose, cornerIntaking))
+                                                    .addPath(new BezierLine(startPose, cornerIntaking))
                                                     .setConstantHeadingInterpolation(cornerIntaking.getHeading())
                                                     .addPath(new BezierLine(cornerIntaking, farZoneShooting))
                                                     .setConstantHeadingInterpolation(farZoneShooting.getHeading())
@@ -235,7 +234,7 @@ public final class Auto extends LinearOpMode {
 
                             if (pathDone) {
                                 state = SCORING;
-                                path = shoot3(robot);
+                                path = shootAll(robot);
                             }
                             break;
 
@@ -251,12 +250,14 @@ public final class Auto extends LinearOpMode {
 
         } else {
 
-            if (isRedAlliance)  robot.handler.presserL.setActivated(true);
-            else                robot.handler.presserR.setActivated(true);
+//            if (isRedAlliance)  robot.handler.presserL.setActivated(true);
+//            else                robot.handler.presserR.setActivated(true);
 
             Pose
-                    scoringPreload = Auto.scoringPreload.toPose(isRedAlliance),
                     toSpike2Control = Auto.toSpike2Control.toPose(isRedAlliance),
+                    openGateControl = Auto.openGateControl.toPose(isRedAlliance),
+                    openGate = Auto.openGate.toPose(isRedAlliance),
+                    toSpike3Control = Auto.toSpike3Control.toPose(isRedAlliance),
                     startSpike2 = Auto.startSpike2.toPose(isRedAlliance),
                     intaked2 = Auto.intaked2.toPose(isRedAlliance),
                     startSpike3 = Auto.startSpike3.toPose(isRedAlliance),
@@ -281,10 +282,10 @@ public final class Auto extends LinearOpMode {
                 // Run the preload action first
                 private Action path = new SequentialAction(
                         new FollowPathAction(f, f.pathBuilder()
-                                .addPath(new BezierLine(sharedPose, scoringPreload))
-                                .setLinearHeadingInterpolation(sharedPose.getHeading(), scoringPreload.getHeading())
+                                .addPath(new BezierLine(startPose, scoring))
+                                .setLinearHeadingInterpolation(startPose.getHeading(), scoring.getHeading())
                                 .build(), false),
-                        shoot3(robot)
+                        shootAll(robot)
                 );
 
                 public boolean run(@NonNull TelemetryPacket p) {
@@ -305,21 +306,63 @@ public final class Auto extends LinearOpMode {
                                     path = new SequentialAction(
                                             new InstantAction(() -> robot.handler.setIntake(1)),
                                             new FollowPathAction(f, f.pathBuilder()
-                                                    .addPath(new BezierCurve(sharedPose, toSpike2Control, startSpike2))
-                                                    .setLinearHeadingInterpolation(sharedPose.getHeading(), startSpike2.getHeading())
+                                                    .addPath(new BezierCurve(scoring, toSpike2Control, startSpike2))
+                                                    .setLinearHeadingInterpolation(scoring.getHeading(), startSpike2.getHeading())
                                                     .addPath(new BezierLine(startSpike2, intaked2))
                                                     .setConstantHeadingInterpolation(intaked2.getHeading())
                                                     .setVelocityConstraint(SPEED_INTAKING)
-                                                    .build(), true),
+                                                    .addPath(new BezierCurve(intaked2, toSpike2Control, scoring))
+                                                    .setTangentHeadingInterpolation()
+                                                    .setReversed()
+                                                    .build(), true
+                                            ),
                                             new InstantAction(() -> robot.handler.setIntake(0))
                                     );
-                                }
-                                else if (timesScored >= 2) {
-                                    state = PARKING;
-                                    path = new FollowPathAction(f, f.pathBuilder()
-                                            .addPath(new BezierLine(sharedPose, park))
-                                            .setLinearHeadingInterpolation(sharedPose.getHeading(), park.getHeading())
-                                            .build(), true);
+                                } else if (timesScored == 2) {
+                                    state = INTAKING_SPIKE;
+                                    path = new SequentialAction(
+                                            new InstantAction(() -> robot.handler.setIntake(1)),
+                                            new FollowPathAction(f, f.pathBuilder()
+                                                    .addPath(new BezierLine(scoring, startSpike1))
+                                                    .setLinearHeadingInterpolation(scoring.getHeading(), startSpike1.getHeading())
+                                                    .addPath(new BezierLine(startSpike1, intaked1))
+                                                    .setConstantHeadingInterpolation(intaked1.getHeading())
+                                                    .setVelocityConstraint(SPEED_INTAKING)
+                                                    .addPath(new BezierCurve(intaked1, openGateControl, openGate))
+                                                    .setLinearHeadingInterpolation(intaked1.getHeading(), openGate.getHeading())
+                                                    .addPath(new BezierLine(openGate, scoring))
+                                                    .setLinearHeadingInterpolation(openGate.getHeading(), scoring.getHeading())
+                                                    .setReversed()
+                                                    .build(), true
+                                            ),
+                                            new InstantAction(() -> robot.handler.setIntake(0))
+                                    );
+                                } else if (timesScored == 3) {
+                                    state = INTAKING_SPIKE;
+                                    path = new SequentialAction(
+                                            new InstantAction(() -> robot.handler.setIntake(1)),
+                                            new FollowPathAction(f, f.pathBuilder()
+                                                    .addPath(new BezierCurve(scoring, toSpike3Control, startSpike3))
+                                                    .setTangentHeadingInterpolation()
+                                                    .addPath(new BezierLine(startSpike3, intaked3))
+                                                    .setConstantHeadingInterpolation(intaked3.getHeading())
+                                                    .setVelocityConstraint(SPEED_INTAKING)
+                                                    .addPath(new BezierCurve(intaked3, toSpike3Control, scoring))
+                                                    .setTangentHeadingInterpolation()
+                                                    .setReversed()
+                                                    .build(), true
+                                            ),
+                                            new InstantAction(() -> robot.handler.setIntake(0))
+                                    );
+                                } else {
+                                    if (timesScored >= 4) {
+                                        state = PARKING;
+                                        path = new FollowPathAction(f, f.pathBuilder()
+                                                .addPath(new BezierLine(scoring, park))
+                                                .setLinearHeadingInterpolation(scoring.getHeading(), park.getHeading())
+                                                .build(), true
+                                        );
+                                    }
                                 }
                             }
                             break;
@@ -328,15 +371,7 @@ public final class Auto extends LinearOpMode {
 
                             if (pathDone) {
                                 state = SCORING;
-                                Pose control = toSpike2Control;
-                                path = new SequentialAction(
-                                        new FollowPathAction(f, f.pathBuilder()
-                                                .addPath(new BezierCurve(sharedPose, control, scoring))
-                                                .setTangentHeadingInterpolation()
-                                                .setReversed()
-                                                .build(), false),
-                                        shoot3(robot)
-                                );
+                                path = shootAll(robot);
                             }
                             break;
 
@@ -363,7 +398,7 @@ public final class Auto extends LinearOpMode {
 
         waitForStart(); //--------------------------------------------------------------------------------------------------------------------------
 
-        robot.drivetrain.setPose(sharedPose);
+        robot.drivetrain.setPose(startPose);
 
         Actions.runBlocking(new ParallelAction(
                 telemetryPacket -> {
@@ -378,7 +413,7 @@ public final class Auto extends LinearOpMode {
         Thread.sleep((long) (DEAD_TIME * 1000));
     }
 
-    private static Action shoot3(Robot robot) {
+    private static Action shootAll(Robot robot) {
         return new SequentialAction(
                 new InstantAction(() -> feed = true),
                 new FirstTerminateAction(
