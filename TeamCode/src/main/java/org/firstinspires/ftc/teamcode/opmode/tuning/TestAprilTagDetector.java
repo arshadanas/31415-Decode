@@ -42,8 +42,8 @@ public final class TestAprilTagDetector extends LinearOpMode {
                 hardwareMap,
                 OpenCvCameraRotation.UPRIGHT,
                 "camera back",
-                0.166,
-                1, 2, 3
+                0.165,
+                21, 22, 23
         );
 
         while (opModeInInit()) {
