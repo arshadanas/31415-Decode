@@ -57,7 +57,7 @@ public final class Auto extends LinearOpMode {
                 ) :
                 new Pose(
                         2 * SIZE_TILE + SIZE_TAB / 2 + Auto.LENGTH_DRIVETRAIN / 2,
-                        Auto.WIDTH_INCLUDING_PRESSERS / 2,
+                        Auto.WIDTH_DRIVETRAIN / 2,
                         PI
                 );
 
@@ -67,8 +67,7 @@ public final class Auto extends LinearOpMode {
     public static double
             DEAD_TIME = 0,
             LENGTH_DRIVETRAIN = 14.81745,
-            WIDTH_DRIVETRAIN = 15.53937,
-            WIDTH_INCLUDING_PRESSERS = 17.312992126,
+            WIDTH_DRIVETRAIN = 15.72,
             SIZE_FIELD = 141.5,
             SIZE_TILE = SIZE_FIELD/6,
             SIZE_TAB = 0.8,

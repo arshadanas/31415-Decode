@@ -137,7 +137,7 @@ public final class Tele extends LinearOpMode {
 
             // sharedPose = null; // expire the shared pose
 
-            double x = Auto.WIDTH_INCLUDING_PRESSERS / 2.0;
+            double x = Auto.WIDTH_DRIVETRAIN / 2.0;
             Pose wallResetPose = new Pose(
                     !isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
                     Auto.LENGTH_DRIVETRAIN / 2.0,
