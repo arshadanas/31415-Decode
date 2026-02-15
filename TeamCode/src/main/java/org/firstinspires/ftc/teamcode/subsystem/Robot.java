@@ -81,7 +81,7 @@ public final class Robot {
         Profiler.end("turret");
 
         Profiler.start("handler");
-        handler.run(!lifting && inLaunchZone && (
+        handler.run(!lifting && inLaunchZone, (
                 forceFeed || (
                         feed &&
                         shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&

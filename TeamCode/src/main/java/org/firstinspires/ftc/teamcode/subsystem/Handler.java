@@ -37,13 +37,13 @@ public final class Handler {
             SPEED_IDLE_FEEDER = 0,
             TIME_KEEP_FEEDING_AFTER_LAST = 1,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
-            THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
+            THRESHOLD_BACK_MM = 90, // Height to move onto next feed; above rotor = ~90 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
             TIME_FRONT_DIST_COOLDOWN = 0.05,
-            TIME_BACK_DIST_COOLDOWN = 0.05,
-            TIME_BACK_DIST_FLUCTUATION = 0.15,
+            TIME_FEED_COOLDOWN = 0.05,
+            TIME_BACK_DIST_FLUCTUATION = 0.1,
             TIME_FEEDER_FLUCTUATION = 0.05,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
@@ -136,18 +136,12 @@ public final class Handler {
         presserL = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED, presserLServo);
     }
 
-    void run(boolean readyToFeed) {
+    void run(boolean inLaunchZone, boolean readyToFeed) {
 
         if (readyToFeed)
             timeSinceInFeedingTolerance.reset();
         else if (timeSinceInFeedingTolerance.seconds() <= TIME_FEEDER_FLUCTUATION)
             readyToFeed = true;
-
-        boolean ballAtFeeder = back1.getReading() <= THRESHOLD_BACK_MM;
-        if (ballAtFeeder)
-            timeSinceHasBall.reset();
-        else if (timeSinceHasBall.seconds() <= TIME_BACK_DIST_FLUCTUATION)
-            ballAtFeeder = true;
 
         // move empty slot to intake
         int nearestIntakeSlot = rotor.getNearestSlot(i -> artifacts[i] == EMPTY, Rotor.Zone.INTAKE_SENSORS);
@@ -177,40 +171,45 @@ public final class Handler {
             }
         }
 
-        int slotAtFeeder = rotor.getSlotAt(Rotor.Zone.FEEDER_OMNIS);
-        boolean canFeed = !feedingOrder.isEmpty() && (
-                            slotAtFeeder == -1 ||
-                            artifacts[slotAtFeeder] == EMPTY ||
-                            slotAtFeeder == feedingOrder.get(0)
-                    );
-
-        if (canFeed)
-            timeSinceFeederRunning.reset();
-        boolean shouldContinueFeeding = feedingOrder.isEmpty() && timeSinceFeederRunning.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
-
-        double feederPower =
-                manualFeederPower != 0 ?                                manualFeederPower :
-                readyToFeed && (canFeed || shouldContinueFeeding) ?     1 :
-                                                                        SPEED_IDLE_FEEDER;
-
         if (!intaking && !feedingOrder.isEmpty()) {
             rotor.moveSlot(feedingOrder.get(0), Rotor.Zone.FEEDER_SENSORS);
 
             // check back slot sensors
             int currentBackSlot = rotor.getSlotAt(Rotor.Zone.FEEDER_SENSORS);
             if (
-                    readyToFeed && canFeed &&
+                    inLaunchZone &&
+                    readyToFeed &&
                     currentBackSlot != -1 && artifacts[currentBackSlot] != EMPTY && // the slot was previously full
-                    !ballAtFeeder && // distance sensor reports no artifact
-                    timeSinceFeed.seconds() >= TIME_BACK_DIST_COOLDOWN
+                    back1.getReading() >= THRESHOLD_BACK_MM && // distance sensor reports no artifact
+                    timeSinceFeed.seconds() >= TIME_FEED_COOLDOWN
             ) {
-                artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
-                boostRPM.run();
-                timeSinceFeed.reset();
-            }
+                if (timeSinceHasBall.seconds() >= TIME_BACK_DIST_FLUCTUATION) {
+                    artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
+                    boostRPM.run();
+                    timeSinceFeed.reset();
+                }
+            } else timeSinceHasBall.reset();
+
         }
 
         feedingOrder.removeIf(slot -> artifacts[slot] == EMPTY);
+
+        int slotAtFeeder = rotor.getSlotAt(Rotor.Zone.FEEDER_OMNIS);
+        boolean noBallOrCorrectBallAtFeeder = (
+                slotAtFeeder == -1 ||
+                artifacts[slotAtFeeder] == EMPTY ||
+                (!feedingOrder.isEmpty() && slotAtFeeder == feedingOrder.get(0))
+        );
+
+        if (noBallOrCorrectBallAtFeeder && feedingOrder.isEmpty())
+            timeSinceFeederRunning.reset();
+        boolean keepRunningFeeder =false;
+//                timeSinceFeederRunning.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
+
+        double feederPower =
+                manualFeederPower != 0 ?                                manualFeederPower :
+                readyToFeed && (noBallOrCorrectBallAtFeeder || keepRunningFeeder) ?     1 :
+                                                                        SPEED_IDLE_FEEDER;
 
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;
@@ -256,7 +255,8 @@ public final class Handler {
     }
 
     boolean feedsPending() {
-        return !feedingOrder.isEmpty() || timeSinceFeederRunning.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
+        return !feedingOrder.isEmpty();
+//                || timeSinceFeederRunning.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
     }
 
     private void feedDefault() {
