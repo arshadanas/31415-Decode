@@ -84,16 +84,16 @@ public final class Auto extends LinearOpMode {
 
             toSpike2Control = new EditablePose(51.33762057877812, 56.26045016077167, 0),
             startSpike2 = new EditablePose(40, 57.6353, PI),
-            intaked2 = new EditablePose(13, 57.6353, PI),
+            intaked2 = new EditablePose(20, 57.6353, PI),
 
             startSpike1 = new EditablePose(40, 82.76, PI),
-            intaked1 = new EditablePose(16.990353697749192, 83.45453376205788, PI),
+            intaked1 = new EditablePose(20, 83.45453376205788, PI),
             openGateControl = new EditablePose(24.901134887459808, 78.59137733118973, 0),
             openGate = new EditablePose(15.892301929260448, 70.65426591639871, PI/2),
 
             toSpike3Control = new EditablePose(46.0128617363344, 34.06430868167202, 0),
             startSpike3 = new EditablePose(28.887459807073956, 35.27891125401929, PI),
-            intaked3 = new EditablePose(13, 35.0474, PI),
+            intaked3 = new EditablePose(20, 35.0474, PI),
 
             intakingGate = new EditablePose(16, 58, toRadians(167.4)),
             scoring = new EditablePose(48.7669, 89.8697, -PI/2),

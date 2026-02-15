@@ -37,7 +37,7 @@ public final class Handler {
             SPEED_IDLE_FEEDER = 0,
             TIME_KEEP_FEEDING_AFTER_LAST = 1,
             THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
-            THRESHOLD_BACK_MM = 90, // Height to move onto next feed; above rotor = ~90 // TODO Decrease for faster feeding
+            THRESHOLD_BACK_MM = 100, // Height to move onto next feed; above rotor = ~90 // TODO Decrease for faster feeding
             INTAKE_POWER_OMNI_CONTACT = 0.4,
             INTAKE_POWER_IDLE = 0,
 
@@ -239,8 +239,8 @@ public final class Handler {
         if (
                 intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT &&
                 (
-                        omniSlot != -1 && artifacts[omniSlot] != EMPTY || // ball at front
-                        slotToFront != -1 && artifacts[slotToFront] != EMPTY // ball going to front
+                        omniSlot != -1 && artifacts[omniSlot] != EMPTY  // ball at front
+//                       || slotToFront != -1 && artifacts[slotToFront] != EMPTY // ball going to front
                 ) // artifact touching omni wheel
         )
             return INTAKE_POWER_OMNI_CONTACT;
