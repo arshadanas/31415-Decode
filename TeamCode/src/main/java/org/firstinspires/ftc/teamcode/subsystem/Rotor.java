@@ -138,7 +138,7 @@ public final class Rotor {
     }
 
     int slotGoingToFront() {
-        return -1; // TODO return slot that is moving to the front
+        return wrap((int) -Math.round(target / (2 * PI / 3)), 0, 3);
     }
 
     /**
