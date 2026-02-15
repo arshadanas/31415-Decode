@@ -14,7 +14,6 @@ import com.pedropathing.math.Vector;
 import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
-import org.firstinspires.ftc.teamcode.control.Ranges;
 
 @Config
 public final class AutoAim {
@@ -99,13 +98,13 @@ public final class AutoAim {
      */
     private static double getFinalAirtime(Vector2 S_0, Vector2 S_vel_0, Vector2 G) {
         double airtime = 0;
-        int iterations = 7; // TODO vary iterations based on |S_vel_0|
+        int iterations = 15; // TODO vary iterations based on |S_vel_0|
         for (int i = 0; i < iterations; i++) {
             Vector2 S_t = S_0.sum(S_vel_0.product(airtime));
             double distToGoal = S_t.distance(G);
             airtime = 0; // TODO curve fit airtime
         }
-        return Ranges.clip(airtime, 0, 3); // TODO set maximum airtime
+        return airtime; // TODO set maximum airtime
     }
 
     /**
@@ -128,16 +127,25 @@ public final class AutoAim {
         return 0.271632 * preLaunchRPM + 109.1459;
     }
 
+    static {
+        Vector2 ad = new Vector2();
+    }
+
     public static void main(String[] args) {
 
-        double a = System.nanoTime();
-        double airtime = getFinalAirtime(
-                new Vector2(-70.75,-70.75),     // S_0
-                new Vector2(-63.4788154,-63.8), // S_vel_0
-                new Vector2(70.75,70.75)        // G
-        );
-        System.out.println((System.nanoTime() - a)/1e+6);
-        System.out.println(airtime);
+        double sum = 0;
+
+        for (int i = 0; i < 200; i++){
+            double a = System.nanoTime();
+            double airtime = getFinalAirtime(
+                    new Vector2(-70.75, -70.75),     // S_0
+                    new Vector2(-63.4788154, -63.8), // S_vel_0
+                    new Vector2(70.75, 70.75)        // G
+            );
+            sum += ((System.nanoTime() - a) / 1e+6);
+        }
+
+        System.out.println(sum / 200);
     }
 
     void printTo(Telemetry telemetry) {
