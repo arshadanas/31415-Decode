@@ -1,8 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.subsystem.Container.Zone.FEEDER_SENSORS;
-import static org.firstinspires.ftc.teamcode.subsystem.Container.Zone.INTAKE_SENSORS;
-
 import static java.lang.Math.max;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -15,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.opmode.Tele;
 
 @TeleOp(group = "Testing/tuning")
-public final class TuneContainer extends LinearOpMode {
+public final class TuneRotor extends LinearOpMode {
 
     private final ElapsedTime loopTimer = new ElapsedTime();
     @Override
@@ -24,7 +21,7 @@ public final class TuneContainer extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Container container = new Container(hardwareMap, () -> {}, () -> {});
+        Rotor rotor = new Rotor(hardwareMap);
 
         waitForStart();
 
@@ -33,31 +30,27 @@ public final class TuneContainer extends LinearOpMode {
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            container.run(1,1);
-
-//            for (CRServo servo : container.servos)
-//                servo.setPower(gamepad1.right_trigger - gamepad1.left_trigger);
-//                servo.setPower(Container.ffGains.kV * Container.MAX_VEL);
+            rotor.run();
 
             if (gamepad1.dpadLeftWasPressed())
-                container.moveSlot(0, FEEDER_SENSORS);
+                rotor.moveSlot(0, Rotor.Zone.FEEDER_SENSORS);
 
             else if (gamepad1.dpadUpWasPressed())
-                container.moveSlot(1, FEEDER_SENSORS);
+                rotor.moveSlot(1, Rotor.Zone.FEEDER_SENSORS);
 
             else if (gamepad1.dpadRightWasPressed())
-                container.moveSlot(2, FEEDER_SENSORS);
+                rotor.moveSlot(2, Rotor.Zone.FEEDER_SENSORS);
 
             else if (gamepad1.squareWasPressed())
-                container.moveSlot(0, INTAKE_SENSORS);
+                rotor.moveSlot(0, Rotor.Zone.INTAKE_SENSORS);
 
             else if (gamepad1.triangleWasPressed())
-                container.moveSlot(1, INTAKE_SENSORS);
+                rotor.moveSlot(1, Rotor.Zone.INTAKE_SENSORS);
 
             else if (gamepad1.circleWasPressed())
-                container.moveSlot(2, INTAKE_SENSORS);
+                rotor.moveSlot(2, Rotor.Zone.INTAKE_SENSORS);
 
-            container.printTo(telemetry);
+            rotor.printTo(telemetry);
 
             Thread.sleep((long)(max(Tele.AVG_LOOP_TIME_MS - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());

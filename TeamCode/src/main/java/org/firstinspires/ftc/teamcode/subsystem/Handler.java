@@ -4,6 +4,8 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLO
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
+import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -13,51 +15,51 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 import org.firstinspires.ftc.teamcode.subsystem.utility.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
+import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
+import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Config
 public final class Handler {
 
     public static double
-            TIME_KEEP_FEEDING_AFTER_LAST = 1,
             ANGLE_PRESSER_RETRACTED = 87,
             ANGLE_PRESSER_EXTENDED = 211,
             ANGLE_PRESSER_L_OFFSET = -37,
+
             SPEED_IDLE_FEEDER = 0,
+            TIME_KEEP_FEEDING_AFTER_LAST = 1,
+            THRESHOLD_FRONT_MM = 70, // start of ramp = ~115
+            THRESHOLD_BACK_MM = 70, // Height to move onto next feed; above rotor = ~75 // TODO Decrease for faster feeding
+            INTAKE_POWER_OMNI_CONTACT = 0.4,
+            INTAKE_POWER_IDLE = 0,
+
+            TIME_FRONT_DIST_COOLDOWN = 0.05,
+            TIME_BACK_DIST_COOLDOWN = 0.05,
+            TIME_BACK_DIST_FLUCTUATION = 0.15,
+            TIME_FEEDER_FLUCTUATION = 0.05,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05,
-            CACHE_THRESHOLD_PRESSERS = 0.05,
-            INTAKE_CHECKING_TIME = 0.1;
+            CACHE_THRESHOLD_PRESSERS = 0.05;
 
-    public final Container container;
+    public final Rotor rotor;
     private final CachedMotorEx intake;
     private final CachedDcMotor[] feeder;
+    private final AnalogSensor front1, back1;
+    private final ColorSensor color1, color2;
+
+
     public final SimpleServoPivot presserR, presserL;
     private final CachedSimpleServo presserRServo, presserLServo;
 
-    private final ElapsedTime intakeTimer = new ElapsedTime();
-
-    public Motif randomization = Motif.PGP;
-    /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
-    public boolean allowOneWrongInMotifs = false;
-    public boolean motifMode = false;
-
-    private int numArtifactsScored = 0;
-    public void decrementArtifactsScored() {
-        if (numArtifactsScored > 0) numArtifactsScored--;
-    }
-    public void incrementArtifactsScored() {
-        if (numArtifactsScored < 9) numArtifactsScored++;
-    }
-    public void clearRamp() {
-        numArtifactsScored = 0;
-    }
 
     private double intakePower;
     public void setIntake(double power) {
@@ -70,18 +72,50 @@ public final class Handler {
     }
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
-    private final ElapsedTime timeSinceLastFeed = new ElapsedTime();
+    private final ElapsedTime
+            timeSinceFeederRunning = new ElapsedTime(),
+            timeSinceNoBall = new ElapsedTime(),
+            timeSinceIntaked = new ElapsedTime(),
+            timeSinceFeed = new ElapsedTime(),
+            timeSinceInFeedingTolerance = new ElapsedTime();
 
-    boolean feedsPending() {
-        return !feedingOrder.isEmpty() || timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
+    private final Runnable boostRPM;
+
+    public final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+
+    public boolean isEmpty() {
+        return Artifact.EMPTY.numOccurrencesIn(artifacts) == 3;
     }
+    public boolean hasArtifacts() {
+        return Artifact.EMPTY.numOccurrencesIn(artifacts) < 3;
+    }
+    public boolean isFull() {
+        return Artifact.EMPTY.numOccurrencesIn(artifacts) == 0;
+    }
+
+    public void setContents(Artifact[] artifacts) {
+        assert artifacts.length == 3;
+        if (Arrays.equals(this.artifacts, artifacts))
+            return;
+
+        System.arraycopy(artifacts, 0, this.artifacts, 0, 3);
+        feedDefault();
+    }
+
+    private Artifact a1 = EMPTY, a2 = EMPTY;
+    private HSV hsv1 = new HSV(), hsv2 = new HSV();
 
     Handler(HardwareMap hardwareMap, Runnable boostRPM) {
 
-        container = new Container(hardwareMap, () -> {
-            if (motifMode) feedMotif();
-            else feedFastest();
-        }, boostRPM);
+        rotor = new Rotor(hardwareMap);
+
+        front1 = new AnalogSensor(hardwareMap, "front 1", 4000);
+        back1 = new AnalogSensor(hardwareMap, "back 1", 4000);
+
+        color1 = new ColorSensor(hardwareMap, "color 1", 1);
+        color2 = new ColorSensor(hardwareMap, "color 2", 1);
+
+        this.boostRPM = boostRPM;
 
         intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
         intake.setInverted(true);
@@ -104,51 +138,93 @@ public final class Handler {
 
     void run(boolean feed) {
 
-        feedingOrder.removeIf(slot -> container.get(slot) == EMPTY);
+        feedingOrder.removeIf(slot -> artifacts[slot] == EMPTY);
 
         boolean feedsEmpty = feedingOrder.isEmpty();
         if (!feedsEmpty)
-            timeSinceLastFeed.reset();
+            timeSinceFeederRunning.reset();
 
         // move empty slot to intake
-        if (intakePower != 0 && EMPTY.numOccurrencesIn(container.artifacts) > 0)
-            container.moveSlot(container.getNearestIntakeSlot(), Container.Zone.INTAKE_SENSORS);
+        if (intakePower != 0 && EMPTY.numOccurrencesIn(artifacts) > 0)
+            rotor.moveSlot(
+                    rotor.getNearestSlot(i -> artifacts[i] == EMPTY, Rotor.Zone.INTAKE_SENSORS),
+                    Rotor.Zone.INTAKE_SENSORS
+            );
         // move filled slot to feeder
         else if (!feedsEmpty)
-            container.moveSlot(feedingOrder.get(0), Container.Zone.FEEDER_SENSORS);
+            rotor.moveSlot(feedingOrder.get(0), Rotor.Zone.FEEDER_SENSORS);
 
 
-        int slotAtFeeder = container.getSlotAt(Container.Zone.FEEDER_OMNIS);
-        boolean artifactTouchingFeeder = slotAtFeeder != -1 && container.get(slotAtFeeder) != EMPTY;
+        int slotAtFeeder = rotor.getSlotAt(Rotor.Zone.FEEDER_OMNIS);
 
-        double feederPower;
-        if (manualFeederPower != 0){
-            feederPower = manualFeederPower;
+        double feederPower =
+                manualFeederPower != 0 ? manualFeederPower :
+                        feed && ((
+                                        !feedsEmpty && (
+                                            slotAtFeeder == -1 ||
+                                            artifacts[slotAtFeeder] == EMPTY ||
+                                            slotAtFeeder == feedingOrder.get(0)
+                                        )
+                                ) || (feedsEmpty && timeSinceFeederRunning.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST)
+                        ) ? 1 : SPEED_IDLE_FEEDER;
 
-        }else{
-            boolean shouldFeed = feed && (
-                    (!feedsEmpty && (
-                            slotAtFeeder == -1 ||
-                            container.get(slotAtFeeder) == EMPTY ||
-                            slotAtFeeder == feedingOrder.get(0)
-                    )) || (feedsEmpty && timeSinceLastFeed.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST)
-            );
-            feederPower = shouldFeed ? 1 : SPEED_IDLE_FEEDER;
+
+
+
+
+        // intake sensing
+        int currentFrontSlot = rotor.getSlotAt(Rotor.Zone.INTAKE_SENSORS);
+        if (
+                intakePower > 0 && // intake is running
+                        currentFrontSlot != -1 &&   // there is a slot near the front intaking zone
+                        artifacts[currentFrontSlot] == EMPTY && // the slot was previously empty
+                        front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
+                        timeSinceIntaked.seconds() >= TIME_FRONT_DIST_COOLDOWN
+        ) {
+            // read i2c
+            color1.update();
+            color2.update();
+            hsv1 = color1.getHSV();
+            hsv2 = color2.getHSV();
+            a1 = Artifact.fromHSV(hsv1);
+            a2 = Artifact.fromHSV(hsv2);
+
+            artifacts[currentFrontSlot] = (a1 == GREEN || a2 == GREEN) ? GREEN : PURPLE;
+            timeSinceIntaked.reset();
+
+            feedDefault();
         }
-//
-//        double feederPower = manualFeederPower != 0 ?  manualFeederPower :  // manual power takes priority
-//                              ? 1 : SPEED_IDLE_FEEDER;
 
-        
+        if (feed)
+            timeSinceInFeedingTolerance.reset();
+
+        if (back1.getReading() <= THRESHOLD_BACK_MM)
+            timeSinceNoBall.reset();
+
+        // check back slot sensors
+        int currentBackSlot = rotor.getSlotAt(Rotor.Zone.FEEDER_SENSORS);
+        if (
+                (feederPower > 0 || timeSinceInFeedingTolerance.seconds() <= TIME_FEEDER_FLUCTUATION) &&  // the feeder is running
+                        currentBackSlot != -1 && // there is a slot near the back feeding zone
+                        artifacts[currentBackSlot] != EMPTY && // the slot was not previously empty
+                        timeSinceNoBall.seconds() >= TIME_BACK_DIST_FLUCTUATION && // distance sensor reports no artifact
+                        timeSinceFeed.seconds() >= TIME_BACK_DIST_COOLDOWN
+        ) {
+            artifacts[currentBackSlot] = EMPTY; // clear the back slot since it has been fed out
+            boostRPM.run();
+            timeSinceFeed.reset();
+        }
+
+
+
+
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;
             servo.setPower(feederPower);
         }
 
-        container.run(intakePower, feederPower);
-
         intake.threshold = CACHE_THRESHOLD_INTAKE;
-        intake.set(container.adaptiveClipIntakePower(intakePower));
+        intake.set(adaptiveClipIntakePower(intakePower));
 
         presserRServo.threshold = CACHE_THRESHOLD_PRESSERS;
         presserLServo.threshold = CACHE_THRESHOLD_PRESSERS;
@@ -157,25 +233,71 @@ public final class Handler {
     }
 
     /**
+     * Rounds intake speeds of [0, {@link #INTAKE_POWER_OMNI_CONTACT}) up to {@link #INTAKE_POWER_OMNI_CONTACT}
+     * if there is an {@link Artifact} touching the intake's front omni wheel <br><br>
+     * Rounds speeds of ({@link #INTAKE_POWER_IDLE}, 0] down to {@link #INTAKE_POWER_IDLE}
+     * if there is no {@link Artifact} touching the intake's front omni wheel
+     */
+    double adaptiveClipIntakePower(double intakePower) {
+        int omniSlot = rotor.getSlotAt(Rotor.Zone.INTAKE_OMNI);
+        int slotToFront = rotor.slotGoingToFront();
+        if (
+                intakePower >= 0 &&
+                        intakePower < INTAKE_POWER_OMNI_CONTACT &&
+                        (
+                                omniSlot != -1 && artifacts[omniSlot] != EMPTY ||
+                                slotToFront != -1 && artifacts[slotToFront] != EMPTY
+                        ) // artifact touching omni wheel
+        )
+            return INTAKE_POWER_OMNI_CONTACT;
+
+        if (
+                intakePower <= 0 &&
+                        intakePower > INTAKE_POWER_IDLE &&
+                        (omniSlot == -1 || artifacts[omniSlot] == EMPTY) // no artifact near the omni wheel
+        )
+            return INTAKE_POWER_IDLE;
+
+        return intakePower;
+    }
+
+    boolean feedsPending() {
+        return !feedingOrder.isEmpty() || timeSinceFeederRunning.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
+    }
+
+    private void feedDefault() {
+        if (motifMode) feedMotif();
+        else feedFastest();
+    }
+
+    public void feedSingle(Artifact color) {
+        feedingOrder.clear();
+
+        int first = rotor.getNearestSlot(i -> artifacts[i] == color, Rotor.Zone.FEEDER_SENSORS);
+        if (first != -1) // no Artifacts in the container
+            feedingOrder.add(first);
+    }
+
+    /**
      * Generate the most efficient feeding order
      */
     public void feedFastest() {
         feedingOrder.clear();
 
-        int first = container.getNearestFeedSlot();
+        int first = rotor.getNearestSlot(i -> artifacts[i] != EMPTY, Rotor.Zone.FEEDER_SENSORS);
         if (first == -1) // no Artifacts in the container
             return;
 
         feedingOrder.add(first);
 
-        int signOfFirstError = (int) signum(container.getError(first, Container.Zone.FEEDER_SENSORS));
+        int signOfFirstError = (int) signum(rotor.getError(first, Rotor.Zone.FEEDER_SENSORS));
 
         int second = wrap(first - signOfFirstError, 0, 3);
-        if (container.get(second) != EMPTY)
+        if (artifacts[second] != EMPTY)
             feedingOrder.add(second);
 
         int third = wrap(second - signOfFirstError, 0, 3);
-        if (container.get(third) != EMPTY)
+        if (artifacts[third] != EMPTY)
             feedingOrder.add(third);
     }
 
@@ -184,28 +306,52 @@ public final class Handler {
      */
     public void feedMotif() {
         feedingOrder.clear();
-        feedingOrder.addAll(randomization.getScoringOrder(allowOneWrongInMotifs, numArtifactsScored, container.artifacts));
+        feedingOrder.addAll(randomization.getScoringOrder(allowOneWrongInMotifs, numArtifactsScored, artifacts));
     }
 
-    public void feedSingle(Artifact color) {
-        feedingOrder.clear();
 
-        int first = container.getNearestFeedSlot(color);
-        if (first != -1) // no Artifacts in the container
-            feedingOrder.add(first);
+
+    public Motif randomization = Motif.PGP;
+    /// When scoring 3 {@link Artifact}s intended to score {@link Motif} points, allow up to ONE wrong color {@link Artifact}
+    public boolean allowOneWrongInMotifs = false;
+    public boolean motifMode = false;
+
+    private int numArtifactsScored = 0;
+    public void decrementArtifactsScored() {
+        if (numArtifactsScored > 0) numArtifactsScored--;
     }
+    public void incrementArtifactsScored() {
+        if (numArtifactsScored < 9) numArtifactsScored++;
+    }
+    public void clearRamp() {
+        numArtifactsScored = 0;
+    }
+
+
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("HANDLER", !motifMode ?
-                "Throughput, ignoring motifs" :
-                "Scoring motifs, " + (allowOneWrongInMotifs ? "up to one incorrect color" : "colors must be gxact"));
+        telemetry.addData("HANDLER", Arrays.toString(artifacts));
+        telemetry.addLine();
+        telemetry.addData("Artifact 1", a1);
+        hsv1.printTo(telemetry);
+        telemetry.addLine();
+        telemetry.addData("Artifact 2", a2);
+        hsv2.printTo(telemetry);
+        telemetry.addLine();
+        telemetry.addData("Front dist (mm)", front1.getReading());
+        telemetry.addData("Back dist (mm)", back1.getReading());
+        telemetry.addLine();
+        telemetry.addData("Motifs", !motifMode ?
+                        "Throughput, ignoring motifs" :
+                        "Scoring motifs, " + (allowOneWrongInMotifs ? "up to one incorrect color" : "colors must be gxact")
+        );
         telemetry.addLine();
         telemetry.addData("Feeding order", feedingOrder.toString());
         telemetry.addData("Randomization", randomization);
         telemetry.addLine();
         telemetry.addLine(numArtifactsScored + String.format(" ARTIFACT%s SCORED", numArtifactsScored == 1 ? "" : "S"));
         telemetry.addLine("\n--------------------------------------\n");
-        container.printTo(telemetry);
+        rotor.printTo(telemetry);
     }
 
 }

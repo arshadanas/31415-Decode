@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.opmode.tuning;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.Direction.REVERSE;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.pedropathing.Constants.pinpointConstants;
-import static org.firstinspires.ftc.teamcode.subsystem.Container.ROTOR_ENCODER_OFFSET;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
@@ -18,7 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystem.DigitalArtifactColor;
+import org.firstinspires.ftc.teamcode.subsystem.Rotor;
 import org.firstinspires.ftc.teamcode.subsystem.Turret;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
@@ -53,9 +52,6 @@ public final class TestSensors extends LinearOpMode {
                 frontDistance1 = new AnalogSensor(hardwareMap, "front 1", 4000),
                 backDistance1 = new AnalogSensor(hardwareMap, "back 1", 4000);
 
-        DigitalArtifactColor color1 = new DigitalArtifactColor(hardwareMap, "color 1a", "color 1b"); // TODO CONFIGURE
-        DigitalArtifactColor color2 = new DigitalArtifactColor(hardwareMap, "color 2a", "color 2b"); // TODO CONFIGURE
-
         DigitalChannel color1a = hardwareMap.digitalChannel.get("color 1a");
         DigitalChannel color1b = hardwareMap.digitalChannel.get("color 1b");
         DigitalChannel color2a = hardwareMap.digitalChannel.get("color 2a");
@@ -77,7 +73,7 @@ public final class TestSensors extends LinearOpMode {
             double turretRadQuad = normalizeRadians(turretQuadrature.getPosition() * turretRadPerTick);
             double turretRadPerSec = turretQuadrature.getCorrectedVelocity() * turretRadPerTick;
 
-            double rotorRad = normalizeRadians(rotorEncoder.getReading() + ROTOR_ENCODER_OFFSET);
+            double rotorRad = normalizeRadians(rotorEncoder.getReading() + Rotor.ROTOR_ENCODER_OFFSET);
 
             double turretRadAbs = normalizeRadians(-turretAbsolute.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
 
@@ -107,18 +103,6 @@ public final class TestSensors extends LinearOpMode {
             telemetry.addLine();
             telemetry.addData("Front distance (mm)", frontDistance1.getReading());
             telemetry.addData("Back distance (mm)", backDistance1.getReading());
-            telemetry.addLine();
-            telemetry.addLine("--------------------------------------");
-            telemetry.addLine();
-            telemetry.addLine("DIGITAL SENSORS");
-            telemetry.addLine();
-            telemetry.addData("Color 1", color1.getArtifact());
-            telemetry.addData("Color 1a", color1a.getState());
-            telemetry.addData("Color 1b", color1b.getState());
-            telemetry.addLine();
-            telemetry.addData("Color 2", color2.getArtifact());
-            telemetry.addData("Color 2a", color2a.getState());
-            telemetry.addData("Color 2b", color2b.getState());
             telemetry.addLine();
             telemetry.addLine("--------------------------------------");
             telemetry.addLine();

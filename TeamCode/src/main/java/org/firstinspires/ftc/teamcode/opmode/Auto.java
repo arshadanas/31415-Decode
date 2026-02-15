@@ -171,7 +171,7 @@ public final class Auto extends LinearOpMode {
 
         robot.setAlliance(isRedAlliance);
         Pose startPose = sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
-        robot.handler.container.setArtifacts(Motif.PGP.artifacts);
+        robot.handler.setContents(Motif.PGP.artifacts);
 
         Follower f = robot.drivetrain.drivetrain;
 
@@ -404,7 +404,7 @@ public final class Auto extends LinearOpMode {
                 telemetryPacket -> {
                     robot.run(feed, false);
                     sharedPose = robot.drivetrain.getPose();
-                    System.arraycopy(robot.handler.container.artifacts, 0, Auto.artifacts, 0, 3);
+                    System.arraycopy(robot.handler.artifacts, 0, Auto.artifacts, 0, 3);
                     return opModeIsActive();
                 },
                 auto
@@ -417,7 +417,7 @@ public final class Auto extends LinearOpMode {
         return new SequentialAction(
                 new InstantAction(() -> feed = true),
                 new FirstTerminateAction(
-                        t -> robot.hasArtifacts(),
+                        t -> robot.handler.hasArtifacts(),
                         new SleepAction(TIME_MAX_SCORE)
                 ),
                 new InstantAction(() -> feed = false)

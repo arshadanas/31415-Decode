@@ -23,9 +23,9 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.subsystem.Artifact;
-import org.firstinspires.ftc.teamcode.subsystem.Container;
 import org.firstinspires.ftc.teamcode.subsystem.Motif;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
+import org.firstinspires.ftc.teamcode.subsystem.Rotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 import java.io.File;
@@ -73,7 +73,7 @@ public final class Tele extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, new Pose());
         robot.drivetrain.startTeleopDrive();
 
-        robot.handler.container.setArtifacts(Auto.artifacts);
+        robot.handler.setContents(Auto.artifacts);
         // expire the shared artifacts
         System.arraycopy(Artifact.EMPTY_ARRAY, 0, Auto.artifacts, 0, 3);
 
@@ -103,7 +103,7 @@ public final class Tele extends LinearOpMode {
                 case EDITING_PRELOAD:
                     if (gamepad1.squareWasPressed()) {
                         preload = !preload;
-                        robot.handler.container.setArtifacts(preload ? Motif.PGP.artifacts : Artifact.EMPTY_ARRAY);
+                        robot.handler.setContents(preload ? Motif.PGP.artifacts : Artifact.EMPTY_ARRAY);
                     }
                     break;
                 case EDITING_PROFILING:
@@ -119,7 +119,7 @@ public final class Tele extends LinearOpMode {
             telemetry.addLine();
             telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "near zone (GOAL SIDE)" : "far zone (AUDIENCE SIDE)"));
             telemetry.addLine();
-            telemetry.addLine(EDITING_PRELOAD.markIf(selected) + "Preloaded: " + Arrays.toString(robot.handler.container.artifacts));
+            telemetry.addLine(EDITING_PRELOAD.markIf(selected) + "Preloaded: " + Arrays.toString(robot.handler.artifacts));
             telemetry.addLine();
             telemetry.addLine(EDITING_PROFILING.markIf(selected) + "Profiler " + (doProfiling ? "ENABLED" : "disabled"));
             telemetry.addLine();
@@ -201,7 +201,7 @@ public final class Tele extends LinearOpMode {
                         robot.handler.randomization = Motif.PPG;
 
                     if (gamepad1.triangleWasPressed())
-                        robot.handler.container.moveSlot(i++, Container.Zone.FEEDER_SENSORS);
+                        robot.handler.rotor.moveSlot(i++, Rotor.Zone.FEEDER_SENSORS);
 
                     if (gamepad1.crossWasPressed())
                         robot.handler.feedSingle(GREEN);

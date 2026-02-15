@@ -16,7 +16,6 @@ import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_INACTIV
 import static org.firstinspires.ftc.teamcode.subsystem.Lift.ANGLE_SWITCH_L_OFFSET;
 import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_SHALLOWEST;
 import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_STEEPEST;
-
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -24,7 +23,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystem.Container;
+import org.firstinspires.ftc.teamcode.subsystem.Rotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 @Config
@@ -116,8 +115,8 @@ public final class TuneServos extends LinearOpMode {
             gateL.offset = ANGLE_PRESSER_L_OFFSET;
             gearL.turnToAngle(gearLMax ? ANGLE_SWITCH_ENGAGED : ANGLE_SWITCH_INACTIVE);
 
-            rotor1.turnToAngle(normalizeRadians(rotorAngle + Container.ROTOR_OUTPUT_OFFSET));
-            rotor2.turnToAngle(normalizeRadians(rotorAngle + Container.ROTOR_OUTPUT_OFFSET + rotor2offset));
+            rotor1.turnToAngle(normalizeRadians(rotorAngle + Rotor.ROTOR_OUTPUT_OFFSET));
+            rotor2.turnToAngle(normalizeRadians(rotorAngle + Rotor.ROTOR_OUTPUT_OFFSET + rotor2offset));
 
             telemetry.addLine(HOOD.markIf(selected) + HOOD.name() + " at " + (hoodMax ? "max" : "min"));
             telemetry.addLine(GATE_R.markIf(selected) + GATE_R.name() + " at " + (gateRMax ? "max" : "min"));
