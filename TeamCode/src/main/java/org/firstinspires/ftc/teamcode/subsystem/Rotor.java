@@ -15,7 +15,9 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
+import java.util.OptionalInt;
 import java.util.function.IntPredicate;
+import java.util.stream.IntStream;
 
 @Config
 public final class Rotor {
@@ -88,27 +90,20 @@ public final class Rotor {
         /**
          * @return The (index of the) slot in the given zone, using the given slot 0 frame of reference
          */
-        int getSlotHere(double slot0Reference) {
-            for (int i = 0; i < 3; i++)
-                if (abs(distFrom(slot0Reference, i)) <= this.getTolerance())
-                    return i;
-            return -1;
+        OptionalInt getSlotHere(double slot0Reference, IntPredicate predicate) {
+            return IntStream.range(0, 3)
+                    .filter(predicate)
+                    .filter(i -> abs(distFrom(slot0Reference, i)) <= this.getTolerance())
+                    .findFirst();
         }
 
         /**
          * @return Slot closest to the specified zone that satisfies the predicate. -1 if no such slot found
          */
-        int getNearestSlot(double slot0Reference, IntPredicate predicate) {
-            double min = Double.MAX_VALUE;
-            int minInd = -1;
-            for (int i = 0; i < 3; i++) if (predicate.test(i)) {
-                double error = abs(distFrom(slot0Reference, i));
-                if (error < min) {
-                    min = error;
-                    minInd = i;
-                }
-            }
-            return minInd;
+        OptionalInt getNearestSlot(double slot0Reference, IntPredicate predicate) {
+            return IntStream.range(0, 3)
+                    .filter(predicate)
+                    .reduce((a, b) -> abs(distFrom(slot0Reference, a)) < abs(distFrom(slot0Reference, b)) ? a : b);
         }
     }
 
