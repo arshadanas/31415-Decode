@@ -40,7 +40,7 @@ public final class Rotor {
     private final CachedSimpleServo servo;
     private final AnalogSensor encoder;
 
-    private double lastRadians = getTargetRadians(0, Zone.INTAKE_SENSORS);
+    private double lastServoTarget = getServoTarget(0, Zone.INTAKE_SENSORS);
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
     private boolean wrapAround = true;
 
@@ -86,7 +86,7 @@ public final class Rotor {
 
         if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
             wrapAround = false;
-            servo.turnToAngle(lastRadians);
+            servo.turnToAngle(lastServoTarget);
         }
     }
 
@@ -97,26 +97,26 @@ public final class Rotor {
         slot = Ranges.wrap(slot, 0, 3);
         this.target = normalizeRadians(target.radians - 2 * PI / 3 * slot);
 
-        double newRadians = getTargetRadians(slot, target);
-        if (newRadians == lastRadians)
+        double newServoTarget = getServoTarget(slot, target);
+        if (newServoTarget == lastServoTarget)
             return;
 
-        double front0 = getTargetRadians(0, Zone.INTAKE_SENSORS);
-        double front1 = getTargetRadians(1, Zone.INTAKE_SENSORS);
+        double front0 = getServoTarget(0, Zone.INTAKE_SENSORS);
+        double front1 = getServoTarget(1, Zone.INTAKE_SENSORS);
 
-        wrapAround = lastRadians == front0 && newRadians == front1 ||
-                lastRadians == front1 && newRadians == front0;
+        wrapAround = lastServoTarget == front0 && newServoTarget == front1 ||
+                lastServoTarget == front1 && newServoTarget == front0;
 
-        lastRadians = newRadians;
+        lastServoTarget = newServoTarget;
 
         if (wrapAround) {
             servo.turnToAngle(-PI);
             wrapAroundTimer.reset();
         } else
-            servo.turnToAngle(lastRadians);
+            servo.turnToAngle(lastServoTarget);
     }
 
-    private static double getTargetRadians(int slot, Zone target) {
+    private static double getServoTarget(int slot, Zone target) {
         return normalizeRadians(ROTOR_OUTPUT_OFFSET + (
                 slot == 0 ? target.radians == 0 ? 0 : OFFSET_0_BACK :
                 slot == 1 ? target.radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
