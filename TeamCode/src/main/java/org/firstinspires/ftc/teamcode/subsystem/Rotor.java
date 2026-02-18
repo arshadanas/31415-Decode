@@ -49,11 +49,8 @@ public final class Rotor {
      */
     private double position = 0, target = 0;
 
-    /**
-     * Position of given slot, in radians
-     */
-    private double getPositionOf(int slot) {
-        return normalizeRadians(position + wrap(slot, 0, 3) * 2 * PI / 3.0);
+    private static double mapRadians(double slot0Radians, int slot) {
+        return normalizeRadians(slot0Radians + wrap(slot, 0, 3) * 2 * PI / 3.0);
     }
 
     public enum Zone {
@@ -152,7 +149,7 @@ public final class Rotor {
      * @return  Distance, in radians, between given slot's position and given target
      */
     double getError(int slot, Zone target) {
-        return normalizeRadians(target.radians - getPositionOf(slot));
+        return normalizeRadians(target.radians - mapRadians(position, slot));
     }
 
     /**
