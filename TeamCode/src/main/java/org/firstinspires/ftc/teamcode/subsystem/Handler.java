@@ -144,7 +144,7 @@ public final class Handler {
             rotor.moveSlot(feedingOrder.get(0), Rotor.Zone.FEEDER_SENSORS);
 
         // rotor at position:
-        int currentFrontSlot = rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.INTAKE_SENSORS);
+        int currentFrontSlot = Rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.INTAKE_SENSORS);
         if (
                 currentFrontSlot != -1 && artifacts[currentFrontSlot] == EMPTY && // the slot was previously empty
                 front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
@@ -170,7 +170,7 @@ public final class Handler {
             timeSinceHasBall.reset();
 
         // check back slot sensors
-        int currentBackSlot = rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.FEEDER_SENSORS);
+        int currentBackSlot = Rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.FEEDER_SENSORS);
         if (
                 currentBackSlot != -1 && artifacts[currentBackSlot] != EMPTY && // the slot was previously full
                 (back1.getReading() >= THRESHOLD_BACK_MM && timeSinceHasBall.seconds() >= TIME_BACK_DIST_FLUCTUATION) && // distance sensor reports no artifact
@@ -182,7 +182,7 @@ public final class Handler {
         }
         feedingOrder.removeIf(slot -> artifacts[slot] == EMPTY);
 
-        int slotAtFeeder = rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.FEEDER_OMNIS);
+        int slotAtFeeder = Rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.FEEDER_OMNIS);
         boolean noBallOrCorrectBallAtFeeder =
                         slotAtFeeder == -1 ||
 //                        artifacts[slotAtFeeder] == EMPTY ||
@@ -222,8 +222,8 @@ public final class Handler {
      * if there is no {@link Artifact} touching the intake's front omni wheel
      */
     double adaptiveClipIntakePower(double intakePower) {
-        int omniSlot = rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.INTAKE_OMNI);
-        int slotToFront = rotor.slotGoingToFront();
+        int omniSlot = Rotor.getSlotInTolerance(rotor.slot0Position, Rotor.Zone.INTAKE_OMNI);
+        int slotToFront = Rotor.getSlotInTolerance(rotor.slot0Target, Rotor.Zone.INTAKE_OMNI);
         if (
                 intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT &&
                 (
@@ -272,7 +272,7 @@ public final class Handler {
 
         feedingOrder.add(first);
 
-        int signOfFirstError = (int) signum(rotor.getError(first, rotor.slot0Position, Rotor.Zone.FEEDER_SENSORS));
+        int signOfFirstError = (int) signum(Rotor.getError(first, rotor.slot0Position, Rotor.Zone.FEEDER_SENSORS));
 
         int second = wrap(first - signOfFirstError, 0, 3);
         if (artifacts[second] != EMPTY)

@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
@@ -122,23 +121,19 @@ public final class Rotor {
     }
 
     /**
-     * @return The (index of the) slot currently at the given target, -1 if no slot at that position
+     * @return The (index of the) slot in the given zone, using the given slot 0 frame of reference
      */
-    int getSlotInTolerance(double slot0Radians, Zone target) {
+    static int getSlotInTolerance(double slot0Reference, Zone zone) {
         for (int i = 0; i < 3; i++)
-            if (abs(getError(i, slot0Radians, target)) <= target.getTolerance())
+            if (abs(getError(i, slot0Reference, zone)) <= zone.getTolerance())
                 return i;
         return -1;
-    }
-
-    int slotGoingToFront() {
-        return wrap((int) -Math.round(slot0Target / (2 * PI / 3)), 0, 3);
     }
 
     /**
      * @return  Distance, in radians, between given slot's position and given target
      */
-    double getError(int slot, double slot0Radians, Zone target) {
+    static double getError(int slot, double slot0Radians, Zone target) {
         return normalizeRadians(target.radians - offsetRadians(slot0Radians, slot));
     }
 
