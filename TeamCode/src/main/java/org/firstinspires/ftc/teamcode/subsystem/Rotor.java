@@ -39,7 +39,7 @@ public final class Rotor {
     private final CachedSimpleServo servo;
     private final AnalogSensor encoder;
 
-    private double lastServoTarget = getServoTarget(0, Zone.INTAKE_SENSORS);
+    private double lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(0);
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
     private boolean wrapAround = true;
 
@@ -69,6 +69,47 @@ public final class Rotor {
             }
         }
 
+        private double getServoTarget(int slot) {
+            slot = Ranges.wrap(slot, 0, 3);
+            return normalizeRadians(ROTOR_OUTPUT_OFFSET + (
+                    slot == 0 ? radians == 0 ? 0 : OFFSET_0_BACK :
+                    slot == 1 ? radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
+                                radians == 0 ? OFFSET_2_FRONT : OFFSET_2_BACK
+            ));
+        }
+
+        /**
+         * @return  Distance, in radians, between given slot's position and given target
+         */
+        double distFrom(double slot0Reference, int slot) {
+            return normalizeRadians(this.radians - offsetRadians(slot0Reference, slot));
+        }
+
+        /**
+         * @return The (index of the) slot in the given zone, using the given slot 0 frame of reference
+         */
+        int getSlotHere(double slot0Reference) {
+            for (int i = 0; i < 3; i++)
+                if (abs(distFrom(slot0Reference, i)) <= this.getTolerance())
+                    return i;
+            return -1;
+        }
+
+        /**
+         * @return Slot closest to the specified zone that satisfies the predicate. -1 if no such slot found
+         */
+        int getNearestSlot(double slot0Reference, IntPredicate predicate) {
+            double min = Double.MAX_VALUE;
+            int minInd = -1;
+            for (int i = 0; i < 3; i++) if (predicate.test(i)) {
+                double error = abs(distFrom(slot0Reference, i));
+                if (error < min) {
+                    min = error;
+                    minInd = i;
+                }
+            }
+            return minInd;
+        }
     }
 
     Rotor(HardwareMap hardwareMap) {
@@ -92,12 +133,12 @@ public final class Rotor {
     public void moveSlot(int slot, Zone target) {
         this.slot0Target = offsetRadians(target.radians, -slot);
 
-        double newServoTarget = getServoTarget(slot, target);
+        double newServoTarget = target.getServoTarget(slot);
         if (newServoTarget == lastServoTarget)
             return;
 
-        double front0 = getServoTarget(0, Zone.INTAKE_SENSORS);
-        double front1 = getServoTarget(1, Zone.INTAKE_SENSORS);
+        double front0 = Zone.INTAKE_SENSORS.getServoTarget(0);
+        double front1 = Zone.INTAKE_SENSORS.getServoTarget(1);
 
         wrapAround = lastServoTarget == front0 && newServoTarget == front1 ||
                 lastServoTarget == front1 && newServoTarget == front0;
@@ -109,48 +150,6 @@ public final class Rotor {
             wrapAroundTimer.reset();
         } else
             servo.turnToAngle(lastServoTarget);
-    }
-
-    private static double getServoTarget(int slot, Zone target) {
-        slot = Ranges.wrap(slot, 0, 3);
-        return normalizeRadians(ROTOR_OUTPUT_OFFSET + (
-                slot == 0 ? target.radians == 0 ? 0 : OFFSET_0_BACK :
-                slot == 1 ? target.radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
-                            target.radians == 0 ? OFFSET_2_FRONT : OFFSET_2_BACK
-        ));
-    }
-
-    /**
-     * @return The (index of the) slot in the given zone, using the given slot 0 frame of reference
-     */
-    static int getSlotInTolerance(double slot0Reference, Zone zone) {
-        for (int i = 0; i < 3; i++)
-            if (abs(getError(i, slot0Reference, zone)) <= zone.getTolerance())
-                return i;
-        return -1;
-    }
-
-    /**
-     * @return  Distance, in radians, between given slot's position and given target
-     */
-    static double getError(int slot, double slot0Radians, Zone target) {
-        return normalizeRadians(target.radians - offsetRadians(slot0Radians, slot));
-    }
-
-    /**
-     * @return Slot closest to the specified zone that satisfies the predicate. -1 if no such slot found
-     */
-    int getNearestSlot(IntPredicate predicate, Rotor.Zone zone) {
-        double min = Double.MAX_VALUE;
-        int minInd = -1;
-        for (int i = 0; i < 3; i++) if (predicate.test(i)) {
-            double error = abs(getError(i, slot0Position, zone));
-            if (error < min) {
-                min = error;
-                minInd = i;
-            }
-        }
-        return minInd;
     }
 
     void printTo(Telemetry telemetry) {
