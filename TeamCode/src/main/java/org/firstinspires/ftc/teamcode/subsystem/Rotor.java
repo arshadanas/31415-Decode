@@ -44,7 +44,7 @@ public final class Rotor {
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
     private boolean wrapAround = true;
 
-    private double slot0Position = 0, slot0Target = 0;
+    double slot0Position = 0, slot0Target = 0;
 
     private static double offsetRadians(double slot0Radians, int numSlotsCCW) {
         return normalizeRadians(slot0Radians + numSlotsCCW * 2 * PI / 3.0);
@@ -124,9 +124,9 @@ public final class Rotor {
     /**
      * @return The (index of the) slot currently at the given target, -1 if no slot at that position
      */
-    int getSlotAt(Zone target) {
+    int getSlotInTolerance(double slot0Radians, Zone target) {
         for (int i = 0; i < 3; i++)
-            if (atPosition(i, target))
+            if (abs(getError(i, slot0Radians, target)) <= target.getTolerance())
                 return i;
         return -1;
     }
@@ -136,17 +136,10 @@ public final class Rotor {
     }
 
     /**
-     * @return  If the given slot is at the given target, within tolerance in either direction
-     */
-    boolean atPosition(int slot, Zone target) {
-        return abs(getError(slot, target)) <= target.getTolerance();
-    }
-
-    /**
      * @return  Distance, in radians, between given slot's position and given target
      */
-    double getError(int slot, Zone target) {
-        return normalizeRadians(target.radians - offsetRadians(slot0Position, slot));
+    double getError(int slot, double slot0Radians, Zone target) {
+        return normalizeRadians(target.radians - offsetRadians(slot0Radians, slot));
     }
 
     /**
@@ -156,7 +149,7 @@ public final class Rotor {
         double min = Double.MAX_VALUE;
         int minInd = -1;
         for (int i = 0; i < 3; i++) if (predicate.test(i)) {
-            double error = abs(getError(i, zone));
+            double error = abs(getError(i, slot0Position, zone));
             if (error < min) {
                 min = error;
                 minInd = i;
