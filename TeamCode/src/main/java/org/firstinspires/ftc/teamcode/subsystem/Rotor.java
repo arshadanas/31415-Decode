@@ -44,13 +44,10 @@ public final class Rotor {
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
     private boolean wrapAround = true;
 
-    /**
-     * Position of slot 0, in radians
-     */
-    private double position = 0, target = 0;
+    private double slot0Position = 0, slot0Target = 0;
 
-    private static double mapRadians(double slot0Radians, int slot) {
-        return normalizeRadians(slot0Radians + wrap(slot, 0, 3) * 2 * PI / 3.0);
+    private static double offsetRadians(double slot0Radians, int numSlotsCCW) {
+        return normalizeRadians(slot0Radians + numSlotsCCW * 2 * PI / 3.0);
     }
 
     public enum Zone {
@@ -82,7 +79,7 @@ public final class Rotor {
 
     void run() {
 
-        position = normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET);
+        slot0Position = normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET);
 
         if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
             wrapAround = false;
@@ -94,8 +91,7 @@ public final class Rotor {
      * @param slot Slot you wish to move (0, 1 or 2)
      */
     public void moveSlot(int slot, Zone target) {
-        slot = Ranges.wrap(slot, 0, 3);
-        this.target = normalizeRadians(target.radians - 2 * PI / 3 * slot);
+        this.slot0Target = offsetRadians(target.radians, -slot);
 
         double newServoTarget = getServoTarget(slot, target);
         if (newServoTarget == lastServoTarget)
@@ -117,6 +113,7 @@ public final class Rotor {
     }
 
     private static double getServoTarget(int slot, Zone target) {
+        slot = Ranges.wrap(slot, 0, 3);
         return normalizeRadians(ROTOR_OUTPUT_OFFSET + (
                 slot == 0 ? target.radians == 0 ? 0 : OFFSET_0_BACK :
                 slot == 1 ? target.radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
@@ -135,7 +132,7 @@ public final class Rotor {
     }
 
     int slotGoingToFront() {
-        return wrap((int) -Math.round(target / (2 * PI / 3)), 0, 3);
+        return wrap((int) -Math.round(slot0Target / (2 * PI / 3)), 0, 3);
     }
 
     /**
@@ -149,7 +146,7 @@ public final class Rotor {
      * @return  Distance, in radians, between given slot's position and given target
      */
     double getError(int slot, Zone target) {
-        return normalizeRadians(target.radians - mapRadians(position, slot));
+        return normalizeRadians(target.radians - offsetRadians(slot0Position, slot));
     }
 
     /**
@@ -171,8 +168,8 @@ public final class Rotor {
     void printTo(Telemetry telemetry) {
         telemetry.addLine("ROTOR:");
         telemetry.addLine();
-        telemetry.addData("Slot 0 position (deg)", toDegrees(position));
-        telemetry.addData("Slot 0 target (deg)", toDegrees(target));
-        telemetry.addData("Error (deg)", toDegrees(normalizeRadians(target - position)));
+        telemetry.addData("Slot 0 position (deg)", toDegrees(slot0Position));
+        telemetry.addData("Slot 0 target (deg)", toDegrees(slot0Target));
+        telemetry.addData("Error (deg)", toDegrees(normalizeRadians(slot0Target - slot0Position)));
     }
 }
