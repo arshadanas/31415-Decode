@@ -41,9 +41,9 @@ public final class Rotor {
     private final CachedSimpleServo servo;
     private final AnalogSensor encoder;
 
-    private double lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(0);
+    private double lastServoTarget;
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
-    private boolean wrapAround = true;
+    private boolean wrapAround = false;
 
     double slot0Position = 0, slot0Target = 0;
 
@@ -110,6 +110,11 @@ public final class Rotor {
     Rotor(HardwareMap hardwareMap) {
         servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
+
+        // slot nearest to feeder because we preload with a slot aligned to the feeder
+        Zone.FEEDER_SENSORS
+            .getNearestSlot(normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET), i -> true)
+            .ifPresent(i -> this.lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(i));
     }
 
     void run() {
