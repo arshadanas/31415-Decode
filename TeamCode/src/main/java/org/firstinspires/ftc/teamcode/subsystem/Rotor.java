@@ -112,9 +112,9 @@ public final class Rotor {
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
 
         // slot nearest to feeder because we preload with a slot aligned to the feeder
-        Zone.FEEDER_SENSORS
-            .getNearestSlot(normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET), i -> true)
-            .ifPresent(i -> this.lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(i));
+        OptionalInt slotAtFeeder = Zone.FEEDER_SENSORS.getNearestSlot(normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET), i -> true);
+        if (slotAtFeeder.isPresent())
+            this.lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(slotAtFeeder.getAsInt());
     }
 
     void run() {
