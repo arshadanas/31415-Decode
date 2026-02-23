@@ -72,11 +72,11 @@ public final class Handler {
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
     private final ElapsedTime
-            timeSinceBallAtFeeder = new ElapsedTime(),
-            timeSinceHasBall = new ElapsedTime(),
+            timeSinceRunningFeeder = new ElapsedTime(),
+            timeSinceFeederSeenBall = new ElapsedTime(),
             timeSinceIntaked = new ElapsedTime(),
-            timeSinceFeed = new ElapsedTime(),
-            timeSinceInFeedingTolerance = new ElapsedTime();
+            timeSinceFed = new ElapsedTime(),
+            timeSinceShooterInTolerance = new ElapsedTime();
 
     private final Runnable boostRPM;
 
@@ -164,18 +164,18 @@ public final class Handler {
         // Everytime we detect a ball, reset timer
         // This is for the holes
         if (back1.getReading() < THRESHOLD_BACK_MM)
-            timeSinceHasBall.reset();
+            timeSinceFeederSeenBall.reset();
 
         // check back slot sensors
         OptionalInt filledBackSlot = Rotor.Zone.FEEDER_SENSORS.getSlotHere(rotor.slot0Position, i -> artifacts[i] != EMPTY);
         if (
                 filledBackSlot.isPresent() && // the slot was previously full
-                (back1.getReading() >= THRESHOLD_BACK_MM && timeSinceHasBall.seconds() >= TIME_BACK_DIST_FLUCTUATION) && // distance sensor reports no artifact
-                timeSinceFeed.seconds() >= TIME_FEED_COOLDOWN
+                (back1.getReading() >= THRESHOLD_BACK_MM && timeSinceFeederSeenBall.seconds() >= TIME_BACK_DIST_FLUCTUATION) && // distance sensor reports no artifact
+                timeSinceFed.seconds() >= TIME_FEED_COOLDOWN
         ) {
             artifacts[filledBackSlot.getAsInt()] = EMPTY; // clear the back slot since it has been fed out
             boostRPM.run();
-            timeSinceFeed.reset();
+            timeSinceFed.reset();
         }
         feedingOrder.removeIf(slot -> artifacts[slot] == EMPTY);
 
@@ -187,9 +187,9 @@ public final class Handler {
         ;
 
         if (shooterInTolerance && noBallOrCorrectBallAtFeeder)
-            timeSinceBallAtFeeder.reset();
+            timeSinceRunningFeeder.reset();
 
-        boolean keepRunningFeeder = timeSinceBallAtFeeder.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
+        boolean keepRunningFeeder = timeSinceRunningFeeder.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST;
 
         double feederPower =
                 manualFeederPower != 0 ?                                                    manualFeederPower :
