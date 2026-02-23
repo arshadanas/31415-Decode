@@ -115,8 +115,8 @@ public final class TuneServos extends LinearOpMode {
             gateL.offset = ANGLE_PRESSER_L_OFFSET;
             gearL.turnToAngle(gearLMax ? ANGLE_SWITCH_ENGAGED : ANGLE_SWITCH_INACTIVE);
 
-            rotor1.turnToAngle(normalizeRadians(rotorAngle + Rotor.ROTOR_OUTPUT_OFFSET));
-            rotor2.turnToAngle(normalizeRadians(rotorAngle + Rotor.ROTOR_OUTPUT_OFFSET + rotor2offset));
+            rotor1.turnToAngle(normalizeRadians(rotorAngle + Rotor.OFFSET_0_FRONT + Rotor.ENCODER_OFFSET));
+            rotor2.turnToAngle(normalizeRadians(rotorAngle + Rotor.OFFSET_0_FRONT + Rotor.ENCODER_OFFSET + rotor2offset));
 
             telemetry.addLine(HOOD.markIf(selected) + HOOD.name() + " at " + (hoodMax ? "max" : "min"));
             telemetry.addLine(GATE_R.markIf(selected) + GATE_R.name() + " at " + (gateRMax ? "max" : "min"));

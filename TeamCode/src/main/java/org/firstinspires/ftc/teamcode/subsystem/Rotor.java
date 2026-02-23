@@ -22,14 +22,22 @@ import java.util.stream.IntStream;
 @Config
 public final class Rotor {
 
+    public static void main(String... args) {
+        System.out.println(Zone.FEEDER_SENSORS.getServoTarget(0));
+        System.out.println(Zone.INTAKE_SENSORS.getServoTarget(1));
+        System.out.println(Zone.FEEDER_SENSORS.getServoTarget(1));
+        System.out.println(Zone.INTAKE_SENSORS.getServoTarget(2));
+        System.out.println(Zone.FEEDER_SENSORS.getServoTarget(2));
+    }
+
     public static double
-            ROTOR_ENCODER_OFFSET = -1.5742869852988852,
-            ROTOR_OUTPUT_OFFSET = -1.7,
-            OFFSET_0_BACK = 3.45,
-            OFFSET_1_FRONT = -1.7,
-            OFFSET_1_BACK = 1.175,
-            OFFSET_2_FRONT = 2.35,
-            OFFSET_2_BACK = -1.125,
+            ENCODER_OFFSET = -1.5742869852988852,
+            OFFSET_0_FRONT = -0.12571301470111473,
+            OFFSET_0_BACK = 0.18269433170909233,
+            OFFSET_1_FRONT = 0.2686820876920806,
+            OFFSET_1_BACK = 0.0020894341022874574,
+            OFFSET_2_FRONT = 0.12989188290568965,
+            OFFSET_2_BACK = -0.20351546350451732,
 
             TIME_WRAPAROUND = 0.03,
 
@@ -45,7 +53,7 @@ public final class Rotor {
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
     private boolean wrapAround = false;
 
-    double slot0Position = 0, slot0Target = 0;
+    double slot0Position, slot0Target;
 
     private static double offsetRadians(double slot0Radians, int numSlotsCCW) {
         return normalizeRadians(slot0Radians + numSlotsCCW * 2 * PI / 3.0);
@@ -73,8 +81,8 @@ public final class Rotor {
 
         private double getServoTarget(int slot) {
             slot = Ranges.wrap(slot, 0, 3);
-            return normalizeRadians(ROTOR_OUTPUT_OFFSET + (
-                    slot == 0 ? radians == 0 ? 0 : OFFSET_0_BACK :
+            return normalizeRadians(offsetRadians(radians, -slot) + ENCODER_OFFSET + (
+                    slot == 0 ? radians == 0 ? OFFSET_0_FRONT : OFFSET_0_BACK :
                     slot == 1 ? radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
                                 radians == 0 ? OFFSET_2_FRONT : OFFSET_2_BACK
             ));
@@ -113,13 +121,13 @@ public final class Rotor {
 
         // slot nearest to feeder because we preload with a slot aligned to the feeder
         Zone.FEEDER_SENSORS
-            .getNearestSlot(normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET), i -> true)
+            .getNearestSlot(slot0Target = slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET), i -> true)
             .ifPresent(i -> this.lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(i));
     }
 
     void run() {
 
-        slot0Position = normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET);
+        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
 
         if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
             wrapAround = false;
