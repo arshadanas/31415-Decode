@@ -17,7 +17,6 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
 import java.util.OptionalInt;
 import java.util.function.IntPredicate;
-import java.util.stream.IntStream;
 
 @Config
 public final class Rotor {
@@ -90,29 +89,37 @@ public final class Rotor {
         }
 
         /**
-         * @return  Distance, in radians, between given slot's position and given target
+         * @return Distance, in radians, between given slot and this zone's specific {@link #radians}
          */
         double distFrom(double slot0Reference, int slot) {
             return normalizeRadians(this.radians - offsetRadians(slot0Reference, slot));
         }
 
         /**
-         * @return The (index of the) slot in the given zone, using the given slot 0 frame of reference
+         * @return Slot in this zone that satisfies the predicate
          */
         OptionalInt getSlotHere(double slot0Reference, IntPredicate predicate) {
-            return IntStream.range(0, 3)
-                    .filter(predicate)
-                    .filter(i -> abs(distFrom(slot0Reference, i)) <= this.getTolerance())
-                    .findFirst();
+            for (int i = 0; i < 3; i++)
+                if (predicate.test(i) && abs(distFrom(slot0Reference, i)) <= this.getTolerance())
+                    return OptionalInt.of(i);
+            return OptionalInt.empty();
         }
 
         /**
-         * @return Slot closest to the specified zone that satisfies the predicate. -1 if no such slot found
+         * @return Slot closest to this zone that satisfies the predicate
          */
         OptionalInt getNearestSlot(double slot0Reference, IntPredicate predicate) {
-            return IntStream.range(0, 3)
-                    .filter(predicate)
-                    .reduce((a, b) -> abs(distFrom(slot0Reference, a)) < abs(distFrom(slot0Reference, b)) ? a : b);
+            double min = Double.MAX_VALUE;
+            int minInd = -1;
+            for (int i = 0; i < 3; i++)
+                if (predicate.test(i)) {
+                    double error = abs(distFrom(slot0Reference, i));
+                    if (error < min) {
+                        min = error;
+                        minInd = i;
+                    }
+                }
+            return minInd == -1 ? OptionalInt.empty() : OptionalInt.of(minInd);
         }
     }
 
