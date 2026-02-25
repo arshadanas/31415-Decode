@@ -23,6 +23,7 @@ import java.util.stream.IntStream;
 public final class Rotor {
 
     public static void main(String... args) {
+        System.out.println(Zone.INTAKE_SENSORS.getServoTarget(0));
         System.out.println(Zone.FEEDER_SENSORS.getServoTarget(0));
         System.out.println(Zone.INTAKE_SENSORS.getServoTarget(1));
         System.out.println(Zone.FEEDER_SENSORS.getServoTarget(1));
