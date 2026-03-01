@@ -8,6 +8,7 @@ import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.OptionalInt;
 
 public enum Motif {
 
@@ -58,31 +59,33 @@ public enum Motif {
 
         allowOneWrong = allowOneWrong && EMPTY.numOccurrencesIn(spindexerSlots) == 0 && numArtifactsScored <= 6;
 
-        int firstArtifactIndex = effectiveMotif.artifacts[0].firstOccurrenceIn(spindexerSlots);
-        int auditIndex = 1; // spindexer slot to check after first one
+        int firstIndex, secondIndex;
 
-        // no artifact in spindexer matches first color of motif
-        if (firstArtifactIndex == -1) {
+        OptionalInt indexOfA0 = effectiveMotif.artifacts[0].firstOccurrenceIn(spindexerSlots);
+        if (indexOfA0.isPresent()) {
+            firstIndex = indexOfA0.getAsInt();
+            secondIndex = 1;
+        } else {
             if (!allowOneWrong)
                 return new ArrayList<>();
 
             // find occurrence of second motif color in spindexer
-            firstArtifactIndex = effectiveMotif.artifacts[1].firstOccurrenceIn(spindexerSlots) - 1;
-
-            if (firstArtifactIndex == -2) // -2 because search result was followed by - 1
+            OptionalInt indexOfA1 = effectiveMotif.artifacts[1].firstOccurrenceIn(spindexerSlots);
+            if (!indexOfA1.isPresent())
                 return new ArrayList<>();
 
-            auditIndex = 0;
+            firstIndex = indexOfA1.getAsInt() - 1;
+            secondIndex = 0;
         }
 
         ArrayList<Integer> scoringOrder = new ArrayList<>(Arrays.asList(0, 1, 2));
 
-        Collections.rotate(scoringOrder, -firstArtifactIndex);
+        Collections.rotate(scoringOrder, -firstIndex);
 
-        boolean correctAudited = spindexerSlots[scoringOrder.get(auditIndex)] == effectiveMotif.artifacts[auditIndex];
+        boolean correctAudited = spindexerSlots[scoringOrder.get(secondIndex)] == effectiveMotif.artifacts[secondIndex];
 
-        if (!correctAudited && spindexerSlots[scoringOrder.get(2)] == effectiveMotif.artifacts[auditIndex]) {
-            Collections.swap(scoringOrder, auditIndex, 2);
+        if (!correctAudited && spindexerSlots[scoringOrder.get(2)] == effectiveMotif.artifacts[secondIndex]) {
+            Collections.swap(scoringOrder, secondIndex, 2);
             correctAudited = true;
         }
 
