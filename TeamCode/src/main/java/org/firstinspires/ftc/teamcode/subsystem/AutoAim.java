@@ -15,24 +15,19 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 @Config
 public final class AutoAim {
 
+    public static Vector2 GOAL_OFFSET = new Vector2(0, 0);
+
     public static double
-            GOAL_OFFSET_Y = 0,
-            GOAL_OFFSET_X = 0,
             LAUNCH_RPM_TUNING = 5000,
             LAUNCH_RAD_TUNING = 1.0776000610289713;
 
     double launchRPM, launchAngle, turretAngle, r0, r_t, airtime;
     LaunchZone currentZone;
 
-    private Vector2 G;
-
-    AutoAim() {}
+    private final Vector2 G = new Vector2(0, SIZE_FIELD + GOAL_OFFSET.y);
 
     void setAlliance(boolean isRedAlliance) {
-        G = new Vector2(
-                isRedAlliance ? SIZE_FIELD - GOAL_OFFSET_X : GOAL_OFFSET_X,
-                SIZE_FIELD + GOAL_OFFSET_Y
-        );
+        G.x += isRedAlliance ? SIZE_FIELD - GOAL_OFFSET.x : GOAL_OFFSET.x;
     }
 
     void update(Pose pose, Vector velocity, double angVel, double currentRPM) {
