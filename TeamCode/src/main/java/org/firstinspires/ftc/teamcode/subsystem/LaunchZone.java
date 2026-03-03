@@ -18,16 +18,8 @@ public enum LaunchZone {
     NEAR,
     FAR;
 
-    public static final double
-            FORWARD_OFFSET_IN = 1.45714,
-            LENGTH_TOTAL_IN = 17.73172,
-            WIDTH_TOTAL_IN = Auto.WIDTH_DRIVETRAIN;
-
-    private static final Transform nearZonePosition;
-    private static final Transform farZonePosition;
-    private static final Rectangle nearZoneRect;
-    private static final Rectangle farZoneRect;
-    private static final Rectangle robotRect;
+    private static final Transform nearZonePosition, farZonePosition;
+    private static final Rectangle nearZoneRect, farZoneRect, robotRect;
     private static final Gjk collisionSolver = new Gjk();
 
     static {
@@ -37,7 +29,7 @@ public enum LaunchZone {
         nearZoneRect = new Rectangle(nearZoneSize, nearZoneSize);
         farZoneRect = new Rectangle(farZoneSize, farZoneSize);
 
-        robotRect = new Rectangle(LENGTH_TOTAL_IN, WIDTH_TOTAL_IN * 1);
+        robotRect = new Rectangle(17.73172, Auto.WIDTH_DRIVETRAIN * 1);
 
         nearZonePosition = new Transform();
         farZonePosition = new Transform();
@@ -55,9 +47,10 @@ public enum LaunchZone {
         Transform robotPose = new Transform();
 
         robotPose.rotate(heading);
+        double FORWARD_OFFSET = 1.45714;
         robotPose.translate(
-                currentPose.getX() + (FORWARD_OFFSET_IN * cos(heading)),
-                currentPose.getY() + (FORWARD_OFFSET_IN * sin(heading))
+                currentPose.getX() + (FORWARD_OFFSET * cos(heading)),
+                currentPose.getY() + (FORWARD_OFFSET * sin(heading))
         );
 
         if (collisionSolver.detect(robotRect, robotPose, nearZoneRect, nearZonePosition)) {
