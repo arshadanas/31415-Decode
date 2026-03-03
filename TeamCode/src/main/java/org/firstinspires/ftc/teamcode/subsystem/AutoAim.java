@@ -127,12 +127,9 @@ public final class AutoAim {
         return 0.271632 * preLaunchRPM + 109.1459;
     }
 
-    static {
-        Vector2 ad = new Vector2();
-    }
-
     public static void main(String[] args) {
 
+        Vector2 ad = new Vector2();
         double sum = 0;
 
         for (int i = 0; i < 200; i++){
