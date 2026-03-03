@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static java.lang.Math.PI;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -21,15 +19,10 @@ public final class AutoAim {
     public static double
             GOAL_OFFSET_Y = 0,
             GOAL_OFFSET_X = 0,
-            LAUNCH_RPM = 5000,
-            LAUNCH_RAD = 1.0776000610289713,
-            TURRET_X_OFFSET = -1.86759,
-            CURVE_FIT_RPM_MIN = 2916.29066,
-            CURVE_FIT_RPM_SLOPE = 21.27491,
-            CURVE_FIT_ANGLE_SLOPE = -0.00307104,
-            CURVE_FIT_ANGLE_Y_INT = 1.22222;
+            LAUNCH_RPM_TUNING = 5000,
+            LAUNCH_RAD_TUNING = 1.0776000610289713;
 
-    double launchRPM, launchAngle, turretAngle, r, r_t, airtime;
+    double launchRPM, launchAngle, turretAngle, r0, r_t, airtime;
     LaunchZone currentZone;
 
     private Vector2 G;
@@ -49,62 +42,50 @@ public final class AutoAim {
         currentZone = LaunchZone.getCurrentZone(pose);
         Profiler.end("GetCurrentZone");
 
-        double heading = normalizeRadians(pose.getHeading());
-
-        Vector2 R = new Vector2(pose.getX(), pose.getY()); // robot center
-        Vector2 R_vel = new Vector2(velocity.getXComponent(), velocity.getYComponent());
-
-        Vector2 S = getTurretCenter(R, heading);
-        Vector2 S_vel = getTurretVel(R_vel, heading, angVel);
-
-        Vector2 rVector = S.to(G);
-        r = rVector.getMagnitude();
-
         double
-                m = S_vel.getMagnitude(),
-                a = S_vel.getDirection(),
-                b = rVector.getDirection(),
-                g = b - a,
-                r_vel = -m*cos(g),
-                h_vel = m*sin(g);
+                heading = normalizeRadians(pose.getHeading()),
+                TURRET_X_OFFSET = -1.86759;
+
+        Vector2 s0 = new Vector2(pose.getX(), pose.getY())
+                        .sum(Vector2.create(TURRET_X_OFFSET, heading));
+        Vector2 v0 = new Vector2(velocity.getXComponent(), velocity.getYComponent())
+                        .sum(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2));
+
+        Vector2 launchVec = s0.to(G);
+        r0 = launchVec.getMagnitude();
 
         Profiler.start("iterate airtime");
-        airtime = getFinalAirtime(S, S_vel, G);
+        airtime = getFinalAirtime(s0, v0, G);
         Profiler.end("iterate airtime");
 
-        Vector2 S_t = S.sum(S_vel.product(airtime));
-        double heading_t = heading + angVel * airtime;
-        Vector2 rVector_t = S_t.to(G);
-        r_t = rVector_t.getMagnitude();
+        Vector2 s_t = s0.sum(v0.product(airtime));
+        Vector2 launchVec_t = s_t.to(G);
+        r_t = launchVec_t.getMagnitude();
 
-        turretAngle = -rVector_t.getAngleBetween(heading_t);
-        launchRPM = CURVE_FIT_RPM_SLOPE * r_t + CURVE_FIT_RPM_MIN;
-        launchAngle = CURVE_FIT_ANGLE_SLOPE * r_t + CURVE_FIT_ANGLE_Y_INT;
-//        launchRPM = LAUNCH_RPM;
-//        launchAngle = LAUNCH_RAD;
+        turretAngle = -launchVec_t.getAngleBetween(heading);
+        launchRPM = 21.27491 * r_t + 2916.29066;
+        launchAngle = -0.00307104 * r_t + 1.22222;
+//        launchRPM = LAUNCH_RPM_TUNING;
+//        launchAngle = LAUNCH_RAD_TUNING;
 
     }
 
-    private static Vector2 getTurretCenter(Vector2 R, double heading) {
-        return R.sum(Vector2.create(TURRET_X_OFFSET, heading));
-    }
-
-    private static Vector2 getTurretVel(Vector2 R_vel, double heading, double angVel) {
-        return R_vel.sum(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI/2));
-    }
-    
     /**
-     * https://www.desmos.com/calculator/akmmitciiz
+     * <a href="https://www.desmos.com/calculator/9rno9gfxn7">Desmos</a>
      */
-    private static double getFinalAirtime(Vector2 S_0, Vector2 S_vel_0, Vector2 G) {
+    private static double getFinalAirtime(Vector2 s0, Vector2 v0, Vector2 G) {
         double airtime = 0;
-        int iterations = 15; // TODO vary iterations based on |S_vel_0|
+        int iterations = 15;
         for (int i = 0; i < iterations; i++) {
-            Vector2 S_t = S_0.sum(S_vel_0.product(airtime));
-            double distToGoal = S_t.distance(G);
-            airtime = 0; // TODO curve fit airtime
+            Vector2 s_t = s0.sum(v0.product(airtime));
+            airtime = getAirtime(s_t.distance(G));
         }
-        return airtime; // TODO set maximum airtime
+        return airtime;
+    }
+
+    // TODO curve fit, determine # iterations, & clip output
+    private static double getAirtime(double distToGoal) {
+        return 0;
     }
 
     /**
@@ -148,7 +129,7 @@ public final class AutoAim {
     void printTo(Telemetry telemetry) {
         telemetry.addData("Current zone", currentZone);
         telemetry.addLine();
-        telemetry.addData("Shooter-goal dist at 0 (in)", r);
+        telemetry.addData("Shooter-goal dist at 0 (in)", r0);
         telemetry.addData("Shooter-goal dist at t (in)", r_t);
         telemetry.addLine();
         telemetry.addData("Turret angle at 0 (deg)", toDegrees(turretAngle));
