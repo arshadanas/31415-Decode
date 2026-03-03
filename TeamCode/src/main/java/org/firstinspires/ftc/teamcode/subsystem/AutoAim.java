@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static java.lang.Math.PI;
-import static java.lang.Math.toDegrees;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -47,9 +46,9 @@ public final class AutoAim {
                 TURRET_X_OFFSET = -1.86759;
 
         Vector2 s0 = new Vector2(pose.getX(), pose.getY())
-                        .sum(Vector2.create(TURRET_X_OFFSET, heading));
+                        .add(Vector2.create(TURRET_X_OFFSET, heading));
         Vector2 v0 = new Vector2(velocity.getXComponent(), velocity.getYComponent())
-                        .sum(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2));
+                        .add(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2));
 
         Vector2 launchVec = s0.to(G);
         r0 = launchVec.getMagnitude();
@@ -58,8 +57,7 @@ public final class AutoAim {
         airtime = getFinalAirtime(s0, v0, G);
         Profiler.end("iterate airtime");
 
-        Vector2 s_t = s0.sum(v0.product(airtime));
-        Vector2 launchVec_t = s_t.to(G);
+        Vector2 launchVec_t = v0.product(airtime).add(s0).negate().add(G); // -(v0*t + s0) + G
         r_t = launchVec_t.getMagnitude();
 
         turretAngle = -launchVec_t.getAngleBetween(heading);
@@ -76,10 +74,8 @@ public final class AutoAim {
     private static double getFinalAirtime(Vector2 s0, Vector2 v0, Vector2 G) {
         double airtime = getLinearAirtime(s0, v0, G);
         int iterations = 15;
-        for (int i = 0; i < iterations; i++) {
-            Vector2 s_t = s0.sum(v0.product(airtime));
-            airtime = getAirtime(s_t.distance(G));
-        }
+        for (int i = 0; i < iterations; i++)
+            airtime = getAirtime(v0.product(airtime).add(s0).distance(G)); // |v0*t + s0 - G|
         return airtime;
     }
 
@@ -129,19 +125,18 @@ public final class AutoAim {
     public static void main(String[] args) {
 
         Vector2 ad = new Vector2();
-        double sum = 0;
+        int n = 200;
+        double a = System.nanoTime();
 
-        for (int i = 0; i < 200; i++){
-            double a = System.nanoTime();
+        for (int i = 0; i < n; i++){
             double airtime = getFinalAirtime(
                     new Vector2(-70.75, -70.75),     // S_0
                     new Vector2(-63.4788154, -63.8), // S_vel_0
                     new Vector2(70.75, 70.75)        // G
             );
-            sum += ((System.nanoTime() - a) / 1e+6);
         }
 
-        System.out.println(sum / 200);
+        System.out.println((System.nanoTime() - a) / n / 1e+6);
     }
 
     void printTo(Telemetry telemetry) {
@@ -149,9 +144,6 @@ public final class AutoAim {
         telemetry.addLine();
         telemetry.addData("Shooter-goal dist at 0 (in)", r0);
         telemetry.addData("Shooter-goal dist at t (in)", r_t);
-        telemetry.addLine();
-        telemetry.addData("Turret angle at 0 (deg)", toDegrees(turretAngle));
-        telemetry.addLine();
-        telemetry.addData("Computed airtime t", airtime);
+        telemetry.addData("Computed airtime t (s)", airtime);
     }
 }
