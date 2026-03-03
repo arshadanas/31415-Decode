@@ -74,13 +74,31 @@ public final class AutoAim {
      * <a href="https://www.desmos.com/calculator/9rno9gfxn7">Desmos</a>
      */
     private static double getFinalAirtime(Vector2 s0, Vector2 v0, Vector2 G) {
-        double airtime = 0;
+        double airtime = getLinearAirtime(s0, v0, G);
         int iterations = 15;
         for (int i = 0; i < iterations; i++) {
             Vector2 s_t = s0.sum(v0.product(airtime));
             airtime = getAirtime(s_t.distance(G));
         }
         return airtime;
+    }
+
+    /**
+     * @return closed form airtime solution for a linear airtime curve-fit
+     */
+    private static double getLinearAirtime(Vector2 s0, Vector2 v0, Vector2 G) {
+        Vector2 launchPath = s0.to(G);
+        double // Mx + B
+                M = 0.00343072843338, // TODO curve fit
+                B = 0.286480431595,
+                M_invSquared = 1 / (M*M),
+                // quadratic coeffs
+                a = v0.getMagnitudeSquared() - M_invSquared,
+                b = -2 * v0.dot(launchPath) + 2*B*M_invSquared,
+                c = launchPath.getMagnitudeSquared() - B*B*M_invSquared;
+
+        return 0;
+//        return ( -b - sqrt(b*b - 4*a*c) ) / (2*a);
     }
 
     // TODO curve fit, determine # iterations, & clip output
