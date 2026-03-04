@@ -24,10 +24,12 @@ public final class AutoAim {
     double launchRPM, launchAngle, turretAngle, r0, r_t, airtime;
     LaunchZone currentZone;
 
-    private final Vector2 G = new Vector2(0, SIZE_FIELD + GOAL_OFFSET.y);
+    private final Vector2
+            G = new Vector2(0, SIZE_FIELD + GOAL_OFFSET.y),
+            s0 = new Vector2(), v0 = new Vector2(), launchVec = new Vector2();
 
     void setAlliance(boolean isRedAlliance) {
-        G.x += isRedAlliance ? SIZE_FIELD - GOAL_OFFSET.x : GOAL_OFFSET.x;
+        G.x = isRedAlliance ? SIZE_FIELD - GOAL_OFFSET.x : GOAL_OFFSET.x;
     }
 
     void update(Pose pose, Vector velocity, double angVel, double currentRPM) {
@@ -40,22 +42,23 @@ public final class AutoAim {
                 heading = normalizeRadians(pose.getHeading()),
                 TURRET_X_OFFSET = -1.86759;
 
-        Vector2 s0 = new Vector2(pose.getX(), pose.getY())
-                        .add(Vector2.create(TURRET_X_OFFSET, heading));
-        Vector2 v0 = new Vector2(velocity.getXComponent(), velocity.getYComponent())
-                        .add(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2));
+        s0.set(pose.getX(), pose.getY())
+          .add(Vector2.create(TURRET_X_OFFSET, heading));
 
-        Vector2 launchVec = s0.to(G);
+        v0.set(velocity.getXComponent(), velocity.getYComponent())
+          .add(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2));
+
+        launchVec.set(G).subtract(s0); // L = G - s0
         r0 = launchVec.getMagnitude();
 
         Profiler.start("iterate airtime");
         airtime = getFinalAirtime(s0, v0, G);
         Profiler.end("iterate airtime");
 
-        Vector2 launchVec_t = v0.product(airtime).add(s0).negate().add(G); // -(v0*t + s0) + G
-        r_t = launchVec_t.getMagnitude();
+        launchVec.subtract(v0.product(airtime)); // L -= v0*t
 
-        turretAngle = -launchVec_t.getAngleBetween(heading);
+        r_t = launchVec.getMagnitude();
+        turretAngle = -launchVec.getAngleBetween(heading);
         launchRPM = 21.27491 * r_t + 2916.29066;
         launchAngle = -0.00307104 * r_t + 1.22222;
 //        launchRPM = LAUNCH_RPM_TUNING;
