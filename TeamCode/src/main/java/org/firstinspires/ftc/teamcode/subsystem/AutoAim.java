@@ -26,7 +26,7 @@ public final class AutoAim {
 
     private final Vector2
             G = new Vector2(0, SIZE_FIELD + GOAL_OFFSET.y),
-            s0 = new Vector2(), v0 = new Vector2(), launchVec = new Vector2();
+            launchVec = new Vector2();
 
     void setAlliance(boolean isRedAlliance) {
         G.x = isRedAlliance ? SIZE_FIELD - GOAL_OFFSET.x : GOAL_OFFSET.x;
@@ -42,11 +42,11 @@ public final class AutoAim {
                 heading = normalizeRadians(pose.getHeading()),
                 TURRET_X_OFFSET = -1.86759;
 
-        s0.set(pose.getX(), pose.getY())
-          .add(Vector2.create(TURRET_X_OFFSET, heading));
+        Vector2 s0 = Vector2.create(TURRET_X_OFFSET, heading)
+                            .add(pose.getX(), pose.getY());
 
-        v0.set(velocity.getXComponent(), velocity.getYComponent())
-          .add(Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2));
+        Vector2 v0 = Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2)
+                            .add(velocity.getXComponent(), velocity.getYComponent());
 
         launchVec.set(G).subtract(s0); // L = G - s0
         r0 = launchVec.getMagnitude();
