@@ -52,7 +52,7 @@ public final class AutoAim {
         r0 = launchVec.getMagnitude();
 
         Profiler.start("iterate airtime");
-        airtime = getFinalAirtime(s0, v0, G);
+        airtime = getFinalAirtime(launchVec, v0);
         Profiler.end("iterate airtime");
 
         launchVec.subtract(v0.product(airtime)); // L -= v0*t
@@ -69,27 +69,26 @@ public final class AutoAim {
     /**
      * <a href="https://www.desmos.com/calculator/9rno9gfxn7">Desmos</a>
      */
-    private static double getFinalAirtime(Vector2 s0, Vector2 v0, Vector2 G) {
-        double airtime = getLinearAirtime(s0, v0, G);
+    private static double getFinalAirtime(Vector2 launchVec, Vector2 v0) {
+        double airtime = getLinearAirtime(launchVec, v0);
         int iterations = 15;
         for (int i = 0; i < iterations; i++)
-            airtime = getAirtime(v0.product(airtime).add(s0).distance(G)); // |v0*t + s0 - G|
+            airtime = getAirtime(v0.product(airtime).negate().add(launchVec).getMagnitude()); // |L - v0*t|
         return airtime;
     }
 
     /**
      * @return closed form airtime solution for a linear airtime curve-fit
      */
-    private static double getLinearAirtime(Vector2 s0, Vector2 v0, Vector2 G) {
-        Vector2 launchPath = s0.to(G);
+    private static double getLinearAirtime(Vector2 launchVec, Vector2 v0) {
         double // Mx + B
                 M = 0.00343072843338, // TODO curve fit
                 B = 0.286480431595,
                 M_invSquared = 1 / (M*M),
                 // quadratic coeffs
                 a = v0.getMagnitudeSquared() - M_invSquared,
-                b = -2 * v0.dot(launchPath) + 2*B*M_invSquared,
-                c = launchPath.getMagnitudeSquared() - B*B*M_invSquared;
+                b = -2 * v0.dot(launchVec) + 2*B*M_invSquared,
+                c = launchVec.getMagnitudeSquared() - B*B*M_invSquared;
 
         return 0;
 //        return ( -b - sqrt(b*b - 4*a*c) ) / (2*a);
