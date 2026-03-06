@@ -55,7 +55,7 @@ public final class AutoAim {
         airtime = getFinalAirtime(launchVec, v0);
         Profiler.end("iterate airtime");
 
-        launchVec.subtract(v0.product(airtime)); // L -= v0*t
+        launchVec.subtract(v0.multiply(airtime)); // L -= v0*t -- THIS MUTATES v0 BTW
 
         r_t = launchVec.getMagnitude();
         turretAngle = -launchVec.getAngleBetween(heading);
@@ -73,9 +73,10 @@ public final class AutoAim {
         double airtime = getLinearAirtime(launchVec, v0);
         int iterations = 15;
         for (int i = 0; i < iterations; i++)
-            airtime = getAirtime(v0.product(airtime).negate().add(launchVec).getMagnitude()); // |L - v0*t|
+            airtime = getAirtime(iterationVec.set(v0).multiply(airtime).distance(launchVec)); // |v0*t - L|
         return airtime;
     }
+    private static final Vector2 iterationVec = new Vector2();
 
     /**
      * @return closed form airtime solution for a linear airtime curve-fit
