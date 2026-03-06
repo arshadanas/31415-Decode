@@ -125,12 +125,12 @@ public final class AutoAim {
         int n = 200;
         double a = System.nanoTime();
 
-        for (int i = 0; i < n; i++){
-            double airtime = getFinalAirtime(
-                    new Vector2(-70.75, -70.75).to(new Vector2(70.75, 70.75)), // launchVec
-                    new Vector2(-63.4788154, -63.8) // S_vel_0
-            );
-        }
+        Vector2 s0 = new Vector2(-70.75, -70.75);
+        Vector2 v0 = new Vector2(-63.4788154, -63.8);
+        Vector2 G = new Vector2(70.75, 70.75);
+
+        for (int i = 0; i < n; i++)
+            getFinalAirtime(s0.to(G), v0);
 
         System.out.println((System.nanoTime() - a) / n / 1e+6);
     }
