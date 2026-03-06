@@ -53,14 +53,10 @@ public enum LaunchZone {
                 currentPose.getY() + (FORWARD_OFFSET * sin(heading))
         );
 
-        if (collisionSolver.detect(robotRect, robotPose, nearZoneRect, nearZonePosition)) {
-            return NEAR;
-        } else if (collisionSolver.detect(robotRect, robotPose, farZoneRect, farZonePosition)){
-            return FAR;
-        } else{
-            return NONE;
-        }
-
+        return
+                collisionSolver.detect(robotRect, robotPose, nearZoneRect, nearZonePosition) ? NEAR :
+                collisionSolver.detect(robotRect, robotPose, farZoneRect, farZonePosition) ? FAR :
+                                                                                                                                NONE;
     }
 
     public static void main(String... args) {
