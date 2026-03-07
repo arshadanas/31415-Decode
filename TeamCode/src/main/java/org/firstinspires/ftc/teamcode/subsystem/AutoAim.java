@@ -2,7 +2,8 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
-import static java.lang.Math.PI;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
@@ -26,7 +27,9 @@ public final class AutoAim {
 
     private final Vector2
             G = new Vector2(0, SIZE_FIELD + GOAL_OFFSET.y),
-            launchVec = new Vector2();
+            launchVec = new Vector2(),
+            s0 = new Vector2(),
+            v0 = new Vector2();
 
     void setAlliance(boolean isRedAlliance) {
         G.x = isRedAlliance ? SIZE_FIELD - GOAL_OFFSET.x : GOAL_OFFSET.x;
@@ -40,15 +43,14 @@ public final class AutoAim {
 
         double
                 heading = normalizeRadians(pose.getHeading()),
-                TURRET_X_OFFSET = -1.86759;
+                TURRET_X_OFFSET = -1.86759,
+                turretX = TURRET_X_OFFSET * cos(heading),
+                turretY = TURRET_X_OFFSET * sin(heading);
 
-        Vector2 s0 = Vector2.create(TURRET_X_OFFSET, heading)
-                            .add(pose.getX(), pose.getY());
-
-        Vector2 v0 = Vector2.create(angVel * TURRET_X_OFFSET, heading + PI / 2)
-                            .add(velocity.getXComponent(), velocity.getYComponent());
-
+        s0.set(pose.getX() + turretX, pose.getY() + turretY);
+        v0.set(velocity.getXComponent() + angVel * -turretY, velocity.getYComponent() + angVel * turretX);
         launchVec.set(G).subtract(s0); // L = G - s0
+        
         r0 = launchVec.getMagnitude();
 
         Profiler.start("iterate airtime");
@@ -58,6 +60,7 @@ public final class AutoAim {
         launchVec.subtract(v0.multiply(airtime)); // L -= v0*t -- THIS MUTATES v0 BTW
 
         r_t = launchVec.getMagnitude();
+
         turretAngle = -launchVec.getAngleBetween(heading);
         launchRPM = 21.27491 * r_t + 2916.29066;
         launchAngle = -0.00307104 * r_t + 1.22222;
