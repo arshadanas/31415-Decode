@@ -6,8 +6,6 @@ import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
 
-import java.util.OptionalInt;
-
 @Config
 public enum Artifact {
     PURPLE,
@@ -70,10 +68,10 @@ public enum Artifact {
     /**
      * @return The index of the first occurrence of this artifact color in the provided array, -1 if no occurrences
      */
-    public OptionalInt firstOccurrenceIn(Artifact... artifacts) {
+    public int firstOccurrenceIn(Artifact... artifacts) {
         for (int i = 0; i < artifacts.length; i++)
             if (artifacts[i] == this)
-                return OptionalInt.of(i);
-        return OptionalInt.empty();
+                return i;
+        return -1;
     }
 }

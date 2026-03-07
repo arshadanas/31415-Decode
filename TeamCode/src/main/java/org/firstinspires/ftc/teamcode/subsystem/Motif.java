@@ -8,7 +8,6 @@ import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.OptionalInt;
 
 public enum Motif {
 
@@ -61,20 +60,20 @@ public enum Motif {
 
         int firstIndex, secondIndex;
 
-        OptionalInt indexOfA0 = effectiveMotif.artifacts[0].firstOccurrenceIn(spindexerSlots);
-        if (indexOfA0.isPresent()) {
-            firstIndex = indexOfA0.getAsInt();
+        int indexOfA0 = effectiveMotif.artifacts[0].firstOccurrenceIn(spindexerSlots);
+        if (indexOfA0 != -1) {
+            firstIndex = indexOfA0;
             secondIndex = 1;
         } else {
             if (!allowOneWrong)
                 return new ArrayList<>();
 
             // find occurrence of second motif color in spindexer
-            OptionalInt indexOfA1 = effectiveMotif.artifacts[1].firstOccurrenceIn(spindexerSlots);
-            if (!indexOfA1.isPresent())
+            int indexOfA1 = effectiveMotif.artifacts[1].firstOccurrenceIn(spindexerSlots);
+            if (indexOfA1 == -1)
                 return new ArrayList<>();
 
-            firstIndex = indexOfA1.getAsInt() - 1;
+            firstIndex = indexOfA1 - 1;
             secondIndex = 0;
         }
 
