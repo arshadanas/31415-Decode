@@ -15,7 +15,6 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
-import java.util.OptionalInt;
 import java.util.function.IntPredicate;
 
 @Config
@@ -98,17 +97,17 @@ public final class Rotor {
         /**
          * @return Slot in this zone that satisfies the predicate
          */
-        OptionalInt getSlotHere(double slot0Reference, IntPredicate predicate) {
+        int getSlotHere(double slot0Reference, IntPredicate predicate) {
             for (int i = 0; i < 3; i++)
                 if (predicate.test(i) && abs(distFrom(slot0Reference, i)) <= this.getTolerance())
-                    return OptionalInt.of(i);
-            return OptionalInt.empty();
+                    return i;
+            return -1;
         }
 
         /**
          * @return Slot closest to this zone that satisfies the predicate
          */
-        OptionalInt getNearestSlot(double slot0Reference, IntPredicate predicate) {
+        int getNearestSlot(double slot0Reference, IntPredicate predicate) {
             double min = Double.MAX_VALUE;
             int minInd = -1;
             for (int i = 0; i < 3; i++)
@@ -119,7 +118,7 @@ public final class Rotor {
                         minInd = i;
                     }
                 }
-            return minInd == -1 ? OptionalInt.empty() : OptionalInt.of(minInd);
+            return minInd;
         }
     }
 
@@ -128,9 +127,12 @@ public final class Rotor {
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
 
         // slot nearest to feeder because we preload with a slot aligned to the feeder
-        Zone.FEEDER_SENSORS
-            .getNearestSlot(slot0Target = slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET), i -> true)
-            .ifPresent(i -> this.lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(i));
+        int nearestFeedSlot = Zone.FEEDER_SENSORS.getNearestSlot(
+                slot0Target = slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET),
+                i -> true
+        );
+        if (nearestFeedSlot != -1)
+            this.lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(nearestFeedSlot);
     }
 
     void run() {
