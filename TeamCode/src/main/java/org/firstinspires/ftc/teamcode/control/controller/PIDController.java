@@ -13,14 +13,13 @@ import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 public class PIDController implements FeedbackController {
 
     private PIDGains gains = new PIDGains();
-    private State target = new State();
+    private final State target = new State(), error = new State();
 
     private final Filter derivFilter;
     private final Differentiator differentiator = new Differentiator();
     private final Differentiator filterDiff = new Differentiator();
     private final Integrator integrator = new Integrator();
 
-    private State error = new State();
     private double errorIntegral, filteredErrorDerivative, rawErrorDerivative;
 
     public PIDController() {
@@ -40,10 +39,10 @@ public class PIDController implements FeedbackController {
      *                    If the v attribute is non-zero, -v will be used as the {@link #filteredErrorDerivative}
      */
     public double calculate(State measurement) {
-        State lastError = error;
-        error = target.minus(measurement);
+        double lastError = error.x;
+        error.set(target).minusAssign(measurement);
 
-        if (signum(error.x) != signum(lastError.x)) reset();
+        if (signum(error.x) != signum(lastError)) reset();
         errorIntegral = integrator.getIntegral(error.x);
         rawErrorDerivative = differentiator.getDerivative(error.x);
         filteredErrorDerivative = filterDiff.getDerivative(derivFilter.calculate(error.x));
@@ -58,7 +57,7 @@ public class PIDController implements FeedbackController {
     }
 
     public void setTarget(State target) {
-        this.target = target;
+        this.target.set(target);
     }
 
     public double getFilteredErrorDerivative() {

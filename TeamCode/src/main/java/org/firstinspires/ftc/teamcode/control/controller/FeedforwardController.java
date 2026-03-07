@@ -7,7 +7,7 @@ public class FeedforwardController implements Controller {
 
     private FeedforwardGains gains;
 
-    private State target = new State();
+    private final State target = new State();
 
     public FeedforwardController() {
         this(new FeedforwardGains());
@@ -22,7 +22,7 @@ public class FeedforwardController implements Controller {
     }
 
     public double calculate(double additionalOutput) {
-        double baseOutput = gains.times(target).sum();
+        double baseOutput = gains.dot(target);
         return (Math.signum(baseOutput + additionalOutput) * gains.kStatic + baseOutput);
     }
 
@@ -34,6 +34,6 @@ public class FeedforwardController implements Controller {
      * @param target The V and A attributes of the {@link State} parameter are used as velocity and acceleration references
      */
     public void setTarget(State target) {
-        this.target = target;
+        this.target.set(target);
     }
 }

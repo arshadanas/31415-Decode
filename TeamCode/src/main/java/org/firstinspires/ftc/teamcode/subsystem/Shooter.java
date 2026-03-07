@@ -64,6 +64,7 @@ public final class Shooter {
             derivFilter = new KalmanFilter(derivFilterGains),
             outputFilter = new KalmanFilter(outputFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
+    private final State setpoint = new State(), measurement = new State();
 
     private double currentRPM, targetRPM = RPM_ARMING, rawRPM, output;
 
@@ -141,8 +142,8 @@ public final class Shooter {
                 !inLaunchZone ? RPM_ARMING :
                                 targetRPM;
 
-        controller.setTarget(new State(rpmSetpoint));
-        double pidf = controller.calculate(new State(currentRPM)) // pid
+        controller.setTarget(setpoint.set(rpmSetpoint));
+        double pidf = controller.calculate(measurement.set(currentRPM)) // pid
                 + getFeedForward(rpmSetpoint) * voltageScalar; // feedforward
 
         if (boosting) {

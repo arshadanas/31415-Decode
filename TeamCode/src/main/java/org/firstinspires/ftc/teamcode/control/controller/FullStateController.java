@@ -6,11 +6,11 @@ import org.firstinspires.ftc.teamcode.control.gainmatrix.FullStateGains;
 public class FullStateController implements FeedbackController {
 
     private FullStateGains gains = new FullStateGains();
-    private State target = new State();
+    private final State target = new State(), error = new State();
 
     @Override
     public void setTarget(State target) {
-        this.target = target;
+        this.target.set(target);
     }
 
     public void setGains(FullStateGains gains) {
@@ -19,6 +19,7 @@ public class FullStateController implements FeedbackController {
 
     @Override
     public double calculate(State measurement) {
-        return gains.times(target.minus(measurement)).sum();
+        error.set(target).minusAssign(measurement);
+        return gains.dot(error);
     }
 }

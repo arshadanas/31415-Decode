@@ -40,13 +40,14 @@ public final class Turret {
     /**
      * In radians
      */
-    private double position, relativeEncoderOffset, target, absolutePosition, output;
+    private double relativeEncoderOffset, absolutePosition, output;
+    private final State current = new State(), target = new State();
 
     /**
      * 0 = turret facing forward
      */
     public void setTarget(double radians) {
-        this.target = normalizeRadians(radians + PI);
+        this.target.x = normalizeRadians(radians + PI);
     }
 
     private final KalmanFilter derivFilter = new KalmanFilter(filterGains, true);
@@ -70,7 +71,7 @@ public final class Turret {
     void run(boolean feedsPending) {
         motor.threshold = CACHE_THRESHOLD_MOTOR;
 
-        position = motor.encoder.getDistance() + relativeEncoderOffset;
+        current.x = motor.encoder.getDistance() + relativeEncoderOffset;
         absolutePosition = normalizeRadians(-absoluteEnc.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
 
         // Not feeding/shooting, robot is idle
@@ -80,7 +81,7 @@ public final class Turret {
 
             // only recalibrate relative encoder if turret is FAR from the wraparound position (PI/-PI)
             if (abs(normalizeRadians(PI - absolutePosition)) > TOLERANCE_NO_RECALIBRATING)
-                relativeEncoderOffset += normalizeRadians(absolutePosition - position);
+                relativeEncoderOffset += normalizeRadians(absolutePosition - current.x);
             
             return;
         }
@@ -89,22 +90,22 @@ public final class Turret {
         derivFilter.setGains(filterGains);
         controller.setGains(pidGains);
 
-        controller.setTarget(new State(normalizeRadians(target)));
-        motor.set(output = controller.calculate(new State(position)));
+        controller.setTarget(target);
+        motor.set(output = controller.calculate(current));
 
     }
 
     boolean inTolerance(double tolerance) {
-        return abs(normalizeRadians(target - position)) <= tolerance;
+        return abs(normalizeRadians(target.x - current.x)) <= tolerance;
     }
 
     void printTo(Telemetry telemetry) {
         telemetry.addLine("TURRET");
         telemetry.addLine();
-        telemetry.addData("Position (deg)", toDegrees(position));
-        telemetry.addData("Target (deg)", toDegrees(target));
+        telemetry.addData("Position (deg)", toDegrees(current.x));
+        telemetry.addData("Target (deg)", toDegrees(target.x));
         telemetry.addLine();
-        telemetry.addData("Error (deg)", toDegrees(target - position));
+        telemetry.addData("Error (deg)", toDegrees(target.x - current.x));
         telemetry.addData("Filtered error derivative (deg/s)", toDegrees(controller.getFilteredErrorDerivative()));
         telemetry.addData("Raw error derivative (deg/s)", toDegrees(controller.getRawErrorDerivative()));
         telemetry.addLine();
