@@ -9,11 +9,7 @@ data class FeedforwardGains
     @JvmField var kA: Double = 0.0,
     @JvmField var kStatic: Double = 0.0,
 ) {
-    operator fun times(state: State): State {
-        return State(
-            0.0,
-            state.v * kV,
-            state.a * kA,
-        )
+    fun dot(state: State): Double {
+        return state.v * kV + state.a * kA
     }
 }
