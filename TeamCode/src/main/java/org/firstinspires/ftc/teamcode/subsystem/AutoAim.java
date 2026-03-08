@@ -43,14 +43,14 @@ public final class AutoAim {
 
         double
                 heading = normalizeRadians(pose.getHeading()),
-                TURRET_X_OFFSET = -1.86759,
-                turretX = TURRET_X_OFFSET * cos(heading),
-                turretY = TURRET_X_OFFSET * sin(heading);
+                TURRET_FORWARD_OFFSET = -1.86759,
+                turretX = TURRET_FORWARD_OFFSET * cos(heading),
+                turretY = TURRET_FORWARD_OFFSET * sin(heading);
 
         s0.set(pose.getX() + turretX, pose.getY() + turretY);
         v0.set(velocity.getXComponent() + angVel * -turretY, velocity.getYComponent() + angVel * turretX);
         launchVec.set(G).subtract(s0); // L = G - s0
-        
+
         r0 = launchVec.getMagnitude();
 
         Profiler.start("iterate airtime");
