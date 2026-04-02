@@ -211,6 +211,11 @@ public final class KinematicsSolver {
         return dx / ( cos_θ * sqrt( (2 / a_G) * (s_goal.y - s0.y - dx*tan_θ) ));
     }
 
+    private double θ1(double v, boolean upper) {
+        double i = v / (a_G * (s_goal.x - s0.x));
+        return -atan( i*v + (upper ? -1 : 1) * sqrt(i*i*(v*v + 2*a_G*(s_goal.y - s0.y)) - 1) );
+    }
+
     private double θ_3pt(Vector2 target, double y_offset) {
         double
                 dx = s_goal.x - s0.x,
@@ -271,6 +276,52 @@ public final class KinematicsSolver {
         }
     }
 
+    /**
+     * @return Whether this computation was successful and produced a non-NaN result. True = success
+     */
+    public boolean calculateTarget_θ_α(double currentV, boolean upper) {
+        v_launch = currentV;
+        θ_launch = θ_avg;
+        α_launch = 0;
+
+        double θi, cos_θi, sin_θi, vi, vf, θf, α;
+
+        for (int j = 0; j < 5; j++) {
+            computeForwardKinematics();
+
+            vi = v0.getMagnitude();
+            θi = θ1(vi, upper);
+
+            if (Double.isNaN(θi))
+                return false;
+
+            int n = 2;
+            for (int i = 0; i < n; i++) {
+                sin_θi = sin(θi);
+                cos_θi = cos(θi);
+
+                vf = v_launch;
+                θf = asin(vi * sin_θi / vf);
+                α = atan(v_relToGoal.y / (vi * cos_θi + v_relToGoal.x));
+
+                if (i + 1 >= n || θ_launchMin <= θf && θf <= θ_launchMax) {
+                    θ_launch = θf;
+                    α_launch = α;
+                    break;
+                }
+
+                double θ_clipped = Ranges.clip(θf, θ_launchMin, θ_launchMax);
+                double cos_clipped = cos(θ_clipped), sin_clipped = sin(θ_clipped);
+                θi = atan(
+                        vf * sin_clipped /
+                        ( sqrt(vf * vf * cos_clipped * cos_clipped - v_relToGoal.y * v_relToGoal.y) - v_relToGoal.x )
+                );
+            }
+        }
+
+        return true;
+    }
+
     public String resultsToString() {
         return "θ_launch: " + θ_launch + "\nv_launch: " + v_launch + "\nα_launch: " + α_launch;
     }
@@ -302,6 +353,14 @@ public final class KinematicsSolver {
         solver.printResults();
 
         System.out.println();
+
+        solver.setRobotState(87,85.4, -1.46, -36.3, 25.6, 0.13);
+        solver.calculateTarget_θ_α(210, true);
+        solver.printResults();
+
+        solver.setRobotState(87,85.4, -1.46, -36.3, 25.6, 0.13);
+        solver.calculateTarget_θ_α(210, false);
+        solver.printResults();
     }
 
     private static long a;
