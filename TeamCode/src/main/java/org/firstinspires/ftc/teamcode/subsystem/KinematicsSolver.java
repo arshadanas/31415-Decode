@@ -104,10 +104,6 @@ public final class KinematicsSolver {
         unitTurretToGoal.set(G);
         unitTurretToGoal.subtract(s_turret);
         unitTurretToGoal.normalize();
-//        System.out.println("s_turret: " + s_turret);
-//        System.out.println("v_turret: " + v_turret);
-//        System.out.println("unitTurretToGoal: " + unitTurretToGoal);
-//        System.out.println();
     }
 
     private void setRobotState(double x, double y, double heading, double vx, double vy, double angVel) {
@@ -139,15 +135,6 @@ public final class KinematicsSolver {
                 sqrt(v_launch*v_launch * cos_θ_launch*cos_θ_launch - v_relToGoal.y*v_relToGoal.y) - v_relToGoal.x,
                 v_launch * sin_θ_launch
         );
-
-//        System.out.println("s0: " + s0);
-//        System.out.println("s_launch: " + s_launch);
-//        System.out.println("unitLaunchPtToGoal: " + unitLaunchPtToGoal);
-//        System.out.println("v_relToGoal: " + v_relToGoal);
-//        System.out.println("k: " + k);
-//        System.out.println("s_goal: " + s_goal);
-//        System.out.println("s_rim: " + s_rim);
-//        System.out.println("v0: " + v0);
     }
 
     private static double W(double x, double A, double B, double C, double D) {
@@ -238,14 +225,11 @@ public final class KinematicsSolver {
     }
 
     public void calculateTarget_v_θ_α() {
-//        long a = System.nanoTime();
         θ_launch = θ_avg;
         α_launch = 0;
         double θi, cos_θi, sin_θi, tan_θi = 0, vi = 0, vf, θf, α;
-//        System.out.println(θ_avg);
 
         for (int j = 0; j < 5; j++) {
-            // begin iteration
             computeForwardKinematics();
 
             if (j == 0) {
@@ -253,17 +237,10 @@ public final class KinematicsSolver {
                 cos_θi = cos(θi);
                 tan_θi = sin(θi) / cos_θi;
                 vi = v1(cos_θi, tan_θi);
-//                System.out.println("init guess");
-//                System.out.println("θi: " + θi);
-//                System.out.println("vi: " + vi);
             }
 
-            // start iteration
             computeRimApproach(vi, tan_θi);
             θi = θ_3pt(s_rimTarget, 0);
-//            System.out.println("s_rimNearest: " + s_rimNearest);
-//            System.out.println("s_rimTarget: " + s_rimTarget);
-//            System.out.println("θi: " + θi);
 
             int n = 3;
             for (int i = 0; i < n; i++) {
@@ -276,18 +253,10 @@ public final class KinematicsSolver {
                 θf = asin(vi * sin_θi / vf);
                 α = atan(v_relToGoal.y / (vi * cos_θi + v_relToGoal.x));
 
-//                System.out.println("θf: " + θf);
-//                System.out.println("vf: " + vf);
-//                System.out.println("vi: " + vi);
-//                System.out.println("α: " + α);
-
                 if (i + 1 >= n || θ_launchMin <= θf && θf <= θ_launchMax) {
                     θ_launch = θf;
                     v_launch = vf;
                     α_launch = α;
-//                    System.out.println("θ_launch: " + θ_launch);
-//                    System.out.println("v_launch: " + v_launch);
-//                    System.out.println("α_launch: " + α_launch);
                     break;
                 }
 
@@ -297,14 +266,8 @@ public final class KinematicsSolver {
                         vf * sin_clipped /
                         ( sqrt(vf * vf * cos_clipped * cos_clipped - v_relToGoal.y * v_relToGoal.y) - v_relToGoal.x )
                 );
-//                System.out.println("θ_clipped: " + θ_clipped);
-//                System.out.println("θi post clip: " + θi);
-//                System.out.println();
             }
-//            System.out.println();
-//            System.out.println();
         }
-//        b(a);
     }
 
     public String resultsToString() {
@@ -323,25 +286,19 @@ public final class KinematicsSolver {
         System.out.println(solver.resultsToString());
         System.out.println();
 
-        a();
         solver.setRobotState(40.9,102, -1.46, 61.5, -6.2, 0.13);
         solver.calculateTarget_v_θ_α();
         System.out.println(solver.resultsToString());
-        b();
         System.out.println();
 
-        a();
         solver.setRobotState(111.5,120, -1.46, -14.3, -33.5, 0.13);
         solver.calculateTarget_v_θ_α();
         System.out.println(solver.resultsToString());
-        b();
         System.out.println();
 
-        a();
         solver.setRobotState(75.9,12.7, -1.46, -36.3, 25.6, 0.13);
         solver.calculateTarget_v_θ_α();
         System.out.println(solver.resultsToString());
-        b();
         System.out.println();
     }
 
