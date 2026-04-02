@@ -408,23 +408,13 @@ public final class KinematicsSolver {
         KinematicsSolver solver = new KinematicsSolver();
         solver.setAlliance(true);
 
-        solver.setRobotState(75.9, 12.7, -1.46, -74.8, 60.2, 0.3);
+        solver.setRobotState(46.1,86.4, -0.8, 119.6, -99, 0.3);
         solver.calculateTarget_v_θ_α();
         solver.printResults();
-
-        System.out.println();
 
         solver.setRobotState(104.6,108.2, -0.05, -50.4, 0.5, 0.13);
         System.out.println(solver.calculateTarget_θ_α(200));
         solver.printResults();
-    }
-
-    private static long a;
-    private static void a() {
-        a = System.nanoTime();
-    }
-    private static void b() {
-        System.out.println((System.nanoTime() - a) * 1e-6);
     }
 
 }
