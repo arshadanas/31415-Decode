@@ -18,7 +18,7 @@ public enum LaunchZone {
     NEAR,
     FAR;
 
-    private static final Transform nearZonePosition, farZonePosition;
+    private static final Transform nearZonePosition, farZonePosition, robotPose = new Transform();
     private static final Rectangle nearZoneRect, farZoneRect, robotRect;
     private static final Gjk collisionSolver = new Gjk();
 
@@ -44,8 +44,7 @@ public enum LaunchZone {
     static LaunchZone getCurrentZone(Pose currentPose) {
 
         double heading = currentPose.getHeading();
-        Transform robotPose = new Transform();
-
+        robotPose.identity();
         robotPose.rotate(heading);
         double FORWARD_OFFSET = 1.45714;
         robotPose.translate(
