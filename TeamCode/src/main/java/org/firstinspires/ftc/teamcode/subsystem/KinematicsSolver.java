@@ -408,49 +408,13 @@ public final class KinematicsSolver {
         KinematicsSolver solver = new KinematicsSolver();
         solver.setAlliance(true);
 
-        solver.setRobotState(71.5,70, -3.12, 0.5, 95, 0.13);
+        solver.setRobotState(75.9, 12.7, -1.46, -74.8, 60.2, 0.3);
         solver.calculateTarget_v_θ_α();
-        solver.printResults();
-
-        solver.setRobotState(40.9,102, -1.46, 61.5, -6.2, 0.13);
-        solver.calculateTarget_v_θ_α();
-        solver.printResults();
-
-        solver.setRobotState(111.5,120, -1.46, -14.3, -33.5, 0.13);
-        solver.calculateTarget_v_θ_α();
-        solver.printResults();
-
-        solver.setRobotState(75.9,12.7, -1.46, -36.3, 25.6, 0.13);
-        solver.calculateTarget_v_θ_α();
-        solver.printResults();
-
-        solver.setRobotState(49.5,93.5, -2.55, 51.8, 43, -2.4);
-        solver.calculateTarget_v_θ_α();
-        solver.printResults();
-
-        solver.setRobotState(110.1,119.8, -2.55, 51.8, 43, -2.4);
-        System.out.println(solver.calculateTarget_v_θ_α());
         solver.printResults();
 
         System.out.println();
 
-        solver.setRobotState(87,85.4, -1.46, -36.3, 25.6, 0.13);
-        System.out.println(solver.calculateTarget_θ_α(220, true));
-        solver.printResults();
-
-        System.out.println(solver.calculateTarget_θ_α(220, false));
-        solver.printResults();
-
-        System.out.println(solver.calculateTarget_θ_α(220));
-        solver.printResults();
-
         solver.setRobotState(104.6,108.2, -0.05, -50.4, 0.5, 0.13);
-        System.out.println(solver.calculateTarget_θ_α(200, true));
-        solver.printResults();
-
-        System.out.println(solver.calculateTarget_θ_α(200, false));
-        solver.printResults();
-
         System.out.println(solver.calculateTarget_θ_α(200));
         solver.printResults();
     }
