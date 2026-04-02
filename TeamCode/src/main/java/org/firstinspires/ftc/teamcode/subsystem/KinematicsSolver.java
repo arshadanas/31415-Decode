@@ -419,6 +419,14 @@ public final class KinematicsSolver {
         solver.calculateTarget_v_θ_α();
         solver.printResults();
 
+        solver.setRobotState(49.5,93.5, -2.55, 51.8, 43, -2.4);
+        solver.calculateTarget_v_θ_α();
+        solver.printResults();
+
+        solver.setRobotState(110.1,119.8, -2.55, 51.8, 43, -2.4);
+        System.out.println(solver.calculateTarget_v_θ_α());
+        solver.printResults();
+
         System.out.println();
 
         solver.setRobotState(87,85.4, -1.46, -36.3, 25.6, 0.13);
