@@ -250,7 +250,8 @@ public final class KinematicsSolver {
 
             if (j == 0) {
                 θi = θ_3pt(s_rim, r_ball + r_rimClearance);
-                tan_θi = sin(θi) / (cos_θi = cos(θi));
+                cos_θi = cos(θi);
+                tan_θi = sin(θi) / cos_θi;
                 vi = v1(cos_θi, tan_θi);
 //                System.out.println("init guess");
 //                System.out.println("θi: " + θi);
@@ -266,7 +267,9 @@ public final class KinematicsSolver {
 
             int n = 3;
             for (int i = 0; i < n; i++) {
-                tan_θi = (sin_θi = sin(θi)) / (cos_θi = cos(θi));
+                sin_θi = sin(θi);
+                cos_θi = cos(θi);
+                tan_θi = sin_θi / cos_θi;
                 vi = v1(cos_θi, tan_θi);
 
                 vf = sqrt(vi * vi + v_relToGoal.getMagnitudeSquared() + 2 * v_relToGoal.x * vi * cos_θi);
@@ -329,6 +332,13 @@ public final class KinematicsSolver {
 
         a();
         solver.setRobotState(111.5,120, -1.46, -14.3, -33.5, 0.13);
+        solver.calculateTarget_v_θ_α();
+        System.out.println(solver.resultsToString());
+        b();
+        System.out.println();
+
+        a();
+        solver.setRobotState(75.9,12.7, -1.46, -36.3, 25.6, 0.13);
         solver.calculateTarget_v_θ_α();
         System.out.println(solver.resultsToString());
         b();
