@@ -79,7 +79,7 @@ public final class KinematicsSolver {
             s_rimNearest = new Vector2(),
             s_rimTarget = new Vector2();
 
-    private double m2, b;
+    private double m2, b, turretAngle;
 
     double θ_launch = θ_avg, v_launch = 275, α_launch = 0;
 
@@ -106,6 +106,11 @@ public final class KinematicsSolver {
         unitTurretToGoal.set(G);
         unitTurretToGoal.subtract(s_turret);
         unitTurretToGoal.normalize();
+        turretAngle = -unitTurretToGoal.getAngleBetween(heading);
+    }
+
+    public double getTurretAngle() {
+        return turretAngle + α_launch;
     }
 
     private void setRobotState(double x, double y, double heading, double vx, double vy, double angVel) {
