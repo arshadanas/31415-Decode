@@ -273,6 +273,9 @@ public final class KinematicsSolver {
     public String resultsToString() {
         return "θ_launch: " + θ_launch + "\nv_launch: " + v_launch + "\nα_launch: " + α_launch;
     }
+    public void printResults() {
+        System.out.println(resultsToString()+"\n");
+    }
 
     public static void main(String[] args) {
         new Vector2(3,3).normalize();
@@ -283,22 +286,20 @@ public final class KinematicsSolver {
 
         solver.setRobotState(71.5,70, -3.12, 0.5, 95, 0.13);
         solver.calculateTarget_v_θ_α();
-        System.out.println(solver.resultsToString());
-        System.out.println();
+        solver.printResults();
 
         solver.setRobotState(40.9,102, -1.46, 61.5, -6.2, 0.13);
         solver.calculateTarget_v_θ_α();
-        System.out.println(solver.resultsToString());
-        System.out.println();
+        solver.printResults();
 
         solver.setRobotState(111.5,120, -1.46, -14.3, -33.5, 0.13);
         solver.calculateTarget_v_θ_α();
-        System.out.println(solver.resultsToString());
-        System.out.println();
+        solver.printResults();
 
         solver.setRobotState(75.9,12.7, -1.46, -36.3, 25.6, 0.13);
         solver.calculateTarget_v_θ_α();
-        System.out.println(solver.resultsToString());
+        solver.printResults();
+
         System.out.println();
     }
 
