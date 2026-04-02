@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.abs;
 import static java.lang.Math.acos;
 import static java.lang.Math.asin;
 import static java.lang.Math.atan;
@@ -31,8 +32,8 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
 @Config
 public final class KinematicsSolver {
 
-    public static final Vector2 // tunable
-            o_goal = new Vector2(5, -2);
+    public static final Vector2 o_goal = new Vector2(5, -2);
+    public static double r_rimClearance = 0.75, admissibleVerticalErrorAtGoal = 1;
 
     private static final double
             a_G = -386.0886,
@@ -44,13 +45,13 @@ public final class KinematicsSolver {
             o_turretForward = -1.86759,
             y_goal = 40,
             y_rim = 38.75,
-            r_rimClearance = 0.75,
             r_ball = 2.5,
             r_compression = 4/25.4,
             r_wheel_physical = 1.5,
             r_wheel = r_wheel_physical - r_compression,
             c = r_wheel + r_ball,
-            half_F = 141.5/2;
+            half_F = 141.5/2,
+            rim_dist_comparison_error = 0.1;
 
     private static final Vector2
             s_wheel = new Vector2(3.560949685039,10.4596456693),
@@ -220,8 +221,11 @@ public final class KinematicsSolver {
     }
 
     private double θ1(double v, boolean upper) {
+        return θ1(v, upper, 0);
+    }
+    private double θ1(double v, boolean upper, double y_offset) {
         double i = v / (a_G * (s_goal.x - s0.x));
-        return -atan( i*v + (upper ? -1 : 1) * sqrt(i*i*(v*v + 2*a_G*(s_goal.y - s0.y)) - 1) );
+        return -atan( i*v + (upper ? -1 : 1) * sqrt(i*i*(v*v + 2*a_G*(s_goal.y - s0.y + y_offset)) - 1) );
     }
 
     private double θ_3pt(Vector2 target, double y_offset) {
@@ -237,7 +241,10 @@ public final class KinematicsSolver {
         );
     }
 
-    public void calculateTarget_v_θ_α() {
+    /**
+     * @return Whether the calculated launch will clear the goal rim. True = passes safely above the rim
+     */
+    public boolean calculateTarget_v_θ_α() {
         θ_launch = θ_avg;
         α_launch = 0;
         double θi, cos_θi = 0, sin_θi = 0, tan_θi, vi = 0, vf, θf, α;
@@ -282,12 +289,19 @@ public final class KinematicsSolver {
                 );
             }
         }
+
+        computeForwardKinematics();
+        computeRimApproach(v0.x, v0.y);
+        return
+                s_rimNearest.y >= s_rim.y &&
+                s_rimNearest.distance(s_rim) >= r_ball + r_rimClearance - rim_dist_comparison_error &&
+                abs(s_atGoal.y - s_goal.y) <= admissibleVerticalErrorAtGoal;
     }
 
     /**
-     * @return Whether this computation was successful and produced a non-NaN result. True = success
+     * @return Distance to rim at nearest approach. NaN if launch collides with goal wall, or cannot reach goal point
      */
-    public boolean calculateTarget_θ_α(double currentV, boolean upper) {
+    public double calculateTarget_θ_α(double currentV, boolean upper) {
         v_launch = currentV;
         θ_launch = θ_avg;
         α_launch = 0;
@@ -300,8 +314,11 @@ public final class KinematicsSolver {
             vi = v0.getMagnitude();
             θi = θ1(vi, upper);
 
-            if (Double.isNaN(θi))
-                return false;
+            if (Double.isNaN(θi)) {
+                θi = θ1(vi, upper, -admissibleVerticalErrorAtGoal);
+                if (Double.isNaN(θi))
+                    return θi;
+            }
 
             int n = 2;
             for (int i = 0; i < n; i++) {
@@ -327,6 +344,41 @@ public final class KinematicsSolver {
             }
         }
 
+        computeForwardKinematics();
+        computeRimApproach(v0.x, v0.y);
+        double rimDist = s_rimNearest.distance(s_rim);
+        return
+                s_rimNearest.y >= s_rim.y &&
+                rimDist >= r_ball + r_rimClearance - rim_dist_comparison_error &&
+                abs(s_atGoal.y - s_goal.y) <= admissibleVerticalErrorAtGoal ?
+                        rimDist :
+                        Double.NaN;
+    }
+
+    public boolean calculateTarget_θ_α(double currentV) {
+        double
+                d1 = calculateTarget_θ_α(currentV, true),
+                v1 = v_launch,
+                θ1 = θ_launch,
+                α1 = α_launch,
+                d2 = calculateTarget_θ_α(currentV, false),
+                v2 = v_launch,
+                θ2 = θ_launch,
+                α2 = α_launch;
+
+        boolean valid1 = !Double.isNaN(d1), valid2 = !Double.isNaN(d2);
+
+        if (!valid1 && !valid2) return false;
+
+        if (valid1 && (!valid2 || d1 < d2)) {
+            v_launch = v1;
+            θ_launch = θ1;
+            α_launch = α1;
+        } else {
+            v_launch = v2;
+            θ_launch = θ2;
+            α_launch = α2;
+        }
         return true;
     }
 
@@ -363,11 +415,23 @@ public final class KinematicsSolver {
         System.out.println();
 
         solver.setRobotState(87,85.4, -1.46, -36.3, 25.6, 0.13);
-        solver.calculateTarget_θ_α(210, true);
+        System.out.println(solver.calculateTarget_θ_α(220, true));
         solver.printResults();
 
-        solver.setRobotState(87,85.4, -1.46, -36.3, 25.6, 0.13);
-        solver.calculateTarget_θ_α(210, false);
+        System.out.println(solver.calculateTarget_θ_α(220, false));
+        solver.printResults();
+
+        System.out.println(solver.calculateTarget_θ_α(220));
+        solver.printResults();
+
+        solver.setRobotState(104.6,108.2, -0.05, -50.4, 0.5, 0.13);
+        System.out.println(solver.calculateTarget_θ_α(200, true));
+        solver.printResults();
+
+        System.out.println(solver.calculateTarget_θ_α(200, false));
+        solver.printResults();
+
+        System.out.println(solver.calculateTarget_θ_α(200));
         solver.printResults();
     }
 
