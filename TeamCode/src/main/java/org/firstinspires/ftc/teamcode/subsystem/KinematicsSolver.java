@@ -32,7 +32,7 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
 @Config
 public final class KinematicsSolver {
 
-    public static final Vector2 o_goal = new Vector2(5, -2);
+    public static final Vector2 o_goal = new Vector2(5, -2.5);
     public static double r_rimClearance = 0.75, admissibleVerticalErrorAtGoal = 1;
 
     private static final double
