@@ -237,7 +237,7 @@ public final class KinematicsSolver {
         );
     }
 
-    public void generateTarget_v_θ_α() {
+    public void calculateTarget_v_θ_α() {
 //        long a = System.nanoTime();
         θ_launch = θ_avg;
         α_launch = 0;
@@ -316,20 +316,20 @@ public final class KinematicsSolver {
         solver.setAlliance(true);
 
         solver.setRobotState(71.5,70, -3.12, 0.5, 95, 0.13);
-        solver.generateTarget_v_θ_α();
+        solver.calculateTarget_v_θ_α();
         System.out.println(solver.resultsToString());
         System.out.println();
 
         a();
         solver.setRobotState(40.9,102, -1.46, 61.5, -6.2, 0.13);
-        solver.generateTarget_v_θ_α();
+        solver.calculateTarget_v_θ_α();
         System.out.println(solver.resultsToString());
         b();
         System.out.println();
 
         a();
         solver.setRobotState(111.5,120, -1.46, -14.3, -33.5, 0.13);
-        solver.generateTarget_v_θ_α();
+        solver.calculateTarget_v_θ_α();
         System.out.println(solver.resultsToString());
         b();
         System.out.println();
