@@ -242,7 +242,9 @@ public final class KinematicsSolver {
     }
 
     /**
-     * @return Whether the calculated launch will clear the goal rim. True = passes safely above the rim
+     * @return Whether the calculated launch will clear the goal rim.
+     *         True = passes safely above the rim and reaches the goal point,
+     *         within {@link #admissibleVerticalErrorAtGoal} inches vertical error
      */
     public boolean calculateTarget_v_θ_α() {
         θ_launch = θ_avg;
@@ -299,7 +301,7 @@ public final class KinematicsSolver {
     }
 
     /**
-     * @return Distance to rim at nearest approach. NaN if launch collides with goal wall, or cannot reach goal point
+     * @return Distance to rim at nearest approach. NaN if launch collides with goal wall or cannot reach goal point
      */
     public double calculateTarget_θ_α(double currentV, boolean upper) {
         v_launch = currentV;
@@ -355,6 +357,11 @@ public final class KinematicsSolver {
                         Double.NaN;
     }
 
+    /**
+     * @return Whether the calculated launch will clear the goal rim.
+     *         True = passes safely above the rim and reaches the goal point,
+     *         within {@link #admissibleVerticalErrorAtGoal} inches vertical error
+     */
     public boolean calculateTarget_θ_α(double currentV) {
         double
                 d1 = calculateTarget_θ_α(currentV, true),
