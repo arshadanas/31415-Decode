@@ -141,11 +141,11 @@ public final class KinematicsSolver {
         return (((A/4*x + B/3)*x + C/2)*x + D)*x;
     }
 
-    private void computeRimApproach(double vi, double tan_θi) {
+    private void computeRimApproach(double vx, double vy) {
 
         double
-                M = tan_θi,
-                N = (2*a_G / (vi*vi)) * (1 + M*M),
+                M = vy/vx,
+                N = 2*a_G / (vx*vx),
                 O = 2*M - N*s0.x,
                 P = s_rim.y - s0.y + 0.25*s0.x*(2*M + O),
 
@@ -227,19 +227,20 @@ public final class KinematicsSolver {
     public void calculateTarget_v_θ_α() {
         θ_launch = θ_avg;
         α_launch = 0;
-        double θi, cos_θi, sin_θi, tan_θi = 0, vi = 0, vf, θf, α;
+        double θi, cos_θi = 0, sin_θi = 0, tan_θi, vi = 0, vf, θf, α;
 
         for (int j = 0; j < 5; j++) {
             computeForwardKinematics();
 
             if (j == 0) {
                 θi = θ_3pt(s_rim, r_ball + r_rimClearance);
+                sin_θi = sin(θi);
                 cos_θi = cos(θi);
-                tan_θi = sin(θi) / cos_θi;
+                tan_θi = sin_θi / cos_θi;
                 vi = v1(cos_θi, tan_θi);
             }
 
-            computeRimApproach(vi, tan_θi);
+            computeRimApproach(vi*cos_θi, vi*sin_θi);
             θi = θ_3pt(s_rimTarget, 0);
 
             int n = 3;
