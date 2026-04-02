@@ -74,6 +74,7 @@ public final class KinematicsSolver {
             s_goal = new Vector2(),
             s_rim = new Vector2(),
             v0 = new Vector2(),
+            s_atGoal = new Vector2(),
             s_rimNearest = new Vector2(),
             s_rimTarget = new Vector2();
 
@@ -135,6 +136,13 @@ public final class KinematicsSolver {
                 sqrt(v_launch*v_launch * cos_θ_launch*cos_θ_launch - v_relToGoal.y*v_relToGoal.y) - v_relToGoal.x,
                 v_launch * sin_θ_launch
         );
+
+        double t = tx(s_goal.x);
+        s_atGoal.set(s_goal.x, s0.y + (v0.y + a_G/2 * t) * t);
+    }
+
+    private double tx(double x) {
+        return (x - s0.x) / v0.x;
     }
 
     private static double W(double x, double A, double B, double C, double D) {
