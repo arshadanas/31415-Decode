@@ -29,7 +29,7 @@ public final class Robot {
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         shooter = new Shooter(hardwareMap);
-        handler = new Handler(hardwareMap, shooter.boostRPM());
+        handler = new Handler(hardwareMap);
         turret = new Turret(hardwareMap);
         lift = new Lift(hardwareMap);
 

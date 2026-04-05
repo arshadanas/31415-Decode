@@ -74,10 +74,7 @@ public final class Handler {
             timeSinceRunningFeeder = new ElapsedTime(),
             timeSinceFeederSeenBall = new ElapsedTime(),
             timeSinceIntaked = new ElapsedTime(),
-            timeSinceFed = new ElapsedTime(),
-            timeSinceShooterInTolerance = new ElapsedTime();
-
-    private final Runnable boostRPM;
+            timeSinceFed = new ElapsedTime();
 
     public final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
 
@@ -100,7 +97,7 @@ public final class Handler {
     private Artifact a1 = EMPTY, a2 = EMPTY;
     private HSV hsv1 = new HSV(), hsv2 = new HSV();
 
-    Handler(HardwareMap hardwareMap, Runnable boostRPM) {
+    Handler(HardwareMap hardwareMap) {
 
         rotor = new Rotor(hardwareMap);
 
@@ -109,8 +106,6 @@ public final class Handler {
 
         color1 = new ColorSensor(hardwareMap, "color 1", 1);
         color2 = new ColorSensor(hardwareMap, "color 2", 1);
-
-        this.boostRPM = boostRPM;
 
         intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
         intake.setInverted(true);
@@ -174,7 +169,6 @@ public final class Handler {
         ) {
             artifacts[filledBackSlot] = EMPTY; // clear the back slot since it has been fed out
             feedingOrder.remove((Integer) filledBackSlot);
-            boostRPM.run();
             timeSinceFed.reset();
         }
 
