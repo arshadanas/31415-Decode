@@ -4,7 +4,6 @@ import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLO
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
 import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.signum;
 
@@ -127,14 +126,13 @@ public final class Handler {
                 timeSinceIntaked.seconds() >= TIME_FRONT_DIST_COOLDOWN
         ) {
             // read i2c
-            color1.update();
-            color2.update();
-            hsv1 = color1.getHSV();
-            hsv2 = color2.getHSV();
-            a1 = Artifact.fromHSV(hsv1);
-            a2 = Artifact.fromHSV(hsv2);
+//            color1.update();
+//            color2.update();
+//            a1 = Artifact.fromHSV(hsv1 = color1.getHSV());
+//            a2 = Artifact.fromHSV(hsv2 = color2.getHSV());
 
-            artifacts[emptyFrontSlot] = (a1 == GREEN || a2 == GREEN) ? GREEN : PURPLE;
+            artifacts[emptyFrontSlot] = //(a1 == GREEN || a2 == GREEN) ? GREEN :
+                    PURPLE;
             timeSinceIntaked.reset();
 
             feedDefault();
