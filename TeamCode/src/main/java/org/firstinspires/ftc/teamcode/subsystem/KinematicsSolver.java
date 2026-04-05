@@ -23,8 +23,7 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
  * Displacements are in inches (in) <br>
  * Angles are in radians (rad) <br>
  * Durations are in seconds (s) <br>
- *
- * @implSpec <a href="https://www.desmos.com/calculator/kj5s9hm6n4">Desamos visualization</a>
+ * <a href="https://www.desmos.com/calculator/kj5s9hm6n4">Desmos visualization</a>
  *
  * @author Arshad Anas
  * @since 2025/09/18
