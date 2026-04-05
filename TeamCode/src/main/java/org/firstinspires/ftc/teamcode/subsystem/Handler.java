@@ -16,10 +16,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
-import org.firstinspires.ftc.teamcode.subsystem.utility.SimpleServoPivot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
-import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
@@ -53,11 +51,6 @@ public final class Handler {
     private final CachedDcMotor[] feeder;
     private final AnalogSensor front1, back1;
     private final ColorSensor color1, color2;
-
-
-    public final SimpleServoPivot presserR, presserL;
-    private final CachedSimpleServo presserRServo, presserLServo;
-
 
     private double intakePower;
     public void setIntake(double power) {
@@ -116,14 +109,6 @@ public final class Handler {
                 new CachedDcMotor(hardwareMap.get(CRServo.class, "feeder L"))
         };
         feeder[0].motor.setDirection(REVERSE);
-
-
-        presserRServo = new CachedSimpleServo(hardwareMap, "gate R", 0, 300);
-        presserLServo = new CachedSimpleServo(hardwareMap, "gate L", 0, 300).reversed();
-        presserLServo.offset = ANGLE_PRESSER_L_OFFSET;
-
-        presserR = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED, presserRServo);
-        presserL = new SimpleServoPivot(ANGLE_PRESSER_RETRACTED, ANGLE_PRESSER_EXTENDED, presserLServo);
     }
 
     void run(boolean shooterInTolerance) {
@@ -198,11 +183,6 @@ public final class Handler {
         intake.set(adaptiveClipIntakePower(intakePower));
 
         rotor.run();
-
-        presserRServo.threshold = CACHE_THRESHOLD_PRESSERS;
-        presserLServo.threshold = CACHE_THRESHOLD_PRESSERS;
-        presserR.run();
-        presserL.run();
     }
 
     /**
