@@ -170,10 +170,10 @@ public final class Shooter {
     }
 
     /**
-     * <a href="https://www.desmos.com/calculator/b3jnyqoqyv">Desmos curve fit</a>
+     * <a href="https://www.desmos.com/calculator/mkchlqdnmb">Desmos curve fit</a>
      */
     private static double getFeedForward(double rpmSetpoint) {
-        return rpmSetpoint / 8367.27273 + 0.04718383310065716;
+        return rpmSetpoint * 0.000119255617733 + 0.0482677650756;
     }
 
     boolean inTolerance(double rpmTolerance) {
