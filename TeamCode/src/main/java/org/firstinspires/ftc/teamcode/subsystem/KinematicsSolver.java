@@ -131,8 +131,8 @@ public final class KinematicsSolver {
         );
 
         double m1 = (G.y - s_launch.y) / (G.x - s_launch.x);
-        double k_x = (m1 * s_launch.x - s_launch.y + b) / (m1 - m2);
-        k.set(k_x, m2 * k_x + b);
+        k.x = (m1 * s_launch.x - s_launch.y + b) / (m1 - m2);
+        k.y = m2 * k.x + b;
 
         s_goal.set(s_launch.distance(G) + s0.x, y_goal);
         s_rim.set(s_launch.distance(k) + s0.x, y_rim);
