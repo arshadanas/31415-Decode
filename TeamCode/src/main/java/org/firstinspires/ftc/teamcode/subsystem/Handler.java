@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.IntPredicate;
 
 @Config
 public final class Handler {
@@ -69,6 +70,7 @@ public final class Handler {
             timeSinceFed = new ElapsedTime();
 
     public final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+    private final IntPredicate isEmpty = i -> artifacts[i] == EMPTY, isFilled = i -> artifacts[i] != EMPTY;
 
     public boolean hasArtifacts() {
         return Artifact.EMPTY.numOccurrencesIn(artifacts) < 3;
@@ -112,14 +114,14 @@ public final class Handler {
 
     void run(boolean shooterInTolerance) {
 
-        int nearestEmptySlot = Rotor.Zone.INTAKE_SENSORS.getNearestSlot(rotor.slot0Position, i -> artifacts[i] == EMPTY);
+        int nearestEmptySlot = Rotor.Zone.INTAKE_SENSORS.getNearestSlot(rotor.slot0Position, isEmpty);
         if (intakePower > 0 && nearestEmptySlot != -1) // move empty slot to intake
             rotor.moveSlot(nearestEmptySlot, Rotor.Zone.INTAKE_SENSORS);
         else if (!feedingOrder.isEmpty())
             rotor.moveSlot(feedingOrder.get(0), Rotor.Zone.FEEDER_SENSORS);
 
         // rotor at position:
-        int emptyFrontSlot = Rotor.Zone.INTAKE_SENSORS.getSlotHere(rotor.slot0Position, i -> artifacts[i] == EMPTY);
+        int emptyFrontSlot = Rotor.Zone.INTAKE_SENSORS.getSlotHere(rotor.slot0Position, isEmpty);
         if (
                 emptyFrontSlot != -1 && // the slot was previously empty
                 front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
@@ -144,7 +146,7 @@ public final class Handler {
             timeSinceFeederSeenBall.reset();
 
         // check back slot sensors
-        int filledBackSlot = Rotor.Zone.FEEDER_SENSORS.getSlotHere(rotor.slot0Position, i -> artifacts[i] != EMPTY);
+        int filledBackSlot = Rotor.Zone.FEEDER_SENSORS.getSlotHere(rotor.slot0Position, isFilled);
         if (
                 filledBackSlot != -1 && // the slot was previously full
                 (back1.getReading() >= THRESHOLD_BACK_MM && timeSinceFeederSeenBall.seconds() >= TIME_BACK_DIST_FLUCTUATION) && // distance sensor reports no artifact
@@ -184,18 +186,15 @@ public final class Handler {
     }
 
     /**
-     * Rounds intake speeds of [0, {@link #INTAKE_POWER_OMNI_CONTACT}) up to {@link #INTAKE_POWER_OMNI_CONTACT}
-     * if there is an {@link Artifact} touching the intake's front omni wheel <br><br>
+     * Requires minimum intake power of {@link #INTAKE_POWER_OMNI_CONTACT} when there is an
+     * {@link Artifact} touching the front omni wheel
      */
     private double adaptiveClipIntakePower(double intakePower) {
-        int filledOmniSlot = Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Position, i -> artifacts[i] != EMPTY);
-        int filledSlotMovingToOmni = Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Target, i -> artifacts[i] != EMPTY);
+        int filledOmniSlot = Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Position, isFilled);
+        int filledSlotMovingToOmni = Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Target, isFilled);
 
-        if (filledOmniSlot != -1 || filledSlotMovingToOmni != -1)
-            if (intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT)
-                return INTAKE_POWER_OMNI_CONTACT;
-
-        return intakePower;
+        return (filledOmniSlot != -1 || filledSlotMovingToOmni != -1) && intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT ? INTAKE_POWER_OMNI_CONTACT :
+                intakePower;
     }
 
     boolean feedsPending() {
@@ -221,7 +220,7 @@ public final class Handler {
     public void feedFastest() {
         feedingOrder.clear();
 
-        int first = Rotor.Zone.FEEDER_SENSORS.getNearestSlot(rotor.slot0Position, i -> artifacts[i] != EMPTY);
+        int first = Rotor.Zone.FEEDER_SENSORS.getNearestSlot(rotor.slot0Position, isFilled);
         if (first == -1) // no Artifacts in the container
             return;
 
@@ -268,8 +267,8 @@ public final class Handler {
 
     void printTo(Telemetry telemetry) {
         telemetry.addData("HANDLER", Arrays.toString(artifacts));
-        telemetry.addData("Empty slot nearest to intake", Rotor.Zone.INTAKE_SENSORS.getNearestSlot(rotor.slot0Position, i -> artifacts[i] == EMPTY));
-        telemetry.addData("Filled slot nearest to feeder", Rotor.Zone.FEEDER_SENSORS.getNearestSlot(rotor.slot0Position, i -> artifacts[i] != EMPTY));
+        telemetry.addData("Empty slot nearest to intake", Rotor.Zone.INTAKE_SENSORS.getNearestSlot(rotor.slot0Position, isEmpty));
+        telemetry.addData("Filled slot nearest to feeder", Rotor.Zone.FEEDER_SENSORS.getNearestSlot(rotor.slot0Position, isFilled));
         telemetry.addLine();
         telemetry.addData("Artifact 1", a1);
         hsv1.printTo(telemetry);
