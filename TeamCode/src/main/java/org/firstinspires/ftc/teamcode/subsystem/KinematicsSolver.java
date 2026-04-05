@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
  * Angles are in radians (rad) <br>
  * Durations are in seconds (s) <br>
  *
- * @implSpec <a href="https://www.desmos.com/calculator/rq5t2y3n3f">Desmos</a>
+ * @implSpec <a href="https://www.desmos.com/calculator/kj5s9hm6n4">Desamos visualization</a>
  *
  * @author Arshad Anas
  * @since 2025/09/18
