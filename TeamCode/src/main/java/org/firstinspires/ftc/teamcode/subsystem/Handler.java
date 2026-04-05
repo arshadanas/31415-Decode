@@ -173,10 +173,10 @@ public final class Handler {
                 timeSinceFed.seconds() >= TIME_FEED_COOLDOWN
         ) {
             artifacts[filledBackSlot] = EMPTY; // clear the back slot since it has been fed out
+            feedingOrder.remove((Integer) filledBackSlot);
             boostRPM.run();
             timeSinceFed.reset();
         }
-        feedingOrder.removeIf(slot -> artifacts[slot] == EMPTY);
 
         int slotAtFeeder = Rotor.Zone.FEEDER_OMNIS.getSlotHere(rotor.slot0Position, i -> true);
         boolean noBallOrCorrectBallAtFeeder =
