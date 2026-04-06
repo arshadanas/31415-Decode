@@ -142,12 +142,8 @@ public final class KinematicsSolver {
                 v_launch * sin_θ_launch
         );
 
-        double t = tx(s_goal.x);
+        double t = (s_goal.x - s0.x) / v0.x;
         s_atGoal.set(s_goal.x, s0.y + (v0.y + a_G/2 * t) * t);
-    }
-
-    private double tx(double x) {
-        return (x - s0.x) / v0.x;
     }
 
     private static double W(double x, double A, double B, double C, double D) {
