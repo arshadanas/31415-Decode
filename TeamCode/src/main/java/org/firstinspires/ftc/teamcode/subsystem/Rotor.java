@@ -42,7 +42,6 @@ public final class Rotor {
 
             TOLERANCE_INTAKE_SENSORS_DEG = 11.46, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_FEEDER_SENSORS_DEG = 8.6, // too high => false negatives (removals)
-            TOLERANCE_FEEDER_OMNIS_DEG = 30,
             TOLERANCE_INTAKE_OMNI_DEG = 30;
 
     private final CachedSimpleServo servo;
@@ -73,7 +72,6 @@ public final class Rotor {
             switch (this) {
                 case INTAKE_OMNI:       return toRadians(TOLERANCE_INTAKE_OMNI_DEG);
                 case FEEDER_SENSORS:    return toRadians(TOLERANCE_FEEDER_SENSORS_DEG);
-                case FEEDER_OMNIS:      return toRadians(TOLERANCE_FEEDER_OMNIS_DEG);
                 default:                return toRadians(TOLERANCE_INTAKE_SENSORS_DEG);
             }
         }
@@ -94,12 +92,16 @@ public final class Rotor {
             return normalizeRadians(this.radians - offsetRadians(slot0Reference, slot));
         }
 
+        boolean slotIsHere(double slot0Reference, int slot) {
+            return abs(distFrom(slot0Reference, slot)) <= this.getTolerance();
+        }
+
         /**
          * @return Slot in this zone that satisfies the predicate
          */
         int getSlotHere(double slot0Reference, IntPredicate predicate) {
             for (int i = 0; i < 3; i++)
-                if (predicate.test(i) && abs(distFrom(slot0Reference, i)) <= this.getTolerance())
+                if (predicate.test(i) && slotIsHere(slot0Reference, i))
                     return i;
             return -1;
         }

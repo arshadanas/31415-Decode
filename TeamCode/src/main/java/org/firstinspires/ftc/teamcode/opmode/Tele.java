@@ -6,8 +6,6 @@ import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_AL
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PRELOAD;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PROFILING;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.GREEN;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
@@ -185,39 +183,11 @@ public final class Tele extends LinearOpMode {
 
                 } else {
 
-                    // tracking classifier ramp (driver 2)
-                    if (gamepad2.dpadUpWasPressed())
-                        robot.handler.incrementArtifactsScored();
-                    else if (gamepad2.dpadDownWasPressed())
-                        robot.handler.decrementArtifactsScored();
-                    else if (gamepad2.dpadLeftWasPressed() || gamepad2.dpadRightWasPressed())
-                        robot.handler.clearRamp();
-
-                    if (gamepad2.squareWasPressed())
-                        robot.handler.randomization = Motif.GPP;
-                    else if (gamepad2.triangleWasPressed())
-                        robot.handler.randomization = Motif.PGP;
-                    else if (gamepad2.circleWasPressed())
-                        robot.handler.randomization = Motif.PPG;
-
                     if (gamepad1.triangleWasPressed())
                         robot.handler.rotor.moveSlot(i++, Rotor.Zone.FEEDER_SENSORS);
 
-                    if (gamepad1.crossWasPressed())
-                        robot.handler.feedSingle(GREEN);
-
-                    if (gamepad1.circleWasPressed())
-                        robot.handler.feedSingle(PURPLE);
-
                     if (gamepad1.dpadRightWasPressed())
                         robot.handler.feedFastest();
-
-                    if (gamepad1.dpadUpWasPressed())
-                        robot.handler.feedMotif();
-
-                    if (gamepad1.dpadLeftWasPressed())
-                        robot.handler.motifMode = !robot.handler.motifMode;
-
 
                     robot.handler.setIntake(triggersSum);
 
