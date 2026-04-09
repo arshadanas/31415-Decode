@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.control.filter.KalmanFilter;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
-import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
@@ -111,25 +110,16 @@ public final class Shooter {
     }
 
     void run(boolean inLaunchZone, boolean feedsPending) {
-        Profiler.start("shooter_set_gains");
         rpmFilter.setGains(rpmFilterGains);
         derivFilter.setGains(derivFilterGains);
         controller.setGains(pidGains);
-        Profiler.end("shooter_set_gains");
 
-        Profiler.start("shooter_get_encoder_vel");
         rawRPM = motors[0].encoder.getCorrectedVelocity() * 60 / 28.0 * 1.35;
-        Profiler.end("shooter_get_encoder_vel");
 
-        Profiler.start("rpm kalman");
         currentRPM = rpmFilter.calculate(rawRPM);
-        Profiler.end("rpm kalman");
 
-        Profiler.start("get battery voltage");
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
-        Profiler.end("get battery voltage");
 
-        Profiler.start("shooter pidf");
         double rpmSetpoint =
                 !feedsPending ? RPM_IDLE :
                 !inLaunchZone ? RPM_ARMING :
@@ -144,14 +134,11 @@ public final class Shooter {
                 rpmSetpoint == 0 ? 0 :
                 clip(pidf, 0, 1);
 
-        Profiler.end("shooter pidf");
 
-        Profiler.start("shooter_motors");
         for (CachedMotorEx motor : motors) {
             motor.threshold = CACHE_THRESHOLD_MOTORS;
             motor.set(output);
         }
-        Profiler.end("shooter_motors");
     }
 
     /**

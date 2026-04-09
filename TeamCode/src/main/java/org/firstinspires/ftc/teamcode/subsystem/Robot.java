@@ -11,7 +11,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
-import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 @Config
 public final class Robot {
@@ -44,32 +43,24 @@ public final class Robot {
     }
 
     public void run(boolean feed, boolean forceFeed) {
-        Profiler.start("Robot_bulkread");
         bulkReader.bulkRead();
-        Profiler.end("Robot_bulkread");
 
         boolean lifting = lift.gearSwitch.isActivated();
 
         if (lifting)
             turret.setTarget(PI);
         else {
-            Profiler.start("dt");
             drivetrain.update();
             Pose pose = drivetrain.getPose();
-            Profiler.end("dt");
 
-            Profiler.start("GetCurrentZone");
             currentZone = LaunchZone.getCurrentZone(pose);
-            Profiler.end("GetCurrentZone");
 
-            Profiler.start("Auto aim calc");
             autoAim.update(
                     pose,
                     drivetrain.getVelocity(),
                     drivetrain.getAngularVel(),
                     shooter.getRPM()
             );
-            Profiler.end("Auto aim calc");
 
             turret.setTarget(autoAim.turretAngle);
             shooter.setRPM(autoAim.launchRPM);
@@ -79,24 +70,14 @@ public final class Robot {
         boolean inLaunchZone = currentZone != NONE;
         boolean feedsPending = handler.feedsPending();
 
-        Profiler.start("shooter");
         shooter.run(inLaunchZone, feedsPending && !lifting);
-        Profiler.end("shooter");
-
-        Profiler.start("turret");
         turret.run(feedsPending || lifting);
-        Profiler.end("turret");
 
         boolean inTolerance = shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
                                 turret.inTolerance(Turret.TOLERANCE_FEEDING);
 
-        Profiler.start("handler");
         handler.run(!lifting && inLaunchZone && (forceFeed || (feed && inTolerance)));
-        Profiler.end("handler");
-
-        Profiler.start("lift");
         lift.run();
-        Profiler.end("lift");
     }
 
     public void printTo(Telemetry telemetry) {

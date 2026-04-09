@@ -11,7 +11,6 @@ import com.pedropathing.math.Vector;
 
 import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 @Config
 public final class AutoAim {
@@ -48,9 +47,7 @@ public final class AutoAim {
 
         r0 = launchVec.getMagnitude();
 
-        Profiler.start("iterate airtime");
         airtime = getFinalAirtime(launchVec, v0);
-        Profiler.end("iterate airtime");
 
         launchVec.subtract(v0.multiply(airtime)); // L -= v0*t -- THIS MUTATES v0 BTW
 
