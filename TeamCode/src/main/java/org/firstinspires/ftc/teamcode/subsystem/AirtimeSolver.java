@@ -1,19 +1,16 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.Vector;
 
 import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-public final class AutoAim {
+public final class AirtimeSolver {
 
     public static Vector2 GOAL_OFFSET = new Vector2(0, 0);
 
@@ -33,16 +30,15 @@ public final class AutoAim {
         G.x = isRedAlliance ? SIZE_FIELD - GOAL_OFFSET.x : GOAL_OFFSET.x;
     }
 
-    void update(Pose pose, Vector velocity, double angVel, double currentRPM) {
+    void update(double x, double y, double heading, double vx, double vy, double angVel) {
 
         double
-                heading = normalizeRadians(pose.getHeading()),
                 TURRET_FORWARD_OFFSET = -1.86759,
                 turretX = TURRET_FORWARD_OFFSET * cos(heading),
                 turretY = TURRET_FORWARD_OFFSET * sin(heading);
 
-        s0.set(pose.getX() + turretX, pose.getY() + turretY);
-        v0.set(velocity.getXComponent() + angVel * -turretY, velocity.getYComponent() + angVel * turretX);
+        s0.set(x + turretX, y + turretY);
+        v0.set(vx + angVel * -turretY, vy + angVel * turretX);
         launchVec.set(G).subtract(s0); // L = G - s0
 
         r0 = launchVec.getMagnitude();

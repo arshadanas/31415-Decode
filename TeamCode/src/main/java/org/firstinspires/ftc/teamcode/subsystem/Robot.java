@@ -6,6 +6,7 @@ import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -22,7 +23,7 @@ public final class Robot {
     public final Lift lift;
 
     private final BulkReader bulkReader;
-    private final AutoAim autoAim;
+    private final AirtimeSolver solver;
     private final ElapsedTime loopTimer = new ElapsedTime();
 
     private LaunchZone currentZone;
@@ -35,11 +36,11 @@ public final class Robot {
         lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
-        autoAim = new AutoAim();
+        solver = new AirtimeSolver();
     }
 
     public void setAlliance(boolean isRedAlliance) {
-        autoAim.setAlliance(isRedAlliance);
+        solver.setAlliance(isRedAlliance);
     }
 
     public void run(boolean feed, boolean forceFeed) {
@@ -52,19 +53,18 @@ public final class Robot {
         else {
             drivetrain.update();
             Pose pose = drivetrain.getPose();
+            Vector velocity = drivetrain.getVelocity();
 
             currentZone = LaunchZone.getCurrentZone(pose);
 
-            autoAim.update(
-                    pose,
-                    drivetrain.getVelocity(),
-                    drivetrain.getAngularVel(),
-                    shooter.getRPM()
+            solver.update(
+                    pose.getX(), pose.getY(), pose.getHeading(),
+                    velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel()
             );
 
-            turret.setTarget(autoAim.turretAngle);
-            shooter.setRPM(autoAim.launchRPM);
-            shooter.setLaunchAngle(autoAim.launchAngle);
+            turret.setTarget(solver.turretAngle);
+            shooter.setRPM(solver.launchRPM);
+            shooter.setLaunchAngle(solver.launchAngle);
         }
 
         boolean inLaunchZone = currentZone != NONE;
@@ -86,7 +86,7 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         telemetry.addData("Current zone", currentZone);
         telemetry.addLine();
-        autoAim.printTo(telemetry);
+        solver.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");

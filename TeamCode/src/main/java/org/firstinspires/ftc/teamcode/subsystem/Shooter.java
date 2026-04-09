@@ -61,9 +61,6 @@ public final class Shooter {
     void setRPM(double rpm) {
         this.targetRPM = rpm;
     }
-    double getRPM() {
-        return currentRPM;
-    }
     static double getRPMDrop(double preLaunchRPM) {
         return 0.271632 * preLaunchRPM + 109.1459;
     }
