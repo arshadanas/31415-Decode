@@ -36,12 +36,12 @@ public final class Handler {
 
             TIME_FRONT_DIST_COOLDOWN = 0.1,
             TIME_FEED = 1,
-            TIME_KEEP_FEEDING_AFTER_LAST = 0.4,
+            TIME_FEED_LAST_EXTRA = 0.4,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05;
 
-    public final Rotor rotor;
+    private final Rotor rotor;
     private final CachedMotorEx intake;
     private final CachedDcMotor[] feeder;
     private final AnalogSensor front1;
@@ -56,11 +56,13 @@ public final class Handler {
         this.manualFeederPower = power;
     }
 
+    private int lastSlotMoved;
+    public void moveRotor() {
+        rotor.moveSlot(lastSlotMoved++, Rotor.Zone.FEEDER_SENSORS);
+    }
+
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
-    private final ElapsedTime
-            timeSinceIntaked = new ElapsedTime(),
-            timeSinceStartedFeeding = new ElapsedTime(),
-            timeSinceRunningFeeder = new ElapsedTime();
+    private final ElapsedTime timeSinceIntaked = new ElapsedTime(), timeSpentFeeding = new ElapsedTime();
 
     public final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
     private final IntPredicate
@@ -69,10 +71,10 @@ public final class Handler {
             anySlot = i -> true;
 
     public boolean hasArtifacts() {
-        return Artifact.EMPTY.numOccurrencesIn(artifacts) < 3;
+        return artifacts[0] != EMPTY || artifacts[1] != EMPTY || artifacts[2] != EMPTY;
     }
     public boolean isFull() {
-        return Artifact.EMPTY.numOccurrencesIn(artifacts) == 0;
+        return artifacts[0] != EMPTY && artifacts[1] != EMPTY && artifacts[2] != EMPTY;
     }
 
     public void setContents(Artifact[] artifacts) {
@@ -123,21 +125,18 @@ public final class Handler {
         boolean backSlotIsFeedTarget = !feedingOrder.isEmpty() && backSlot == feedingOrder.get(0);
 
         if (backSlot == -1 || !backSlotIsFeedTarget)
-            timeSinceStartedFeeding.reset();
-        else if (timeSinceStartedFeeding.seconds() >= TIME_FEED) {
-            artifacts[backSlot] = EMPTY;
-            feedingOrder.remove(0);
+            timeSpentFeeding.reset();
+        else {
+            boolean lastArtifact = artifacts[(backSlot + 1) % 3] == EMPTY && artifacts[(backSlot + 2) % 3] == EMPTY;
+            if (timeSpentFeeding.seconds() >= TIME_FEED + (lastArtifact ? TIME_FEED_LAST_EXTRA : 0)) {
+                artifacts[backSlot] = EMPTY;
+                feedingOrder.remove(0);
+            }
         }
-
-        boolean runFeeder = feed && (backSlot == -1 || artifacts[backSlot] == EMPTY || backSlotIsFeedTarget);
-        if (runFeeder)
-            timeSinceRunningFeeder.reset();
-        else if (timeSinceRunningFeeder.seconds() <= TIME_KEEP_FEEDING_AFTER_LAST)
-            runFeeder = true;
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
-                runFeeder ? 1 : SPEED_IDLE_FEEDER;
+                feed && (backSlot == -1 || artifacts[backSlot] == EMPTY || backSlotIsFeedTarget) ? 1 : SPEED_IDLE_FEEDER;
 
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;

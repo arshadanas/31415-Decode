@@ -26,8 +26,7 @@ public final class Shooter {
     public static PIDGains pidGains = new PIDGains(0.0005, 0, 0, 1);
     public static KalmanGains
             rpmFilterGains = new KalmanGains(1, 2),
-            derivFilterGains = new KalmanGains(3, 0),
-            outputFilterGains = new KalmanGains(.02, 5);
+            derivFilterGains = new KalmanGains(3, 0);
 
     public static double
 
@@ -50,12 +49,9 @@ public final class Shooter {
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
-    final VoltageSensor batteryVoltageSensor;
+    private final VoltageSensor batteryVoltageSensor;
 
-    private final KalmanFilter
-            rpmFilter = new KalmanFilter(rpmFilterGains),
-            derivFilter = new KalmanFilter(derivFilterGains),
-            outputFilter = new KalmanFilter(outputFilterGains);
+    private final KalmanFilter rpmFilter = new KalmanFilter(rpmFilterGains), derivFilter = new KalmanFilter(derivFilterGains);
     private final PIDController controller = new PIDController(derivFilter);
     private final State setpoint = new State(), measurement = new State();
 
@@ -106,7 +102,6 @@ public final class Shooter {
         Profiler.start("shooter_set_gains");
         rpmFilter.setGains(rpmFilterGains);
         derivFilter.setGains(derivFilterGains);
-        outputFilter.setGains(outputFilterGains);
         controller.setGains(pidGains);
         Profiler.end("shooter_set_gains");
 
@@ -135,7 +130,7 @@ public final class Shooter {
         output =
                 manualPower != 0 ?  manualPower :
                 rpmSetpoint == 0 ? 0 :
-                clip(inTolerance(TOLERANCE_RPM_FILTERING) ? outputFilter.calculate(pidf) : pidf, 0, 1);
+                clip(pidf, 0, 1);
 
         Profiler.end("shooter pidf");
 

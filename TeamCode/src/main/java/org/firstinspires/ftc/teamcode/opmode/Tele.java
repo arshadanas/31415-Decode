@@ -23,7 +23,6 @@ import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.Motif;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
-import org.firstinspires.ftc.teamcode.subsystem.Rotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 import java.io.File;
@@ -141,7 +140,6 @@ public final class Tele extends LinearOpMode {
                     Auto.LENGTH_DRIVETRAIN / 2.0,
                     PI / 2
             );
-            int i = 0;
 
             matchTimer.reset();
 
@@ -184,7 +182,7 @@ public final class Tele extends LinearOpMode {
                 } else {
 
                     if (gamepad1.triangleWasPressed())
-                        robot.handler.rotor.moveSlot(i++, Rotor.Zone.FEEDER_SENSORS);
+                        robot.handler.moveRotor();
 
                     if (gamepad1.dpadRightWasPressed())
                         robot.handler.feedFastest();
@@ -195,7 +193,7 @@ public final class Tele extends LinearOpMode {
                             gamepad1.left_stick_x,
                             gamepad1.left_stick_y,
                             gamepad1.right_stick_x,
-                            gamepad1.right_bumper /*|| triggersSum > 0 */,
+                            gamepad1.right_bumper,
                             isRedAlliance
                     );
 

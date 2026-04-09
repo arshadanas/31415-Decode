@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.MAX_VOLTAGE;
 import static java.lang.Math.max;
 
 import com.acmerobotics.dashboard.FtcDashboard;
@@ -44,8 +43,7 @@ public final class TuneShooter extends LinearOpMode {
             targetRPM = clip(targetRPM, 0, 8000);
 
             shooter.setRPM(targetRPM);
-            double voltageScalar = MAX_VOLTAGE / shooter.batteryVoltageSensor.getVoltage();
-            shooter.setManual(gamepad1.right_trigger * voltageScalar);
+            shooter.setManual(gamepad1.right_trigger);
 
             Thread.sleep((long)(max(Tele.AVG_LOOP_TIME_MS - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());
