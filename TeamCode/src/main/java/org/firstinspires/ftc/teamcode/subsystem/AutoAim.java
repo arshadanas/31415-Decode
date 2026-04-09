@@ -23,7 +23,6 @@ public final class AutoAim {
             LAUNCH_RAD_TUNING = 1.0776000610289713;
 
     double launchRPM, launchAngle, turretAngle, r0, r_t, airtime;
-    LaunchZone currentZone;
 
     private final Vector2
             G = new Vector2(0, SIZE_FIELD + GOAL_OFFSET.y),
@@ -36,10 +35,6 @@ public final class AutoAim {
     }
 
     void update(Pose pose, Vector velocity, double angVel, double currentRPM) {
-
-        Profiler.start("GetCurrentZone");
-        currentZone = LaunchZone.getCurrentZone(pose);
-        Profiler.end("GetCurrentZone");
 
         double
                 heading = normalizeRadians(pose.getHeading()),
@@ -120,8 +115,6 @@ public final class AutoAim {
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("Current zone", currentZone);
-        telemetry.addLine();
         telemetry.addData("Shooter-goal dist at 0 (in)", r0);
         telemetry.addData("Shooter-goal dist at t (in)", r_t);
         telemetry.addData("Computed airtime t (s)", airtime);

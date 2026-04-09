@@ -26,6 +26,8 @@ public final class Robot {
     private final AutoAim autoAim;
     private final ElapsedTime loopTimer = new ElapsedTime();
 
+    private LaunchZone currentZone;
+
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
         shooter = new Shooter(hardwareMap);
@@ -53,11 +55,16 @@ public final class Robot {
         else {
             Profiler.start("dt");
             drivetrain.update();
+            Pose pose = drivetrain.getPose();
             Profiler.end("dt");
+
+            Profiler.start("GetCurrentZone");
+            currentZone = LaunchZone.getCurrentZone(pose);
+            Profiler.end("GetCurrentZone");
 
             Profiler.start("Auto aim calc");
             autoAim.update(
-                    drivetrain.getPose(),
+                    pose,
                     drivetrain.getVelocity(),
                     drivetrain.getAngularVel(),
                     shooter.getRPM()
@@ -69,7 +76,7 @@ public final class Robot {
             shooter.setLaunchAngle(autoAim.launchAngle);
         }
 
-        boolean inLaunchZone = autoAim.currentZone != NONE;
+        boolean inLaunchZone = currentZone != NONE;
         boolean feedsPending = handler.feedsPending();
 
         Profiler.start("shooter");
@@ -96,6 +103,8 @@ public final class Robot {
         telemetry.addData("LOOP TIME (ms)", loopTimer.milliseconds());
         loopTimer.reset();
         telemetry.addLine("\n--------------------------------------\n");
+        telemetry.addData("Current zone", currentZone);
+        telemetry.addLine();
         autoAim.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
