@@ -12,8 +12,6 @@ import static java.lang.Math.sqrt;
 import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.Vector;
 
 import org.dyn4j.geometry.Vector2;
 import org.firstinspires.ftc.teamcode.control.Ranges;
@@ -95,13 +93,12 @@ public final class KinematicsSolver {
         b = -m2 * A_rim.x + A_rim.y;
     }
 
-    public void setRobotState(Pose pose, Vector velocity, double angVel) {
+    public void setRobotState(double x, double y, double heading, double vx, double vy, double angVel) {
         double
-                heading = pose.getHeading(),
                 turretX = o_turretForward * cos(heading),
                 turretY = o_turretForward * sin(heading);
-        s_turret.set(pose.getX() + turretX, pose.getY() + turretY);
-        v_turret.set(velocity.getXComponent() + angVel * -turretY, velocity.getYComponent() + angVel * turretX);
+        s_turret.set(x + turretX, y + turretY);
+        v_turret.set(vx + angVel * -turretY, vy + angVel * turretX);
         unitTurretToGoal.set(G);
         unitTurretToGoal.subtract(s_turret);
         unitTurretToGoal.normalize();
@@ -110,12 +107,6 @@ public final class KinematicsSolver {
 
     public double getTurretAngle() {
         return turretAngle + α_launch;
-    }
-
-    private void setRobotState(double x, double y, double heading, double vx, double vy, double angVel) {
-        Vector vRobot = new Vector();
-        vRobot.setOrthogonalComponents(vx, vy);
-        setRobotState(new Pose(x, y, heading), vRobot, angVel);
     }
 
     private void computeForwardKinematics() {
@@ -398,7 +389,6 @@ public final class KinematicsSolver {
 
     public static void main(String[] args) {
         new Vector2(3,3).normalize();
-        new Pose(0, 0, 0);
 
         KinematicsSolver solver = new KinematicsSolver();
         solver.setAlliance(true);
