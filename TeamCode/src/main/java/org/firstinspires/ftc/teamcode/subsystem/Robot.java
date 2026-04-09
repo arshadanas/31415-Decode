@@ -60,7 +60,7 @@ public final class Robot {
                     drivetrain.getPose(),
                     drivetrain.getVelocity(),
                     drivetrain.getAngularVel(),
-                    shooter.getCurrentRPM()
+                    shooter.getRPM()
             );
             Profiler.end("Auto aim calc");
 

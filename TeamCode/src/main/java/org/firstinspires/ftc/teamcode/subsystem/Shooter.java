@@ -45,7 +45,9 @@ public final class Shooter {
             TOLERANCE_RPM_FEEDING = 80, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_HOOD = 0.05,
-            CACHE_THRESHOLD_MOTORS = 0.001;
+            CACHE_THRESHOLD_MOTORS = 0.001,
+
+            RPM_PER_IN_PER_SEC = 22.1835942324; // https://www.desmos.com/calculator/2prs6sixtf
 
     private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
@@ -57,11 +59,21 @@ public final class Shooter {
 
     private double currentRPM, targetRPM = RPM_ARMING, rawRPM, output;
 
-    public void setRPM(double rpm) {
+    void setRPM(double rpm) {
         this.targetRPM = rpm;
     }
-    double getCurrentRPM() {
+    double getRPM() {
         return currentRPM;
+    }
+    static double getRPMDrop(double preLaunchRPM) {
+        return 0.271632 * preLaunchRPM + 109.1459;
+    }
+    
+    void setVelocity(double inPerSec) {
+        setRPM(inPerSec * RPM_PER_IN_PER_SEC);
+    }
+    double getVelocity() {
+        return currentRPM / RPM_PER_IN_PER_SEC;
     }
 
     /**

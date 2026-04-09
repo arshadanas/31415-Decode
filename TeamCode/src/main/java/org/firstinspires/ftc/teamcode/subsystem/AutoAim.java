@@ -103,26 +103,6 @@ public final class AutoAim {
         return 0;
     }
 
-    /**
-     * Inverse of {@link #getLaunchVel}
-     * @return Angular velocity of shooter wheel at launch, in rpm
-     */
-    private static double getLaunchRPM(double inPerSec) {
-        return 29.68064 * inPerSec - 0.445157; // TODO Tune empirically
-    }
-
-    /**
-     * Inverse of {@link #getLaunchRPM}
-     * @return Linear velocity of {@link Artifact} at launch, in inches/sec
-     */
-    private static double getLaunchVel(double rpm) {
-        return (rpm + 0.445157) / 29.68064; // TODO Tune empirically
-    }
-
-    static double getRPMDrop(double preLaunchRPM) {
-        return 0.271632 * preLaunchRPM + 109.1459;
-    }
-
     public static void main(String[] args) {
 
         Vector2 ad = new Vector2();
