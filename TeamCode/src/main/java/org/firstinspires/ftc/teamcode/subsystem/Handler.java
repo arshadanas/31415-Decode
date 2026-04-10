@@ -144,21 +144,14 @@ public final class Handler {
         }
 
         intake.threshold = CACHE_THRESHOLD_INTAKE;
-        intake.set(adaptiveClipIntakePower(intakePower));
+        intake.set(
+            intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT && (
+                Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Position, filledSlot) != -1 || 
+                Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Target, filledSlot) != -1
+            ) ? INTAKE_POWER_OMNI_CONTACT :intakePower
+        );
 
         rotor.run();
-    }
-
-    /**
-     * Requires minimum intake power of {@link #INTAKE_POWER_OMNI_CONTACT} when there is an
-     * {@link Artifact} touching the front omni wheel
-     */
-    private double adaptiveClipIntakePower(double intakePower) {
-        int filledOmniSlot = Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Position, filledSlot);
-        int filledSlotMovingToOmni = Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Target, filledSlot);
-
-        return (filledOmniSlot != -1 || filledSlotMovingToOmni != -1) && intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT ? INTAKE_POWER_OMNI_CONTACT :
-                intakePower;
     }
 
     boolean feedsPending() {
@@ -166,7 +159,7 @@ public final class Handler {
     }
 
     /**
-     * Generate the most efficient feeding order
+     * Generate the most efficient {@link #feedingOrder}
      */
     public void feedFastest() {
         feedingOrder.clear();
@@ -192,9 +185,9 @@ public final class Handler {
     void printTo(Telemetry telemetry) {
         telemetry.addData("HANDLER", Arrays.toString(artifacts));
         telemetry.addLine();
-        telemetry.addData("Front dist (mm)", front1.getReading());
-        telemetry.addLine();
         telemetry.addData("Feeding order", feedingOrder.toString());
+        telemetry.addLine();
+        telemetry.addData("Front dist (mm)", front1.getReading());
         telemetry.addLine("\n--------------------------------------\n");
         rotor.printTo(telemetry);
     }
