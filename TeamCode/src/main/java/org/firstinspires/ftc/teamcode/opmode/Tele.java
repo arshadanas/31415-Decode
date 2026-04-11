@@ -3,10 +3,10 @@ package org.firstinspires.ftc.teamcode.opmode;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.sharedArtifacts;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.sharedPose;
-import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
-import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PRELOAD;
-import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PROFILING;
-import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_ALLIANCE;
+import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_HEADING;
+import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_PRELOAD;
+import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_SIDE;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
@@ -29,19 +29,19 @@ public final class Tele extends LinearOpMode {
 
     public static double AVG_LOOP_TIME_MS = 17.5;
 
-    enum TeleOpConfig {
+    enum TeleConfig {
         EDITING_ALLIANCE,
         EDITING_SIDE,
         EDITING_PRELOAD,
-        EDITING_PROFILING;
+        EDITING_HEADING;
 
-        public static final TeleOpConfig[] selections = values();
+        public static final TeleConfig[] selections = values();
 
-        public TeleOpConfig plus(int i) {
+        public TeleConfig plus(int i) {
             int max = selections.length;
             return selections[((ordinal() + i) % max + max) % max];
         }
-        public String markIf(TeleOpConfig s) {
+        public String markIf(TeleConfig s) {
             return this == s ? "> " : "  ";
         }
     }
@@ -65,10 +65,9 @@ public final class Tele extends LinearOpMode {
         // expire the shared artifacts
         sharedArtifacts[0] = sharedArtifacts[1] = sharedArtifacts[2] = false;
 
-        TeleOpConfig selected = EDITING_ALLIANCE;
+        TeleConfig selected = EDITING_ALLIANCE;
 
         boolean doTelemetry = false;
-        boolean doProfiling = false;
         boolean isGoalSide = false;
 
         while (opModeInInit()) {
@@ -88,11 +87,10 @@ public final class Tele extends LinearOpMode {
                 case EDITING_PRELOAD:
                     robot.handler.setContents(robot.handler.hasArtifacts() ? Handler.EMPTY : Handler.FULL);
                     break;
-                case EDITING_PROFILING:
-                    doProfiling = !doProfiling;
             }
 
-            robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
+            if (selected == EDITING_HEADING)
+                robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
             robot.drivetrain.update();
 
             telemetry.addLine();
@@ -100,11 +98,10 @@ public final class Tele extends LinearOpMode {
             telemetry.addLine();
             telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "near zone (GOAL SIDE)" : "far zone (AUDIENCE SIDE)"));
             telemetry.addLine();
-            telemetry.addLine(EDITING_PRELOAD.markIf(selected) + "Preloaded: " + Arrays.toString(robot.handler.artifacts));
+            telemetry.addData(EDITING_PRELOAD.markIf(selected) + "Preloaded", Arrays.toString(robot.handler.artifacts));
             telemetry.addLine();
-            telemetry.addLine(EDITING_PROFILING.markIf(selected) + "Profiler " + (doProfiling ? "ENABLED" : "disabled"));
-            telemetry.addLine();
-            telemetry.addData("  Heading (deg, set with right stick)", toDegrees(robot.drivetrain.getPose().getHeading()));
+            telemetry.addLine(EDITING_HEADING.markIf(selected) + "Heading (deg), set with right stick:");
+            telemetry.addLine("  " + toDegrees(robot.drivetrain.getPose().getHeading()));
             telemetry.update();
         }
 
