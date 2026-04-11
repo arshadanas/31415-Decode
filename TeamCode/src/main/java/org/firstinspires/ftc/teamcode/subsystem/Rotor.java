@@ -60,8 +60,7 @@ public final class Rotor {
     public enum Zone {
         INTAKE_SENSORS(0),
         INTAKE_OMNI(0),
-        FEEDER_SENSORS(PI),
-        FEEDER_OMNIS(PI);
+        FEEDER_SENSORS(PI);
 
         private final double radians;
         Zone(double radians) {
@@ -100,26 +99,29 @@ public final class Rotor {
          * @return Slot in this zone that satisfies the predicate
          */
         int getSlotHere(double slot0Reference, IntPredicate predicate) {
-            for (int i = 0; i < 3; i++)
-                if (predicate.test(i) && slotIsHere(slot0Reference, i))
-                    return i;
-            return -1;
+            return
+                    predicate.test(0) && slotIsHere(slot0Reference, 0) ? 0 :
+                    predicate.test(1) && slotIsHere(slot0Reference, 1) ? 1 :
+                    predicate.test(2) && slotIsHere(slot0Reference, 2) ? 2 :
+                                                                                -1;
         }
 
         /**
          * @return Slot closest to this zone that satisfies the predicate
          */
         int getNearestSlot(double slot0Reference, IntPredicate predicate) {
-            double min = Double.MAX_VALUE;
             int minInd = -1;
-            for (int i = 0; i < 3; i++)
-                if (predicate.test(i)) {
-                    double error = abs(distFrom(slot0Reference, i));
-                    if (error < min) {
-                        min = error;
-                        minInd = i;
-                    }
+            double min = abs(distFrom(slot0Reference, 0));
+
+            if (predicate.test(0)) minInd = 0;
+            if (predicate.test(1)) {
+                double error = abs(distFrom(slot0Reference, 1));
+                if (error < min) {
+                    min = error;
+                    minInd = 1;
                 }
+            }
+            if (predicate.test(2) && abs(distFrom(slot0Reference, 2)) < min) minInd = 2;
             return minInd;
         }
     }
@@ -129,12 +131,10 @@ public final class Rotor {
         encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
 
         // slot nearest to feeder because we preload with a slot aligned to the feeder
-        int nearestFeedSlot = Zone.FEEDER_SENSORS.getNearestSlot(
-                slot0Target = slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET),
-                i -> true
-        );
-        if (nearestFeedSlot != -1)
-            this.lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(nearestFeedSlot);
+        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
+        int nearestFeedSlot = Zone.FEEDER_SENSORS.getNearestSlot(slot0Position, i -> true);
+        slot0Target = offsetRadians(Zone.FEEDER_SENSORS.radians, -nearestFeedSlot);
+        lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(nearestFeedSlot);
     }
 
     void run() {
