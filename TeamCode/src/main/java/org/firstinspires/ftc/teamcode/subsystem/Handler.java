@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.PURPLE;
 import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -20,7 +18,6 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.IntPredicate;
 
 @Config
 public final class Handler {
@@ -64,22 +61,20 @@ public final class Handler {
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
     private final ElapsedTime timeSinceIntaked = new ElapsedTime(), timeSpentFeeding = new ElapsedTime();
 
-    public final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
-    private final IntPredicate
-            emptySlot = i -> artifacts[i] == EMPTY,
-            filledSlot = i -> artifacts[i] != EMPTY,
-            anySlot = i -> true;
+    public static final boolean[] FULL = {true, true, true}, EMPTY = {false, false, false};
+    public final boolean[] artifacts = EMPTY.clone();
 
     public boolean hasArtifacts() {
-        return artifacts[0] != EMPTY || artifacts[1] != EMPTY || artifacts[2] != EMPTY;
+        return artifacts[0] || artifacts[1] || artifacts[2];
     }
     public boolean isFull() {
-        return artifacts[0] != EMPTY && artifacts[1] != EMPTY && artifacts[2] != EMPTY;
+        return artifacts[0] && artifacts[1] && artifacts[2];
     }
 
-    public void setContents(Artifact[] artifacts) {
-        assert artifacts.length == 3;
-        System.arraycopy(artifacts, 0, this.artifacts, 0, 3);
+    public void setContents(boolean[] artifacts) {
+        this.artifacts[0] = artifacts[0];
+        this.artifacts[1] = artifacts[1];
+        this.artifacts[2] = artifacts[2];
         feedFastest();
     }
 
@@ -102,7 +97,7 @@ public final class Handler {
 
     void run(boolean feed) {
 
-        int nearestEmptySlot = Rotor.Zone.INTAKE_SENSOR.getNearestSlot(rotor.slot0Position, emptySlot);
+        int nearestEmptySlot = Rotor.Zone.INTAKE_SENSOR.getNearestSlot(rotor.slot0Position, artifacts, false);
 
         if (intakePower > 0 && nearestEmptySlot != -1) // move empty slot to intake
             rotor.moveSlot(nearestEmptySlot, Rotor.Zone.INTAKE_SENSOR);
@@ -115,19 +110,19 @@ public final class Handler {
                 front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
                 timeSinceIntaked.seconds() >= TIME_FRONT_DIST_COOLDOWN // long enough for distance sensor to refresh
         ) {
-            artifacts[nearestEmptySlot] = PURPLE;
+            artifacts[nearestEmptySlot] = true;
             timeSinceIntaked.reset();
             feedFastest();
         }
 
-        int backSlot = Rotor.Zone.FEEDER.getSlotHere(rotor.slot0Position, anySlot);
+        int backSlot = Rotor.Zone.FEEDER.getFilledSlotHere(rotor.slot0Position, Handler.FULL);
 
         boolean backSlotIsFeedTarget = !feedingOrder.isEmpty() && backSlot == feedingOrder.get(0);
 
         if (feed && backSlotIsFeedTarget) {
-            boolean lastArtifact = artifacts[(backSlot + 1) % 3] == EMPTY && artifacts[(backSlot + 2) % 3] == EMPTY;
+            boolean lastArtifact = !artifacts[(backSlot + 1) % 3] && !artifacts[(backSlot + 2) % 3];
             if (timeSpentFeeding.seconds() >= TIME_FEED + (lastArtifact ? TIME_FEED_LAST_EXTRA : 0)) {
-                artifacts[backSlot] = EMPTY;
+                artifacts[backSlot] = false;
                 feedingOrder.remove(0);
                 timeSpentFeeding.reset();
             }
@@ -135,7 +130,7 @@ public final class Handler {
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
-                feed && (backSlot == -1 || artifacts[backSlot] == EMPTY || backSlotIsFeedTarget) ? 1 : SPEED_IDLE_FEEDER;
+                feed && (backSlot == -1 || !artifacts[backSlot] || backSlotIsFeedTarget) ? 1 : SPEED_IDLE_FEEDER;
 
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;
@@ -145,8 +140,8 @@ public final class Handler {
         intake.threshold = CACHE_THRESHOLD_INTAKE;
         intake.set(
             intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT && (
-                Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Position, filledSlot) != -1 || 
-                Rotor.Zone.INTAKE_OMNI.getSlotHere(rotor.slot0Target, filledSlot) != -1
+                Rotor.Zone.INTAKE_OMNI.getFilledSlotHere(rotor.slot0Position, artifacts) != -1 ||
+                Rotor.Zone.INTAKE_OMNI.getFilledSlotHere(rotor.slot0Target, artifacts) != -1
             ) ? INTAKE_POWER_OMNI_CONTACT :intakePower
         );
 
@@ -163,7 +158,7 @@ public final class Handler {
     public void feedFastest() {
         feedingOrder.clear();
 
-        int first = Rotor.Zone.FEEDER.getNearestSlot(rotor.slot0Position, filledSlot);
+        int first = Rotor.Zone.FEEDER.getNearestSlot(rotor.slot0Position, artifacts, true);
         if (first == -1) // no Artifacts in the container
             return;
 
@@ -173,11 +168,11 @@ public final class Handler {
         if (signOfFirstError == 0) signOfFirstError = 1;
 
         int second = wrap(first - signOfFirstError, 0, 3);
-        if (artifacts[second] != EMPTY)
+        if (artifacts[second])
             feedingOrder.add(second);
 
         int third = wrap(second - signOfFirstError, 0, 3);
-        if (artifacts[third] != EMPTY)
+        if (artifacts[third])
             feedingOrder.add(third);
     }
 

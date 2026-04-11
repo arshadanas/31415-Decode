@@ -20,8 +20,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
-import org.firstinspires.ftc.teamcode.subsystem.Artifact;
-import org.firstinspires.ftc.teamcode.subsystem.Motif;
+import org.firstinspires.ftc.teamcode.subsystem.Handler;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
@@ -70,9 +69,9 @@ public final class Tele extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, new Pose());
         robot.drivetrain.startTeleopDrive();
 
-        robot.handler.setContents(Auto.artifacts);
+        robot.handler.setContents(Auto.sharedArtifacts);
         // expire the shared artifacts
-        System.arraycopy(Artifact.EMPTY_ARRAY, 0, Auto.artifacts, 0, 3);
+        Auto.sharedArtifacts[0] = Auto.sharedArtifacts[1] = Auto.sharedArtifacts[2] = false;
 
         TeleOpConfig selected = EDITING_ALLIANCE;
 
@@ -100,7 +99,7 @@ public final class Tele extends LinearOpMode {
                 case EDITING_PRELOAD:
                     if (gamepad1.squareWasPressed()) {
                         preload = !preload;
-                        robot.handler.setContents(preload ? Motif.PGP.artifacts : Artifact.EMPTY_ARRAY);
+                        robot.handler.setContents(preload ? Handler.FULL : Handler.EMPTY);
                     }
                     break;
                 case EDITING_PROFILING:

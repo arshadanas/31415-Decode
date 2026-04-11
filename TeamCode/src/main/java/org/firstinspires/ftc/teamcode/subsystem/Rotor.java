@@ -14,8 +14,6 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
-import java.util.function.IntPredicate;
-
 @Config
 public final class Rotor {
 
@@ -53,7 +51,7 @@ public final class Rotor {
 
         // slot nearest to feeder because we preload with a slot aligned to the feeder
         slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
-        int nearestFeedSlot = Zone.FEEDER.getNearestSlot(slot0Position, i -> true);
+        int nearestFeedSlot = Zone.FEEDER.getNearestSlot(slot0Position, Handler.FULL, true);
         slot0Target = offsetRadians(Zone.FEEDER.radians, -nearestFeedSlot);
         lastServoTarget = Zone.INTAKE_SENSOR.getServoTarget(nearestFeedSlot);
     }
@@ -141,38 +139,31 @@ public final class Rotor {
         }
 
         /**
-         * @return Slot in this zone that satisfies the predicate
+         * @return Filled slot in this {@link Zone}
          */
-        int getSlotHere(double slot0Reference, IntPredicate predicate) {
+        int getFilledSlotHere(double slot0Reference, boolean[] isFilled) {
             return
-                    predicate.test(0) && slotIsHere(slot0Reference, 0) ? 0 :
-                    predicate.test(1) && slotIsHere(slot0Reference, 1) ? 1 :
-                    predicate.test(2) && slotIsHere(slot0Reference, 2) ? 2 :
-                                                                                -1;
+                    isFilled[0] && slotIsHere(slot0Reference, 0) ? 0 :
+                    isFilled[1] && slotIsHere(slot0Reference, 1) ? 1 :
+                    isFilled[2] && slotIsHere(slot0Reference, 2) ? 2 :
+                                                                        -1;
         }
 
         /**
-         * @return Slot closest to this zone that satisfies the predicate
+         * @param getFilled true to get filled slots, false to get empty slots
+         * @return Slot closest to this {@link Zone} that is either filled or empty (per getFilled)
          */
-        int getNearestSlot(double slot0Reference, IntPredicate predicate) {
+        int getNearestSlot(double slot0Reference, boolean[] isFilled, boolean getFilled) {
             double min = Double.MAX_VALUE;
             int minInd = -1;
-            if (predicate.test(0)) {
-                double error = abs(distFrom(slot0Reference, 0));
+            for (int i = 0; i < 3; i++) if (isFilled[i] == getFilled) {
+                double error = abs(distFrom(slot0Reference, i));
                 if (error < min) {
                     min = error;
-                    minInd = 0;
+                    minInd = i;
                 }
+
             }
-            if (predicate.test(1)) {
-                double error = abs(distFrom(slot0Reference, 1));
-                if (error < min) {
-                    min = error;
-                    minInd = 1;
-                }
-            }
-            if (predicate.test(2) && abs(distFrom(slot0Reference, 2)) < min)
-                return 2;
             return minInd;
         }
     }

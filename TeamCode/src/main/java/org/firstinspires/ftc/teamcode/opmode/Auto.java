@@ -6,7 +6,6 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.AutoConfig.EDITING_SIDE
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.INTAKING_SPIKE;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.PARKING;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.SCORING;
-import static org.firstinspires.ftc.teamcode.subsystem.Artifact.EMPTY;
 import static java.lang.Math.PI;
 import static java.lang.Math.ceil;
 import static java.lang.Math.toRadians;
@@ -33,8 +32,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.control.FirstTerminateAction;
 import org.firstinspires.ftc.teamcode.control.motion.EditablePose;
 import org.firstinspires.ftc.teamcode.pedropathing.FollowPathAction;
-import org.firstinspires.ftc.teamcode.subsystem.Artifact;
-import org.firstinspires.ftc.teamcode.subsystem.Motif;
+import org.firstinspires.ftc.teamcode.subsystem.Handler;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 
 @Config
@@ -110,7 +108,7 @@ public final class Auto extends LinearOpMode {
 
     static Pose sharedPose = null;
     static boolean isRedAlliance = false;
-    static final Artifact[] artifacts = {EMPTY, EMPTY, EMPTY};
+    static final boolean[] sharedArtifacts = Handler.EMPTY.clone();
 
     enum AutoConfig {
         CONFIRMING,
@@ -174,7 +172,7 @@ public final class Auto extends LinearOpMode {
 
         robot.setAlliance(isRedAlliance);
         Pose startPose = sharedPose = Auto.getStartingPose(isRedAlliance, isGoalSide);
-        robot.handler.setContents(Motif.PGP.artifacts);
+        robot.handler.setContents(Handler.FULL);
 
         Follower f = robot.drivetrain.drivetrain;
 
@@ -435,7 +433,9 @@ public final class Auto extends LinearOpMode {
                 telemetryPacket -> {
                     robot.run(feed, false);
                     sharedPose = robot.drivetrain.getPose();
-                    System.arraycopy(robot.handler.artifacts, 0, Auto.artifacts, 0, 3);
+                    sharedArtifacts[0] = robot.handler.artifacts[0];
+                    sharedArtifacts[1] = robot.handler.artifacts[1];
+                    sharedArtifacts[2] = robot.handler.artifacts[2];
                     return opModeIsActive();
                 },
                 auto
