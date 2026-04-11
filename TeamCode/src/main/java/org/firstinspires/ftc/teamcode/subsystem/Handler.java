@@ -149,9 +149,10 @@ public final class Handler {
             servo.setPower(feederPower);
         }
 
-        boolean artifactAtOmni = Rotor.Zone.INTAKE_OMNI.getFilledSlotHere(rotor.slot0Position, artifacts) != -1;
-        boolean artifactMovingToOmni = Rotor.Zone.INTAKE_OMNI.getFilledSlotHere(rotor.slot0Target, artifacts) != -1;
-        boolean keepArtifactInside = intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT && (artifactAtOmni || artifactMovingToOmni);
+        boolean keepArtifactInside = intakePower >= 0 && intakePower < INTAKE_POWER_OMNI_CONTACT && (
+                        Rotor.Zone.INTAKE_OMNI.getFilledSlotHere(rotor.slot0Position, artifacts) != -1 ||
+                        Rotor.Zone.INTAKE_OMNI.getFilledSlotHere(rotor.slot0Target, artifacts) != -1
+        );
 
         intake.threshold = CACHE_THRESHOLD_INTAKE;
         intake.set(keepArtifactInside ? INTAKE_POWER_OMNI_CONTACT : intakePower);
