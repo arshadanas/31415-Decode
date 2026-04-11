@@ -129,6 +129,7 @@ public final class Handler {
             if (timeSpentFeeding.seconds() >= TIME_FEED + (lastArtifact ? TIME_FEED_LAST_EXTRA : 0)) {
                 artifacts[backSlot] = EMPTY;
                 feedingOrder.remove(0);
+                timeSpentFeeding.reset();
             }
         } else timeSpentFeeding.reset();
 
