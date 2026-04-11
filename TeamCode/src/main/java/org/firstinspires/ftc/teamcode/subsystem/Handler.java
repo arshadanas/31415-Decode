@@ -59,7 +59,9 @@ public final class Handler {
     }
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
-    private final ElapsedTime timeSinceIntaked = new ElapsedTime(), timeSpentFeeding = new ElapsedTime();
+    private final ElapsedTime timeSinceIntaked = new ElapsedTime(), loopTimer = new ElapsedTime();
+    private double timeSpentFeeding;
+    private boolean started;
 
     public static final boolean[] FULL = {true, true, true}, EMPTY = {false, false, false};
     public final boolean[] artifacts = EMPTY.clone();
@@ -97,6 +99,14 @@ public final class Handler {
 
     void run(boolean feed) {
 
+        double dt = loopTimer.seconds();
+        loopTimer.reset();
+
+        if (!started) {
+            dt = 0;
+            started = true;
+        }
+
         int nearestEmptySlot = Rotor.Zone.INTAKE_SENSOR.getNearestSlot(rotor.slot0Position, artifacts, false);
 
         if (intakePower > 0 && nearestEmptySlot != -1) // move empty slot to intake
@@ -119,14 +129,21 @@ public final class Handler {
 
         boolean backSlotIsFeedTarget = !feedingOrder.isEmpty() && backSlot == feedingOrder.get(0);
 
-        if (feed && backSlotIsFeedTarget) {
+        if (!backSlotIsFeedTarget)
+            timeSpentFeeding = 0; // if slot moves, restart feeding count
+        else if (feed) {
+            timeSpentFeeding += dt;
             artifacts[backSlot] = false;
-            if (timeSpentFeeding.seconds() >= TIME_FEED - (hasArtifacts() ? TIME_SWITCH_EARLY : 0)) {
+            double timeItTakesToFeed = TIME_FEED - (hasArtifacts() ? TIME_SWITCH_EARLY : 0);
+
+            if (timeSpentFeeding < timeItTakesToFeed)
+                artifacts[backSlot] = true;
+            else {
                 feedingOrder.remove(0);
-                timeSpentFeeding.reset();
                 backSlotIsFeedTarget = false;
-            } else artifacts[backSlot] = true;
-        } else timeSpentFeeding.reset();
+                timeSpentFeeding = 0;
+            }
+        }
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
