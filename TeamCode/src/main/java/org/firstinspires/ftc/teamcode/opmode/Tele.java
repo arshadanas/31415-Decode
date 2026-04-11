@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.opmode;
 
 import static org.firstinspires.ftc.teamcode.opmode.Auto.isRedAlliance;
+import static org.firstinspires.ftc.teamcode.opmode.Auto.sharedArtifacts;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.sharedPose;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_ALLIANCE;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleOpConfig.EDITING_PRELOAD;
@@ -15,12 +16,10 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.Handler;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
-import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 import java.util.Arrays;
 
@@ -49,10 +48,6 @@ public final class Tele extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        ElapsedTime matchTimer = new ElapsedTime();
-
-        double TELE = 120; // seconds
-        double LIFT_TIME = TELE - 15; // 15 seconds for lift
 
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -60,16 +55,21 @@ public final class Tele extends LinearOpMode {
         Robot robot = new Robot(hardwareMap, new Pose());
         robot.drivetrain.startTeleopDrive();
 
-        robot.handler.setContents(Auto.sharedArtifacts);
+        Pose wallResetPose = new Pose(
+                Auto.WIDTH_DRIVETRAIN / 2.0,
+                Auto.LENGTH_DRIVETRAIN / 2.0,
+                PI / 2
+        );
+
+        robot.handler.setContents(sharedArtifacts);
         // expire the shared artifacts
-        Auto.sharedArtifacts[0] = Auto.sharedArtifacts[1] = Auto.sharedArtifacts[2] = false;
+        sharedArtifacts[0] = sharedArtifacts[1] = sharedArtifacts[2] = false;
 
         TeleOpConfig selected = EDITING_ALLIANCE;
 
         boolean doTelemetry = false;
         boolean doProfiling = false;
         boolean isGoalSide = false;
-        boolean preload = false;
 
         while (opModeInInit()) {
 
@@ -78,24 +78,18 @@ public final class Tele extends LinearOpMode {
             else if (gamepad1.dpadDownWasPressed())
                 selected = selected.plus(1);
 
-            switch (selected) {
+            if (gamepad1.squareWasPressed()) switch (selected) {
                 case EDITING_ALLIANCE:
-                    if (gamepad1.squareWasPressed())
-                        isRedAlliance = !isRedAlliance;
+                    isRedAlliance = !isRedAlliance;
                     break;
                 case EDITING_SIDE:
-                    if (gamepad1.squareWasPressed())
-                        isGoalSide = !isGoalSide;
+                    isGoalSide = !isGoalSide;
                     break;
                 case EDITING_PRELOAD:
-                    if (gamepad1.squareWasPressed()) {
-                        preload = !preload;
-                        robot.handler.setContents(preload ? Handler.FULL : Handler.EMPTY);
-                    }
+                    robot.handler.setContents(robot.handler.hasArtifacts() ? Handler.EMPTY : Handler.FULL);
                     break;
                 case EDITING_PROFILING:
-                    if (gamepad1.squareWasPressed())
-                        doProfiling = !doProfiling;
+                    doProfiling = !doProfiling;
             }
 
             robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
@@ -114,23 +108,12 @@ public final class Tele extends LinearOpMode {
             telemetry.update();
         }
 
-        Profiler.init(doProfiling);
-
         // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
         robot.setAlliance(isRedAlliance);
         robot.drivetrain.setPose(sharedPose != null ? sharedPose : Auto.getStartingPose(isRedAlliance, isGoalSide));
 
-        // sharedPose = null; // expire the shared pose
-
-        double x = Auto.WIDTH_DRIVETRAIN / 2.0;
-        Pose wallResetPose = new Pose(
-                !isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
-                Auto.LENGTH_DRIVETRAIN / 2.0,
-                PI / 2
-        );
-
-        matchTimer.reset();
+        if (!isRedAlliance) wallResetPose = wallResetPose.mirror();
 
         // Control loop:
         while (opModeIsActive()) {
@@ -165,12 +148,6 @@ public final class Tele extends LinearOpMode {
 
             } else {
 
-                if (gamepad1.triangleWasPressed())
-                    robot.handler.moveRotor();
-
-                if (gamepad1.dpadRightWasPressed())
-                    robot.handler.feedFastest();
-
                 robot.handler.setIntake(triggersSum);
 
                 robot.drivetrain.run(
@@ -190,8 +167,5 @@ public final class Tele extends LinearOpMode {
         }
 
         sharedPose = null; // expire the shared pose
-        Profiler.export();
-        Profiler.init(false);
-        telemetry.update();
     }
 }

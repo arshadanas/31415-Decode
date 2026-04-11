@@ -53,11 +53,6 @@ public final class Handler {
         this.manualFeederPower = power;
     }
 
-    private int lastSlotMoved;
-    public void moveRotor() {
-        rotor.moveSlot(lastSlotMoved++, Rotor.Zone.FEEDER);
-    }
-
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
     private final ElapsedTime timeSinceIntaked = new ElapsedTime(), loopTimer = new ElapsedTime();
     private double timeSpentFeeding;
@@ -171,7 +166,7 @@ public final class Handler {
     /**
      * Generate the most efficient {@link #feedingOrder}
      */
-    public void feedFastest() {
+    private void feedFastest() {
         feedingOrder.clear();
 
         int first = Rotor.Zone.FEEDER.getNearestSlot(rotor.slot0Position, artifacts, true);
