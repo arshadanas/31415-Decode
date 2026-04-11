@@ -32,8 +32,8 @@ public final class Handler {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
 
             TIME_FRONT_DIST_COOLDOWN = 0.1,
+            TIME_SWITCH_EARLY = 0,
             TIME_FEED = 1,
-            TIME_FEED_LAST_EXTRA = 0.4,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05;
@@ -120,17 +120,17 @@ public final class Handler {
         boolean backSlotIsFeedTarget = !feedingOrder.isEmpty() && backSlot == feedingOrder.get(0);
 
         if (feed && backSlotIsFeedTarget) {
-            boolean lastArtifact = !artifacts[(backSlot + 1) % 3] && !artifacts[(backSlot + 2) % 3];
-            if (timeSpentFeeding.seconds() >= TIME_FEED + (lastArtifact ? TIME_FEED_LAST_EXTRA : 0)) {
-                artifacts[backSlot] = false;
+            artifacts[backSlot] = false;
+            if (timeSpentFeeding.seconds() >= TIME_FEED - (hasArtifacts() ? TIME_SWITCH_EARLY : 0)) {
                 feedingOrder.remove(0);
                 timeSpentFeeding.reset();
-            }
+                backSlotIsFeedTarget = false;
+            } else artifacts[backSlot] = true;
         } else timeSpentFeeding.reset();
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
-                feed && (backSlot == -1 || !artifacts[backSlot] || backSlotIsFeedTarget) ? 1 : SPEED_IDLE_FEEDER;
+                feed && (backSlotIsFeedTarget || backSlot == -1 || !artifacts[backSlot]) ? 1 : SPEED_IDLE_FEEDER;
 
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;
