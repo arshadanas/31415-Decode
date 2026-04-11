@@ -16,25 +16,17 @@ import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.subsystem.Handler;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
-import java.io.File;
 import java.util.Arrays;
-
-import dev.nullftc.profiler.entry.BasicProfilerEntryFactory;
-import dev.nullftc.profiler.exporter.CSVProfilerExporter;
 
 @Config
 @TeleOp
 public final class Tele extends LinearOpMode {
-
-    private dev.nullftc.profiler.Profiler realProfiler;
 
     public static double AVG_LOOP_TIME_MS = 17.5;
 
@@ -57,7 +49,6 @@ public final class Tele extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
-        initProfiler();
         ElapsedTime matchTimer = new ElapsedTime();
 
         double TELE = 120; // seconds
@@ -123,139 +114,84 @@ public final class Tele extends LinearOpMode {
             telemetry.update();
         }
 
-        Profiler.setProfiler(doProfiling ? realProfiler : null);
+        Profiler.init(doProfiling);
 
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-        try {
+        // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-            robot.setAlliance(isRedAlliance);
-            robot.drivetrain.setPose(sharedPose != null ? sharedPose : Auto.getStartingPose(isRedAlliance, isGoalSide));
+        robot.setAlliance(isRedAlliance);
+        robot.drivetrain.setPose(sharedPose != null ? sharedPose : Auto.getStartingPose(isRedAlliance, isGoalSide));
 
-            // sharedPose = null; // expire the shared pose
+        // sharedPose = null; // expire the shared pose
 
-            double x = Auto.WIDTH_DRIVETRAIN / 2.0;
-            Pose wallResetPose = new Pose(
-                    !isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
-                    Auto.LENGTH_DRIVETRAIN / 2.0,
-                    PI / 2
-            );
+        double x = Auto.WIDTH_DRIVETRAIN / 2.0;
+        Pose wallResetPose = new Pose(
+                !isRedAlliance ? (Auto.SIZE_FIELD - x) : x,
+                Auto.LENGTH_DRIVETRAIN / 2.0,
+                PI / 2
+        );
 
-            matchTimer.reset();
+        matchTimer.reset();
 
-            // Control loop:
-            while (opModeIsActive()) {
-                Profiler.start("Main-robot-loop");
+        // Control loop:
+        while (opModeIsActive()) {
 
-                Profiler.start("robot.run()");
-                // Read sensors + gamepads:
-                robot.run(gamepad1.square, gamepad1.dpad_down);
+            // Read sensors + gamepads:
+            robot.run(gamepad1.square, gamepad1.dpad_down);
 
-                Profiler.end("robot.run()");
+            float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
 
-                Profiler.start("update_controls");
-                float triggersSum = gamepad1.right_trigger - gamepad1.left_trigger;
+            if (gamepad1.left_bumper) {
 
-                if (gamepad1.left_bumper) {
+                if (gamepad1.squareWasPressed())
+                    doTelemetry = !doTelemetry;
 
-                    if (gamepad1.squareWasPressed())
-                        doTelemetry = !doTelemetry;
+                if (gamepad1.triangleWasPressed())
+                    robot.lift.toggleHold();
 
-                    if (gamepad1.triangleWasPressed())
-                        robot.lift.toggleHold();
+                if (gamepad1.crossWasPressed())
+                    robot.lift.gearSwitch.toggle();
 
-                    if (gamepad1.crossWasPressed())
-                        robot.lift.gearSwitch.toggle();
+                robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
 
-                    robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
+                robot.lift.setPower(gamepad1.left_stick_y);
 
-                    robot.lift.setPower(gamepad1.left_stick_y);
+                robot.handler.setFeederManual(gamepad1.left_trigger);
+                robot.shooter.setManual(gamepad1.right_trigger);
 
-                    robot.handler.setFeederManual(gamepad1.left_trigger);
-                    robot.shooter.setManual(gamepad1.right_trigger);
+                if (gamepad1.dpadRightWasPressed())
+                    robot.drivetrain.setPose(wallResetPose);
+                else if (gamepad1.dpadDownWasPressed() && sharedPose != null)
+                    robot.drivetrain.setPose(sharedPose);
 
-                    if (gamepad1.dpadRightWasPressed())
-                        robot.drivetrain.setPose(wallResetPose);
-                    else if (gamepad1.dpadDownWasPressed() && sharedPose != null)
-                        robot.drivetrain.setPose(sharedPose);
+            } else {
 
-                } else {
+                if (gamepad1.triangleWasPressed())
+                    robot.handler.moveRotor();
 
-                    if (gamepad1.triangleWasPressed())
-                        robot.handler.moveRotor();
+                if (gamepad1.dpadRightWasPressed())
+                    robot.handler.feedFastest();
 
-                    if (gamepad1.dpadRightWasPressed())
-                        robot.handler.feedFastest();
+                robot.handler.setIntake(triggersSum);
 
-                    robot.handler.setIntake(triggersSum);
+                robot.drivetrain.run(
+                        gamepad1.left_stick_x,
+                        gamepad1.left_stick_y,
+                        gamepad1.right_stick_x,
+                        gamepad1.right_bumper,
+                        isRedAlliance
+                );
 
-                    robot.drivetrain.run(
-                            gamepad1.left_stick_x,
-                            gamepad1.left_stick_y,
-                            gamepad1.right_stick_x,
-                            gamepad1.right_bumper,
-                            isRedAlliance
-                    );
-
-                }
-                Profiler.end("update_controls");
-
-                Profiler.start("update_telemetry");
-                if (doTelemetry) {
-                    robot.printTo(telemetry);
-                    telemetry.update();
-                }
-                Profiler.end("update_telemetry");
-
-                Profiler.end("Main-robot-loop");
             }
-            sharedPose = null; // expire the shared pose
-        } finally {
-            exportProfiler();
-            Profiler.setProfiler(null);
-            telemetry.update();
+
+            if (doTelemetry) {
+                robot.printTo(telemetry);
+                telemetry.update();
+            }
         }
-    }
 
-
-
-    private File profilerOutput;
-
-    private void initProfiler(){
-        // Create profile log folder
-        File logsFolder = new File(AppUtil.FIRST_FOLDER, "logs");
-        if (!logsFolder.exists())
-            logsFolder.mkdirs();
-
-        long timestamp = System.currentTimeMillis();
-        profilerOutput = new File(logsFolder, "profiler-" + timestamp + ".csv");
-
-        realProfiler = dev.nullftc.profiler.Profiler.builder()
-                .factory(new BasicProfilerEntryFactory())
-                .exporter(new CSVProfilerExporter(profilerOutput))
-                .build();
-    }
-
-    /**
-     * Exporting is computationally expensive, and has been optimized to the best it can be,
-     * but to be safe we create a new thread to export on as to not have the program be stuck in stop()
-     */
-    private void exportProfiler() {
-        // Check if we are actually in profile mode
-        if (!Profiler.enabled)
-            return;
-
-        RobotLog.i("Starting async profiler export to: " + profilerOutput.getAbsolutePath());
-
-        Thread exportThread = new Thread(() -> {
-            try {
-                realProfiler.export();
-                realProfiler.shutdown();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        exportThread.setDaemon(true);
-        exportThread.start();
+        sharedPose = null; // expire the shared pose
+        Profiler.export();
+        Profiler.init(false);
+        telemetry.update();
     }
 }
