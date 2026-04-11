@@ -141,11 +141,11 @@ public final class Rotor {
         /**
          * @return Filled slot in this {@link Zone}
          */
-        int getFilledSlotHere(double slot0Reference, boolean[] isFilled) {
+        int getFilledSlotHere(double slot0Reference, boolean[] artifacts) {
             return
-                    isFilled[0] && slotIsHere(slot0Reference, 0) ? 0 :
-                    isFilled[1] && slotIsHere(slot0Reference, 1) ? 1 :
-                    isFilled[2] && slotIsHere(slot0Reference, 2) ? 2 :
+                    artifacts[0] && slotIsHere(slot0Reference, 0) ? 0 :
+                    artifacts[1] && slotIsHere(slot0Reference, 1) ? 1 :
+                    artifacts[2] && slotIsHere(slot0Reference, 2) ? 2 :
                                                                         -1;
         }
 
@@ -153,10 +153,10 @@ public final class Rotor {
          * @param getFilled true to get filled slots, false to get empty slots
          * @return Slot closest to this {@link Zone} that is either filled or empty (per getFilled)
          */
-        int getNearestSlot(double slot0Reference, boolean[] isFilled, boolean getFilled) {
+        int getNearestSlot(double slot0Reference, boolean[] artifacts, boolean getFilled) {
             double min = Double.MAX_VALUE;
             int minInd = -1;
-            for (int i = 0; i < 3; i++) if (isFilled[i] == getFilled) {
+            for (int i = 0; i < 3; i++) if (artifacts[i] == getFilled) {
                 double error = abs(distFrom(slot0Reference, i));
                 if (error < min) {
                     min = error;
