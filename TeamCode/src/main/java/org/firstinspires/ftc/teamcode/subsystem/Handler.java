@@ -124,15 +124,13 @@ public final class Handler {
 
         boolean backSlotIsFeedTarget = !feedingOrder.isEmpty() && backSlot == feedingOrder.get(0);
 
-        if (backSlot == -1 || !backSlotIsFeedTarget)
-            timeSpentFeeding.reset();
-        else {
+        if (feed && backSlotIsFeedTarget) {
             boolean lastArtifact = artifacts[(backSlot + 1) % 3] == EMPTY && artifacts[(backSlot + 2) % 3] == EMPTY;
             if (timeSpentFeeding.seconds() >= TIME_FEED + (lastArtifact ? TIME_FEED_LAST_EXTRA : 0)) {
                 artifacts[backSlot] = EMPTY;
                 feedingOrder.remove(0);
             }
-        }
+        } else timeSpentFeeding.reset();
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
