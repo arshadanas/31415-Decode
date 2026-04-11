@@ -155,10 +155,15 @@ public final class Rotor {
          * @return Slot closest to this zone that satisfies the predicate
          */
         int getNearestSlot(double slot0Reference, IntPredicate predicate) {
+            double min = Double.MAX_VALUE;
             int minInd = -1;
-            double min = abs(distFrom(slot0Reference, 0));
-
-            if (predicate.test(0)) minInd = 0;
+            if (predicate.test(0)) {
+                double error = abs(distFrom(slot0Reference, 0));
+                if (error < min) {
+                    min = error;
+                    minInd = 0;
+                }
+            }
             if (predicate.test(1)) {
                 double error = abs(distFrom(slot0Reference, 1));
                 if (error < min) {
@@ -166,7 +171,8 @@ public final class Rotor {
                     minInd = 1;
                 }
             }
-            if (predicate.test(2) && abs(distFrom(slot0Reference, 2)) < min) minInd = 2;
+            if (predicate.test(2) && abs(distFrom(slot0Reference, 2)) < min)
+                return 2;
             return minInd;
         }
     }
