@@ -47,6 +47,60 @@ public final class Rotor {
         return normalizeRadians(slot0Radians + numSlotsCCW * 2 * PI / 3.0);
     }
 
+    Rotor(HardwareMap hardwareMap) {
+        servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
+        encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
+
+        // slot nearest to feeder because we preload with a slot aligned to the feeder
+        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
+        int nearestFeedSlot = Zone.FEEDER.getNearestSlot(slot0Position, i -> true);
+        slot0Target = offsetRadians(Zone.FEEDER.radians, -nearestFeedSlot);
+        lastServoTarget = Zone.INTAKE_SENSOR.getServoTarget(nearestFeedSlot);
+    }
+
+    void run() {
+
+        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
+
+        if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
+            wrapAround = false;
+            servo.turnToAngle(lastServoTarget);
+        }
+    }
+
+    /**
+     * @param slot Slot you wish to move (0, 1 or 2)
+     */
+    public void moveSlot(int slot, Zone target) {
+        this.slot0Target = offsetRadians(target.radians, -slot);
+
+        double newServoTarget = target.getServoTarget(slot);
+        if (newServoTarget == lastServoTarget)
+            return;
+
+        double front0 = Zone.INTAKE_SENSOR.getServoTarget(0);
+        double front1 = Zone.INTAKE_SENSOR.getServoTarget(1);
+
+        wrapAround = lastServoTarget == front0 && newServoTarget == front1 ||
+                lastServoTarget == front1 && newServoTarget == front0;
+
+        lastServoTarget = newServoTarget;
+
+        if (wrapAround) {
+            servo.turnToAngle(-PI);
+            wrapAroundTimer.reset();
+        } else
+            servo.turnToAngle(lastServoTarget);
+    }
+
+    void printTo(Telemetry telemetry) {
+        telemetry.addLine("ROTOR:");
+        telemetry.addLine();
+        telemetry.addData("Slot 0 position (deg)", toDegrees(slot0Position));
+        telemetry.addData("Slot 0 target (deg)", toDegrees(slot0Target));
+        telemetry.addData("Error (deg)", toDegrees(normalizeRadians(slot0Target - slot0Position)));
+    }
+
     public enum Zone {
         INTAKE_SENSOR(0),
         INTAKE_OMNI(0),
@@ -115,59 +169,5 @@ public final class Rotor {
             if (predicate.test(2) && abs(distFrom(slot0Reference, 2)) < min) minInd = 2;
             return minInd;
         }
-    }
-
-    Rotor(HardwareMap hardwareMap) {
-        servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
-        encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
-
-        // slot nearest to feeder because we preload with a slot aligned to the feeder
-        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
-        int nearestFeedSlot = Zone.FEEDER.getNearestSlot(slot0Position, i -> true);
-        slot0Target = offsetRadians(Zone.FEEDER.radians, -nearestFeedSlot);
-        lastServoTarget = Zone.INTAKE_SENSOR.getServoTarget(nearestFeedSlot);
-    }
-
-    void run() {
-
-        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
-
-        if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
-            wrapAround = false;
-            servo.turnToAngle(lastServoTarget);
-        }
-    }
-
-    /**
-     * @param slot Slot you wish to move (0, 1 or 2)
-     */
-    public void moveSlot(int slot, Zone target) {
-        this.slot0Target = offsetRadians(target.radians, -slot);
-
-        double newServoTarget = target.getServoTarget(slot);
-        if (newServoTarget == lastServoTarget)
-            return;
-
-        double front0 = Zone.INTAKE_SENSOR.getServoTarget(0);
-        double front1 = Zone.INTAKE_SENSOR.getServoTarget(1);
-
-        wrapAround = lastServoTarget == front0 && newServoTarget == front1 ||
-                lastServoTarget == front1 && newServoTarget == front0;
-
-        lastServoTarget = newServoTarget;
-
-        if (wrapAround) {
-            servo.turnToAngle(-PI);
-            wrapAroundTimer.reset();
-        } else
-            servo.turnToAngle(lastServoTarget);
-    }
-
-    void printTo(Telemetry telemetry) {
-        telemetry.addLine("ROTOR:");
-        telemetry.addLine();
-        telemetry.addData("Slot 0 position (deg)", toDegrees(slot0Position));
-        telemetry.addData("Slot 0 target (deg)", toDegrees(slot0Target));
-        telemetry.addData("Error (deg)", toDegrees(normalizeRadians(slot0Target - slot0Position)));
     }
 }
