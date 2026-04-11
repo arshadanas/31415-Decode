@@ -4,7 +4,6 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.norm
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -20,15 +19,6 @@ import java.util.function.IntPredicate;
 @Config
 public final class Rotor {
 
-    public static void main(String... args) {
-        System.out.println(Zone.INTAKE_SENSORS.getServoTarget(0));
-        System.out.println(Zone.FEEDER_SENSORS.getServoTarget(0));
-        System.out.println(Zone.INTAKE_SENSORS.getServoTarget(1));
-        System.out.println(Zone.FEEDER_SENSORS.getServoTarget(1));
-        System.out.println(Zone.INTAKE_SENSORS.getServoTarget(2));
-        System.out.println(Zone.FEEDER_SENSORS.getServoTarget(2));
-    }
-
     public static double
             ENCODER_OFFSET = -1.5742869852988852,
             OFFSET_0_FRONT = -0.12571301470111473,
@@ -40,9 +30,9 @@ public final class Rotor {
 
             TIME_WRAPAROUND = 0.03,
 
-            TOLERANCE_INTAKE_SENSORS_DEG = 11.46, // too high => false positives, too low => false negatives (no-detect)
-            TOLERANCE_FEEDER_SENSORS_DEG = 8.6, // too high => false negatives (removals)
-            TOLERANCE_INTAKE_OMNI_DEG = 30;
+            TOLERANCE_INTAKE_SENSOR = 0.2, // too high => false positives, too low => false negatives (no-detect)
+            TOLERANCE_FEEDER = 0.15, // too high => false negatives (removals)
+            TOLERANCE_INTAKE_OMNI = 0.5236;
 
     private final CachedSimpleServo servo;
     private final AnalogSensor encoder;
@@ -58,9 +48,9 @@ public final class Rotor {
     }
 
     public enum Zone {
-        INTAKE_SENSORS(0),
+        INTAKE_SENSOR(0),
         INTAKE_OMNI(0),
-        FEEDER_SENSORS(PI);
+        FEEDER(PI);
 
         private final double radians;
         Zone(double radians) {
@@ -69,10 +59,11 @@ public final class Rotor {
 
         private double getTolerance() {
             switch (this) {
-                case INTAKE_OMNI:       return toRadians(TOLERANCE_INTAKE_OMNI_DEG);
-                case FEEDER_SENSORS:    return toRadians(TOLERANCE_FEEDER_SENSORS_DEG);
-                default:                return toRadians(TOLERANCE_INTAKE_SENSORS_DEG);
+                case INTAKE_SENSOR: return TOLERANCE_INTAKE_SENSOR;
+                case INTAKE_OMNI:   return TOLERANCE_INTAKE_OMNI;
+                case FEEDER:        return TOLERANCE_FEEDER;
             }
+            return 0;
         }
 
         private double getServoTarget(int slot) {
@@ -132,9 +123,9 @@ public final class Rotor {
 
         // slot nearest to feeder because we preload with a slot aligned to the feeder
         slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
-        int nearestFeedSlot = Zone.FEEDER_SENSORS.getNearestSlot(slot0Position, i -> true);
-        slot0Target = offsetRadians(Zone.FEEDER_SENSORS.radians, -nearestFeedSlot);
-        lastServoTarget = Zone.INTAKE_SENSORS.getServoTarget(nearestFeedSlot);
+        int nearestFeedSlot = Zone.FEEDER.getNearestSlot(slot0Position, i -> true);
+        slot0Target = offsetRadians(Zone.FEEDER.radians, -nearestFeedSlot);
+        lastServoTarget = Zone.INTAKE_SENSOR.getServoTarget(nearestFeedSlot);
     }
 
     void run() {
@@ -157,8 +148,8 @@ public final class Rotor {
         if (newServoTarget == lastServoTarget)
             return;
 
-        double front0 = Zone.INTAKE_SENSORS.getServoTarget(0);
-        double front1 = Zone.INTAKE_SENSORS.getServoTarget(1);
+        double front0 = Zone.INTAKE_SENSOR.getServoTarget(0);
+        double front1 = Zone.INTAKE_SENSOR.getServoTarget(1);
 
         wrapAround = lastServoTarget == front0 && newServoTarget == front1 ||
                 lastServoTarget == front1 && newServoTarget == front0;

@@ -58,7 +58,7 @@ public final class Handler {
 
     private int lastSlotMoved;
     public void moveRotor() {
-        rotor.moveSlot(lastSlotMoved++, Rotor.Zone.FEEDER_SENSORS);
+        rotor.moveSlot(lastSlotMoved++, Rotor.Zone.FEEDER);
     }
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>();
@@ -102,16 +102,16 @@ public final class Handler {
 
     void run(boolean feed) {
 
-        int nearestEmptySlot = Rotor.Zone.INTAKE_SENSORS.getNearestSlot(rotor.slot0Position, emptySlot);
+        int nearestEmptySlot = Rotor.Zone.INTAKE_SENSOR.getNearestSlot(rotor.slot0Position, emptySlot);
 
         if (intakePower > 0 && nearestEmptySlot != -1) // move empty slot to intake
-            rotor.moveSlot(nearestEmptySlot, Rotor.Zone.INTAKE_SENSORS);
+            rotor.moveSlot(nearestEmptySlot, Rotor.Zone.INTAKE_SENSOR);
         else if (!feedingOrder.isEmpty())
-            rotor.moveSlot(feedingOrder.get(0), Rotor.Zone.FEEDER_SENSORS);
+            rotor.moveSlot(feedingOrder.get(0), Rotor.Zone.FEEDER);
 
         if (
                 nearestEmptySlot != -1 && // there is an empty slot
-                Rotor.Zone.INTAKE_SENSORS.slotIsHere(rotor.slot0Position, nearestEmptySlot) && // it is at the front
+                Rotor.Zone.INTAKE_SENSOR.slotIsHere(rotor.slot0Position, nearestEmptySlot) && // it is at the front
                 front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
                 timeSinceIntaked.seconds() >= TIME_FRONT_DIST_COOLDOWN // long enough for distance sensor to refresh
         ) {
@@ -120,7 +120,7 @@ public final class Handler {
             feedFastest();
         }
 
-        int backSlot = Rotor.Zone.FEEDER_SENSORS.getSlotHere(rotor.slot0Position, anySlot);
+        int backSlot = Rotor.Zone.FEEDER.getSlotHere(rotor.slot0Position, anySlot);
 
         boolean backSlotIsFeedTarget = !feedingOrder.isEmpty() && backSlot == feedingOrder.get(0);
 
@@ -164,13 +164,13 @@ public final class Handler {
     public void feedFastest() {
         feedingOrder.clear();
 
-        int first = Rotor.Zone.FEEDER_SENSORS.getNearestSlot(rotor.slot0Position, filledSlot);
+        int first = Rotor.Zone.FEEDER.getNearestSlot(rotor.slot0Position, filledSlot);
         if (first == -1) // no Artifacts in the container
             return;
 
         feedingOrder.add(first);
 
-        int signOfFirstError = (int) signum(Rotor.Zone.FEEDER_SENSORS.distFrom(rotor.slot0Position, first));
+        int signOfFirstError = (int) signum(Rotor.Zone.FEEDER.distFrom(rotor.slot0Position, first));
         if (signOfFirstError == 0) signOfFirstError = 1;
 
         int second = wrap(first - signOfFirstError, 0, 3);
