@@ -21,8 +21,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.Handler;
 import org.firstinspires.ftc.teamcode.subsystem.Robot;
 
-import java.util.Arrays;
-
 @Config
 @TeleOp
 public final class Tele extends LinearOpMode {
@@ -98,7 +96,7 @@ public final class Tele extends LinearOpMode {
             telemetry.addLine();
             telemetry.addLine(EDITING_SIDE.markIf(selected) + "Starting in " + (isGoalSide ? "near zone (GOAL SIDE)" : "far zone (AUDIENCE SIDE)"));
             telemetry.addLine();
-            telemetry.addData(EDITING_PRELOAD.markIf(selected) + "Preloaded", Arrays.toString(robot.handler.artifacts));
+            telemetry.addData(EDITING_PRELOAD.markIf(selected) + "Preloaded", robot.handler.getContents());
             telemetry.addLine();
             telemetry.addLine(EDITING_HEADING.markIf(selected) + "Heading (deg), set with right stick:");
             telemetry.addLine("  " + toDegrees(robot.drivetrain.getPose().getHeading()));

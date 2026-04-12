@@ -16,7 +16,6 @@ import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMot
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @Config
 public final class Handler {
@@ -56,7 +55,7 @@ public final class Handler {
     private boolean started;
 
     public static final boolean[] FULL = {true, true, true}, EMPTY = {false, false, false};
-    public final boolean[] artifacts = EMPTY.clone();
+    private final boolean[] artifacts = EMPTY.clone();
 
     public boolean hasArtifacts() {
         return artifacts[0] || artifacts[1] || artifacts[2];
@@ -65,11 +64,21 @@ public final class Handler {
         return artifacts[0] && artifacts[1] && artifacts[2];
     }
 
+    public String getContents() {
+        return (artifacts[0] ? "O" : "_") + " " + (artifacts[1] ? "O" : "_") + " " + (artifacts[1] ? "O" : "_");
+    }
+
     public void setContents(boolean[] artifacts) {
         this.artifacts[0] = artifacts[0];
         this.artifacts[1] = artifacts[1];
         this.artifacts[2] = artifacts[2];
         feedFastest();
+    }
+
+    public void copyContentsTo(boolean[] artifacts) {
+        artifacts[0] = this.artifacts[0];
+        artifacts[1] = this.artifacts[1];
+        artifacts[2] = this.artifacts[2];
     }
 
     Handler(HardwareMap hardwareMap) {
@@ -180,9 +189,9 @@ public final class Handler {
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("HANDLER", Arrays.toString(artifacts));
+        telemetry.addData("HANDLER", getContents());
         telemetry.addLine();
-        telemetry.addData("Feeding order", feedingOrder.toString());
+        telemetry.addData("Feeding order", feedingOrder);
         telemetry.addData("Time spent feeding", timeSpentFeeding);
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", frontDistance.getReading());

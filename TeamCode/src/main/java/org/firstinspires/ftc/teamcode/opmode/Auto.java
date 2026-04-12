@@ -433,9 +433,7 @@ public final class Auto extends LinearOpMode {
                 telemetryPacket -> {
                     robot.run(feed, false);
                     sharedPose = robot.drivetrain.getPose();
-                    sharedArtifacts[0] = robot.handler.artifacts[0];
-                    sharedArtifacts[1] = robot.handler.artifacts[1];
-                    sharedArtifacts[2] = robot.handler.artifacts[2];
+                    robot.handler.copyContentsTo(sharedArtifacts);
                     return opModeIsActive();
                 },
                 auto
