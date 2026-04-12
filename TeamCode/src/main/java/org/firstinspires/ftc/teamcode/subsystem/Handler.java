@@ -167,21 +167,19 @@ public final class Handler {
         feedingOrder.add(first);
         int secondLast = first - 1, last = first;
 
-        int increment = Rotor.Zone.FEEDER.distFrom(rotor.slot0Position, first) >= 0 ? -1 : 1;
-
-        int second = Ranges.wrap(first + increment, 0, 3);
+        int second = Ranges.wrap(first + 1, 0, 3);
         if (artifacts[second]) {
             secondLast = last;
             feedingOrder.add(last = second);
         }
 
-        int third = Ranges.wrap(second + increment, 0, 3);
+        int third = Ranges.wrap(second + 1, 0, 3);
         if (artifacts[third]) {
             secondLast = last;
             feedingOrder.add(last = third);
         }
 
-        feedingOrder.add(Ranges.wrap(last + Ranges.wrap(last - secondLast, -1, 2), 0, 3));
+        feedingOrder.add(Ranges.wrap(2*last - secondLast, 0, 3));
     }
 
     void printTo(Telemetry telemetry) {
