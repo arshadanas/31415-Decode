@@ -171,15 +171,18 @@ public final class Handler {
             return;
 
         feedingOrder.add(first);
-        int secondLast = first - 1, last = first;
-
-        int second = Ranges.wrap(first + 1, 0, 3);
+        
+        int 
+            secondLast = first - 1, 
+            last = first,
+            second = (first + 1) % 3,
+            third = (second + 1) % 3;
+        
         if (artifacts[second]) {
             secondLast = last;
             feedingOrder.add(last = second);
         }
 
-        int third = Ranges.wrap(second + 1, 0, 3);
         if (artifacts[third]) {
             secondLast = last;
             feedingOrder.add(last = third);
