@@ -121,15 +121,15 @@ public final class Tele extends LinearOpMode {
                 if (gamepad1.squareWasPressed())
                     doTelemetry = !doTelemetry;
 
-                if (gamepad1.triangleWasPressed())
-                    robot.lift.toggleHold();
+//                if (gamepad1.triangleWasPressed())
+//                    robot.lift.toggleHold();
 
                 if (gamepad1.crossWasPressed())
                     robot.lift.gearSwitch.toggle();
 
                 robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
 
-                robot.lift.setPower(gamepad1.left_stick_y);
+//                robot.lift.setPower(gamepad1.left_stick_y);
 
                 robot.handler.setFeederManual(gamepad1.left_trigger);
                 robot.shooter.setManual(gamepad1.right_trigger);
