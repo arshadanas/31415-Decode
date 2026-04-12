@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.REVERSE;
-import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
-import static java.lang.Math.signum;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
@@ -12,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.control.Ranges;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
@@ -27,13 +26,11 @@ public final class Handler {
             ANGLE_PRESSER_EXTENDED = 211,
             ANGLE_PRESSER_L_OFFSET = -37,
 
-            SPEED_IDLE_FEEDER = 0,
             THRESHOLD_FRONT_MM = 65, // start of ramp = ~115
             INTAKE_POWER_OMNI_CONTACT = 0.4,
 
             TIME_FRONT_DIST_COOLDOWN = 0.1,
-            TIME_SWITCH_EARLY = 0,
-            TIME_FEED = 1,
+            TIME_FEED = 0.35,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05;
@@ -126,23 +123,16 @@ public final class Handler {
 
         if (!backSlotIsFeedTarget)
             timeSpentFeeding = 0; // if slot moves, restart feeding count
-        else if (feed) {
-            timeSpentFeeding += dt;
+        else if (feed && (timeSpentFeeding += dt) >= TIME_FEED) {
             artifacts[backSlot] = false;
-            double timeItTakesToFeed = TIME_FEED - (hasArtifacts() ? TIME_SWITCH_EARLY : 0);
-
-            if (timeSpentFeeding < timeItTakesToFeed)
-                artifacts[backSlot] = true;
-            else {
-                feedingOrder.remove(0);
-                backSlotIsFeedTarget = false;
-                timeSpentFeeding = 0;
-            }
+            feedingOrder.remove(0);
+            backSlotIsFeedTarget = false;
+            timeSpentFeeding = 0;
         }
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
-                feed && (backSlotIsFeedTarget || backSlot == -1 || !artifacts[backSlot]) ? 1 : SPEED_IDLE_FEEDER;
+                feed && !feedingOrder.isEmpty() && (backSlotIsFeedTarget || backSlot == -1 || !artifacts[backSlot]) ? 1 : 0;
 
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;
@@ -175,22 +165,30 @@ public final class Handler {
             return;
 
         feedingOrder.add(first);
+        int secondLast = first - 1, last = first;
 
-        int signOfFirstError = Rotor.Zone.FEEDER.distFrom(rotor.slot0Position, first) >= 0 ? 1 : -1;
+        int increment = Rotor.Zone.FEEDER.distFrom(rotor.slot0Position, first) >= 0 ? -1 : 1;
 
-        int second = wrap(first - signOfFirstError, 0, 3);
-        if (artifacts[second])
-            feedingOrder.add(second);
+        int second = Ranges.wrap(first + increment, 0, 3);
+        if (artifacts[second]) {
+            secondLast = last;
+            feedingOrder.add(last = second);
+        }
 
-        int third = wrap(second - signOfFirstError, 0, 3);
-        if (artifacts[third])
-            feedingOrder.add(third);
+        int third = Ranges.wrap(second + increment, 0, 3);
+        if (artifacts[third]) {
+            secondLast = last;
+            feedingOrder.add(last = third);
+        }
+
+        feedingOrder.add(Ranges.wrap(last + Ranges.wrap(last - secondLast, -1, 2), 0, 3));
     }
 
     void printTo(Telemetry telemetry) {
         telemetry.addData("HANDLER", Arrays.toString(artifacts));
         telemetry.addLine();
         telemetry.addData("Feeding order", feedingOrder.toString());
+        telemetry.addData("Time spent feeding", timeSpentFeeding);
         telemetry.addLine();
         telemetry.addData("Front dist (mm)", front1.getReading());
         telemetry.addLine("\n--------------------------------------\n");
