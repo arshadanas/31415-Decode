@@ -169,14 +169,14 @@ public final class Handler {
         int first = Rotor.Zone.FEEDER.getNearestSlot(rotor.slot0Position, artifacts, true);
         if (first == -1) // no Artifacts in the container
             return;
-
-        feedingOrder.add(first);
         
         int 
-            secondLast = first - 1, 
             last = first,
+            secondLast = first - 1, 
             second = (first + 1) % 3,
-            third = (second + 1) % 3;
+            third = (first + 2) % 3;
+
+        feedingOrder.add(first);
         
         if (artifacts[second]) {
             secondLast = last;
