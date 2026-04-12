@@ -176,8 +176,7 @@ public final class Handler {
 
         feedingOrder.add(first);
 
-        int signOfFirstError = (int) signum(Rotor.Zone.FEEDER.distFrom(rotor.slot0Position, first));
-        if (signOfFirstError == 0) signOfFirstError = 1;
+        int signOfFirstError = Rotor.Zone.FEEDER.distFrom(rotor.slot0Position, first) >= 0 ? 1 : -1;
 
         int second = wrap(first - signOfFirstError, 0, 3);
         if (artifacts[second])
