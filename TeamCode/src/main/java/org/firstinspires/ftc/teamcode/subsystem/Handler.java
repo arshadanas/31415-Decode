@@ -38,7 +38,7 @@ public final class Handler {
     private final Rotor rotor;
     private final CachedMotorEx intake;
     private final CachedDcMotor[] feeder;
-    private final AnalogSensor front1;
+    private final AnalogSensor frontDistance;
 
     private double intakePower;
     public void setIntake(double power) {
@@ -76,7 +76,7 @@ public final class Handler {
 
         rotor = new Rotor(hardwareMap);
 
-        front1 = new AnalogSensor(hardwareMap, "front 1", 4000);
+        frontDistance = new AnalogSensor(hardwareMap, "front 1", 4000);
 
         intake = new CachedMotorEx(hardwareMap, "intake", Motor.GoBILDA.RPM_1150);
         intake.setInverted(true);
@@ -109,7 +109,7 @@ public final class Handler {
         if (
                 nearestEmptySlot != -1 && // there is an empty slot
                 Rotor.Zone.INTAKE_SENSOR.slotIsHere(rotor.slot0Position, nearestEmptySlot) && // it is at the front
-                front1.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
+                frontDistance.getReading() < THRESHOLD_FRONT_MM && // there is something in front of the distance sensor
                 timeSinceIntaked.seconds() >= TIME_FRONT_DIST_COOLDOWN // long enough for distance sensor to refresh
         ) {
             artifacts[nearestEmptySlot] = true;
@@ -154,9 +154,6 @@ public final class Handler {
         return !feedingOrder.isEmpty();
     }
 
-    /**
-     * Generate the most efficient {@link #feedingOrder}
-     */
     private void feedFastest() {
         feedingOrder.clear();
 
@@ -188,7 +185,7 @@ public final class Handler {
         telemetry.addData("Feeding order", feedingOrder.toString());
         telemetry.addData("Time spent feeding", timeSpentFeeding);
         telemetry.addLine();
-        telemetry.addData("Front dist (mm)", front1.getReading());
+        telemetry.addData("Front dist (mm)", frontDistance.getReading());
         telemetry.addLine("\n--------------------------------------\n");
         rotor.printTo(telemetry);
     }
