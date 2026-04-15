@@ -40,7 +40,7 @@ public enum LaunchZone {
     static LaunchZone getCurrentZone(Pose currentPose) {
 
         robotPose.identity();
-        robotPose.translate(1.45714, 0);
+        robotPose.translate(Auto.LENGTH_INTAKE/2, 0);
         robotPose.rotate(currentPose.getHeading());
         robotPose.translate(currentPose.getX(), currentPose.getY());
 
