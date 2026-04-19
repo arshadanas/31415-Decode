@@ -6,6 +6,10 @@ import static org.firstinspires.ftc.teamcode.opmode.Auto.AutoConfig.EDITING_SIDE
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.INTAKING_SPIKE;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.PARKING;
 import static org.firstinspires.ftc.teamcode.opmode.Auto.State.SCORING;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.LENGTH_DRIVETRAIN;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.SIZE_TAB;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.SIZE_TILE;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.WIDTH_DRIVETRAIN;
 import static java.lang.Math.PI;
 import static java.lang.Math.ceil;
 import static java.lang.Math.toRadians;
@@ -54,8 +58,8 @@ public final class Auto extends LinearOpMode {
                         toRadians(-38)
                 ) :
                 new Pose(
-                        2 * SIZE_TILE + SIZE_TAB / 2 + Auto.LENGTH_DRIVETRAIN / 2,
-                        Auto.WIDTH_DRIVETRAIN / 2,
+                        2 * SIZE_TILE + SIZE_TAB / 2 + LENGTH_DRIVETRAIN / 2,
+                        WIDTH_DRIVETRAIN / 2,
                         PI
                 );
 
@@ -63,14 +67,6 @@ public final class Auto extends LinearOpMode {
     }
 
     public static double
-            DEAD_TIME = 0,
-            LENGTH_DRIVETRAIN = 14.81745,
-            LENGTH_INTAKE = 2.91427,
-            WIDTH_DRIVETRAIN = 15.72,
-            SIZE_FIELD = 141.5,
-            SIZE_TILE = SIZE_FIELD/6,
-            SIZE_TAB = 0.8,
-
             TIME_MAX_SPIKE = 1.5,
             TIME_MAX_GATE = 1.5,
             TIME_MAX_SCORE = 30,
@@ -99,7 +95,7 @@ public final class Auto extends LinearOpMode {
             intakingGate = new EditablePose(16, 58, toRadians(167.4)),
             scoring = new EditablePose(48.7669, 89.8697, -PI/2),
 
-            cornerIntaking = new EditablePose(SIZE_TILE / 2, Auto.WIDTH_DRIVETRAIN / 2, PI),
+            cornerIntaking = new EditablePose(SIZE_TILE / 2, WIDTH_DRIVETRAIN / 2, PI),
             farZoneShooting = new EditablePose(2 * SIZE_TILE, SIZE_TILE/2, PI),
 
             weirdMiddleIntaking = new EditablePose(SIZE_TILE, SIZE_TILE, 3 * PI / 4),
@@ -202,7 +198,6 @@ public final class Auto extends LinearOpMode {
                 public boolean run(@NonNull TelemetryPacket p) {
                     if (matchTimer == null) matchTimer = new ElapsedTime();
 
-                    double remaining = (30 - DEAD_TIME) - matchTimer.seconds();
                     boolean pathDone = !path.run(p);
 
                     switch (state) {
@@ -321,7 +316,6 @@ public final class Auto extends LinearOpMode {
                 public boolean run(@NonNull TelemetryPacket p) {
                     if (matchTimer == null) matchTimer = new ElapsedTime();
 
-                    double remaining = (30 - DEAD_TIME) - matchTimer.seconds();
                     boolean pathDone = !path.run(p);
 
                     switch (state) {
@@ -439,8 +433,6 @@ public final class Auto extends LinearOpMode {
                 },
                 auto
         ));
-
-        Thread.sleep((long) (DEAD_TIME * 1000));
     }
 
     private static Action shootAll(Robot robot) {

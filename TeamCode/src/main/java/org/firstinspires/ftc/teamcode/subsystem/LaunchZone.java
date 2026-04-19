@@ -1,8 +1,10 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
-import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_TILE;
-import static java.lang.Math.sqrt;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.LENGTH_DRIVETRAIN;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.LENGTH_INTAKE;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.SIZE_FIELD;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.SIZE_TILE_DIAG;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.WIDTH_DRIVETRAIN;
 import static java.lang.Math.toRadians;
 
 import com.pedropathing.geometry.Pose;
@@ -10,7 +12,6 @@ import com.pedropathing.geometry.Pose;
 import org.dyn4j.collision.narrowphase.Gjk;
 import org.dyn4j.geometry.Rectangle;
 import org.dyn4j.geometry.Transform;
-import org.firstinspires.ftc.teamcode.opmode.Auto;
 
 public enum LaunchZone {
     NONE,
@@ -20,9 +21,9 @@ public enum LaunchZone {
     private static final Gjk collisionSolver = new Gjk();
 
     private static final Rectangle
-            farZoneRect = new Rectangle(SIZE_TILE * sqrt(2), SIZE_TILE * sqrt(2)),
-            nearZoneRect = new Rectangle(3 * farZoneRect.getWidth(), 3 * farZoneRect.getHeight()),
-            robotRect = new Rectangle(Auto.LENGTH_DRIVETRAIN + Auto.LENGTH_INTAKE, Auto.WIDTH_DRIVETRAIN * 1);
+            nearZoneRect = new Rectangle(3 * SIZE_TILE_DIAG, 3 * SIZE_TILE_DIAG),
+            farZoneRect = new Rectangle(SIZE_TILE_DIAG, SIZE_TILE_DIAG),
+            robotRect = new Rectangle(LENGTH_DRIVETRAIN + LENGTH_INTAKE, WIDTH_DRIVETRAIN * 1);
 
     private static final Transform
             nearZonePosition = new Transform(),
@@ -40,7 +41,7 @@ public enum LaunchZone {
     static LaunchZone getCurrentZone(Pose currentPose) {
 
         robotPose.identity();
-        robotPose.translate(Auto.LENGTH_INTAKE/2, 0);
+        robotPose.translate(LENGTH_INTAKE/2, 0);
         robotPose.rotate(currentPose.getHeading());
         robotPose.translate(currentPose.getX(), currentPose.getY());
 
@@ -52,7 +53,7 @@ public enum LaunchZone {
 
     public static void main(String... args) {
 
-        Pose[] poses = {
+        for (Pose pose : new Pose[]{
                 new Pose(103.05710814094775, 75.76184690157962, toRadians(73)), // NONE
                 new Pose(45.04407033129976, 84.21034755347013, toRadians(132)), // NONE
                 new Pose(89.888919198684, 18.023468057366358, toRadians(136)), // NONE
@@ -64,9 +65,6 @@ public enum LaunchZone {
 
                 new Pose(72.42868451811033, 29.475880052151236, toRadians(180)), // FAR
                 new Pose(52.52777187143498, 14.831812255541072, toRadians(152)), // FAR
-        };
-
-        for (Pose pose : poses)
-            System.out.println(LaunchZone.getCurrentZone(pose));
+        }) System.out.println(LaunchZone.getCurrentZone(pose));
     }
 }

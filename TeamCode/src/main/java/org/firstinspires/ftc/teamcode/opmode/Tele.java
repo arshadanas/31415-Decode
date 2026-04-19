@@ -7,6 +7,8 @@ import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_ALLI
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_HEADING;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_PRELOAD;
 import static org.firstinspires.ftc.teamcode.opmode.Tele.TeleConfig.EDITING_SIDE;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.LENGTH_DRIVETRAIN;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.WIDTH_DRIVETRAIN;
 import static java.lang.Math.PI;
 import static java.lang.Math.toDegrees;
 
@@ -54,8 +56,8 @@ public final class Tele extends LinearOpMode {
         robot.drivetrain.startTeleopDrive();
 
         Pose wallResetPose = new Pose(
-                Auto.WIDTH_DRIVETRAIN / 2.0,
-                Auto.LENGTH_DRIVETRAIN / 2.0,
+                WIDTH_DRIVETRAIN / 2.0,
+                LENGTH_DRIVETRAIN / 2.0,
                 PI / 2
         );
 

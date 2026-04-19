@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.opmode.Auto.SIZE_FIELD;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.SIZE_FIELD;
+import static org.firstinspires.ftc.teamcode.subsystem.Constants.TURRET_FORWARD_OFFSET;
 
 import com.acmerobotics.dashboard.config.Config;
 
@@ -30,7 +31,7 @@ public final class AirtimeSolver {
 
     void update(double x, double y, double heading, double vx, double vy, double angVel) {
 
-        s0.set(-1.86759, 0).rotate(heading);
+        s0.set(TURRET_FORWARD_OFFSET, 0).rotate(heading);
         v0.set(s0).right().multiply(angVel).add(vx, vy);
         s0.add(x, y);
         launchVec.set(G).subtract(s0); // L = G - s0
