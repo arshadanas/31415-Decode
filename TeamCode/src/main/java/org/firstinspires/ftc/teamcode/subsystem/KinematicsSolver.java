@@ -94,11 +94,11 @@ public final class KinematicsSolver {
     }
 
     public void setRobotState(double x, double y, double heading, double vx, double vy, double angVel) {
-        double
-                turretX = o_turretForward * cos(heading),
-                turretY = o_turretForward * sin(heading);
-        s_turret.set(x + turretX, y + turretY);
-        v_turret.set(vx + angVel * -turretY, vy + angVel * turretX);
+
+        s_turret.set(o_turretForward, 0).rotate(heading);
+        v_turret.set(s_turret).right().multiply(angVel).add(vx, vy);
+        s_turret.add(x, y);
+
         unitTurretToGoal.set(G);
         unitTurretToGoal.subtract(s_turret);
         unitTurretToGoal.normalize();
