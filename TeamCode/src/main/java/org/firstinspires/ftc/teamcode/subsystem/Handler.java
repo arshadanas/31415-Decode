@@ -100,14 +100,6 @@ public final class Handler {
 
     void run(boolean feed) {
 
-        double dt = loopTimer.seconds();
-        loopTimer.reset();
-
-        if (!started) {
-            dt = 0;
-            started = true;
-        }
-
         int nearestEmptySlot = Rotor.Zone.INTAKE_SENSOR.getNearestSlot(rotor.slot0Position, artifacts, false);
 
         if (intakePower > 0 && nearestEmptySlot != -1) // move empty slot to intake
@@ -130,14 +122,16 @@ public final class Handler {
 
         boolean backSlotIsFeedTarget = !feedingOrder.isEmpty() && backSlot == feedingOrder.get(0);
 
-        if (!backSlotIsFeedTarget)
+        if (!backSlotIsFeedTarget || !started) {
             timeSpentFeeding = 0; // if slot moves, restart feeding count
-        else if (feed && (timeSpentFeeding += dt) >= TIME_FEED) {
+            started = true;
+        } else if (feed && (timeSpentFeeding += loopTimer.seconds()) >= TIME_FEED) {
             artifacts[backSlot] = false;
             feedingOrder.remove(0);
             backSlotIsFeedTarget = false;
             timeSpentFeeding = 0;
         }
+        loopTimer.reset();
 
         double feederPower =
                 manualFeederPower != 0 ? manualFeederPower :
