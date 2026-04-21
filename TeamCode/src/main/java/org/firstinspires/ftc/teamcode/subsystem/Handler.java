@@ -49,7 +49,7 @@ public final class Handler {
         this.manualFeederPower = power;
     }
 
-    private final ArrayList<Integer> feedingOrder = new ArrayList<>();
+    private final ArrayList<Integer> feedingOrder = new ArrayList<>(4);
     private final ElapsedTime timeSinceIntaked = new ElapsedTime(), loopTimer = new ElapsedTime();
     private double timeSpentFeeding;
     private boolean started;
@@ -164,25 +164,20 @@ public final class Handler {
         if (first == -1) // no Artifacts in the container
             return;
         
-        int 
-            last = first,
-            secondLast = first - 1, 
-            second = (first + 1) % 3,
-            third = (first + 2) % 3;
+        int second = (first + 1) % 3, third = (first + 2) % 3;
 
         feedingOrder.add(first);
-        
+
         if (artifacts[second]) {
-            secondLast = last;
-            feedingOrder.add(last = second);
+            feedingOrder.add(second);
+            feedingOrder.add(third);
+            if (artifacts[third])
+                feedingOrder.add(first);
+        } else {
+            if (artifacts[third])
+                feedingOrder.add(third);
+            feedingOrder.add(second);
         }
-
-        if (artifacts[third]) {
-            secondLast = last;
-            feedingOrder.add(last = third);
-        }
-
-        feedingOrder.add(Ranges.wrap(2*last - secondLast, 0, 3));
     }
 
     void printTo(Telemetry telemetry) {
