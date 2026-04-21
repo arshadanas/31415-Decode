@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.control.Ranges;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedDcMotor;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
@@ -167,17 +166,14 @@ public final class Handler {
         int second = (first + 1) % 3, third = (first + 2) % 3;
 
         feedingOrder.add(first);
-
+        feedingOrder.add(second);
+        
         if (artifacts[second]) {
-            feedingOrder.add(second);
             feedingOrder.add(third);
             if (artifacts[third])
                 feedingOrder.add(first);
-        } else {
-            if (artifacts[third])
-                feedingOrder.add(third);
-            feedingOrder.add(second);
-        }
+        } else if (artifacts[third])
+            feedingOrder.add(1, third);
     }
 
     void printTo(Telemetry telemetry) {
