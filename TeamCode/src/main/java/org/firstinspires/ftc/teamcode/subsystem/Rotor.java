@@ -19,6 +19,7 @@ public final class Rotor {
 
     public static double
             ENCODER_OFFSET = -1.5742869852988852,
+
             OFFSET_0_FRONT = -0.12571301470111473,
             OFFSET_0_BACK = 0.18269433170909233,
             OFFSET_1_FRONT = 0.2686820876920806,
@@ -28,8 +29,8 @@ public final class Rotor {
 
             TIME_WRAPAROUND = 0.03,
 
-            TOLERANCE_INTAKE_SENSOR = 0.2, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_FEEDER = 0.15, // too high => false negatives (removals)
+            TOLERANCE_INTAKE_SENSOR = 0.2, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_INTAKE_OMNI = 0.5236;
 
     private final CachedSimpleServo servo;

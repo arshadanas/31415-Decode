@@ -16,7 +16,8 @@ public final class Robot {
 
     public final MecanumDrivetrain drivetrain;
     public final Handler handler;
-    public final Shooter shooter;
+    public final Flywheel flywheel;
+    private final Hood hood;
     public final Turret turret;
 
     private final BulkReader bulkReader;
@@ -27,7 +28,8 @@ public final class Robot {
 
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
-        shooter = new Shooter(hardwareMap);
+        flywheel = new Flywheel(hardwareMap);
+        hood = new Hood(hardwareMap);
         handler = new Handler(hardwareMap);
         turret = new Turret(hardwareMap);
 
@@ -52,16 +54,16 @@ public final class Robot {
         solver.update(x, y, heading, velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel());
 
         turret.setTarget(solver.turretAngle);
-        shooter.setRPM(solver.launchRPM);
-        shooter.setLaunchAngle(solver.launchAngle);
+        flywheel.setRPM(solver.launchRPM);
+        hood.setLaunchAngle(solver.launchAngle);
 
         boolean inLaunchZone = currentZone != NONE;
         boolean feedsPending = handler.feedsPending();
 
-        shooter.run(inLaunchZone, feedsPending);
+        flywheel.run(inLaunchZone, feedsPending);
         turret.run(feedsPending);
 
-        boolean inTolerance = shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
+        boolean inTolerance = flywheel.inTolerance(Flywheel.TOLERANCE_RPM_FEEDING) &&
                                 turret.inTolerance(Turret.TOLERANCE_FEEDING);
 
         handler.run(inLaunchZone && (forceFeed || (feed && inTolerance)));
@@ -79,7 +81,7 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         handler.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
-        shooter.printTo(telemetry);
+        flywheel.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         turret.printTo(telemetry);
     }

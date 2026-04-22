@@ -126,7 +126,7 @@ public final class Tele extends LinearOpMode {
                 robot.drivetrain.setHeadingWithStick(gamepad1.right_stick_x, gamepad1.right_stick_y, isRedAlliance);
 
                 robot.handler.setFeederManual(gamepad1.left_trigger);
-                robot.shooter.setManual(gamepad1.right_trigger);
+                robot.flywheel.setManual(gamepad1.right_trigger);
 
                 if (gamepad1.dpadRightWasPressed())
                     robot.drivetrain.setPose(wallResetPose);

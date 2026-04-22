@@ -4,8 +4,8 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.norm
 import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.HOOD;
 import static org.firstinspires.ftc.teamcode.opmode.tuning.TuneServos.TestServo.ROTOR;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_SHALLOWEST;
-import static org.firstinspires.ftc.teamcode.subsystem.Shooter.ANGLE_HOOD_STEEPEST;
+import static org.firstinspires.ftc.teamcode.subsystem.Hood.ANGLE_HOOD_SHALLOWEST;
+import static org.firstinspires.ftc.teamcode.subsystem.Hood.ANGLE_HOOD_STEEPEST;
 import static java.lang.Math.PI;
 
 import com.acmerobotics.dashboard.config.Config;

@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.opmode.Tele;
 
 @Config
 @TeleOp(group = "Testing/tuning")
-public final class TuneShooter extends LinearOpMode {
+public final class TuneFlywheel extends LinearOpMode {
 
     private final ElapsedTime loopTimer = new ElapsedTime();
     public static double targetRPM = 3000;
@@ -26,14 +26,14 @@ public final class TuneShooter extends LinearOpMode {
         telemetry.setDisplayFormat(Telemetry.DisplayFormat.MONOSPACE);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        Shooter shooter = new Shooter(hardwareMap);
+        Flywheel flywheel = new Flywheel(hardwareMap);
 
         waitForStart(); // -------------------------------------------------------------------------------------------------------------------
 
         // Control loop:
         while (opModeIsActive()) {
             // Read sensors + gamepads:
-            shooter.run(!gamepad1.square, !gamepad1.square);
+            flywheel.run(!gamepad1.square, !gamepad1.square);
 
             if (gamepad1.dpadUpWasPressed())
                 targetRPM += 50;
@@ -42,13 +42,13 @@ public final class TuneShooter extends LinearOpMode {
 
             targetRPM = clip(targetRPM, 0, 8000);
 
-            shooter.setRPM(targetRPM);
-            shooter.setManual(gamepad1.right_trigger);
+            flywheel.setRPM(targetRPM);
+            flywheel.setManual(gamepad1.right_trigger);
 
             Thread.sleep((long)(max(Tele.AVG_LOOP_TIME_MS - loopTimer.milliseconds(),0)));
             telemetry.addData("LOOP TIME", loopTimer.seconds());
             loopTimer.reset();
-            shooter.printTo(telemetry);
+            flywheel.printTo(telemetry);
             telemetry.update();
         }
     }

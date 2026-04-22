@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static com.acmerobotics.roadrunner.Math.lerp;
 import static com.arcrobotics.ftclib.hardware.motors.Motor.ZeroPowerBehavior.FLOAT;
 import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.abs;
@@ -17,10 +16,9 @@ import org.firstinspires.ftc.teamcode.control.gainmatrix.KalmanGains;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.PIDGains;
 import org.firstinspires.ftc.teamcode.control.motion.State;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedMotorEx;
-import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 
 @Config
-public final class Shooter {
+public final class Flywheel {
 
     public static PIDGains pidGains = new PIDGains(0.0005, 0, 0, 1);
     public static KalmanGains
@@ -34,21 +32,13 @@ public final class Shooter {
             RPM_ARMING = 2700,
             RPM_IDLE = 0,
 
-            LAUNCH_RAD_SHALLOWEST = 0.5567832093586575, // 31.901328 deg
-            LAUNCH_RAD_STEEPEST = 1.0776000610289713, // 61.7419355 deg
-
-            ANGLE_HOOD_SHALLOWEST = 360,
-            ANGLE_HOOD_STEEPEST = 10,
-
             TOLERANCE_RPM_FILTERING = -1,
             TOLERANCE_RPM_FEEDING = 80, // TODO increase for faster feeding
 
-            CACHE_THRESHOLD_HOOD = 0.05,
             CACHE_THRESHOLD_MOTORS = 0.001,
 
             RPM_PER_IN_PER_SEC = 22.1835942324; // https://www.desmos.com/calculator/2prs6sixtf
 
-    private final CachedSimpleServo hood;
     private final CachedMotorEx[] motors;
     private final VoltageSensor batteryVoltageSensor;
 
@@ -72,26 +62,12 @@ public final class Shooter {
         return currentRPM / RPM_PER_IN_PER_SEC;
     }
 
-    /**
-     * @param radians Launch angle (in radians, where 0 is horizontal, parallel to the floor)
-     *                in the range [{@link #LAUNCH_RAD_SHALLOWEST}, {@link #LAUNCH_RAD_STEEPEST}]
-     */
-    public void setLaunchAngle(double radians) {
-        hood.threshold = CACHE_THRESHOLD_HOOD; // TODO adjust when hood angle becomes continuous and differentiable
-        hood.turnToAngle(lerp(
-                clip(radians, LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST),
-                LAUNCH_RAD_SHALLOWEST, LAUNCH_RAD_STEEPEST, // TODO Tune empirically
-                ANGLE_HOOD_SHALLOWEST, ANGLE_HOOD_STEEPEST
-        ));
-    }
-
     private double manualPower;
     public void setManual(double power) {
         manualPower = power;
     }
 
-    Shooter(HardwareMap hardwareMap) {
-        hood = new CachedSimpleServo(hardwareMap, "hood", 0, 360).reversed();
+    Flywheel(HardwareMap hardwareMap) {
 
         motors = new CachedMotorEx[]{
                 new CachedMotorEx(hardwareMap, "shooter R", Motor.GoBILDA.BARE),
