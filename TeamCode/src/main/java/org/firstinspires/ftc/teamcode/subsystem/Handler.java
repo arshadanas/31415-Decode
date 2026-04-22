@@ -164,16 +164,25 @@ public final class Handler {
             return;
         
         int second = (first + 1) % 3, third = (first + 2) % 3;
+        boolean hasSecond = artifacts[second], hasThird = artifacts[third];
+
+        if (!hasSecond && hasThird) {
+            int temp = second;
+            second = third;
+            third = temp;
+
+            hasSecond = true;
+            hasThird = false;
+        }
 
         feedingOrder.add(first);
         feedingOrder.add(second);
         
-        if (artifacts[second]) {
+        if (hasSecond) {
             feedingOrder.add(third);
-            if (artifacts[third])
+            if (hasThird)
                 feedingOrder.add(first);
-        } else if (artifacts[third])
-            feedingOrder.add(1, third);
+        }
     }
 
     void printTo(Telemetry telemetry) {
