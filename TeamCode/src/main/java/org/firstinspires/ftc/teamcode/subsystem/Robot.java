@@ -2,8 +2,6 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
 
-import static java.lang.Math.PI;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.math.Vector;
@@ -20,7 +18,6 @@ public final class Robot {
     public final Handler handler;
     public final Shooter shooter;
     public final Turret turret;
-    public final Lift lift;
 
     private final BulkReader bulkReader;
     private final AirtimeSolver solver;
@@ -33,7 +30,6 @@ public final class Robot {
         shooter = new Shooter(hardwareMap);
         handler = new Handler(hardwareMap);
         turret = new Turret(hardwareMap);
-        lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
         solver = new AirtimeSolver();
@@ -45,39 +41,32 @@ public final class Robot {
 
     public void run(boolean feed, boolean forceFeed) {
         bulkReader.bulkRead();
+        drivetrain.update();
 
-        boolean lifting = lift.gearSwitch.isActivated();
+        Pose pose = drivetrain.getPose();
+        Vector velocity = drivetrain.getVelocity();
 
-        if (lifting)
-            turret.setTarget(PI);
-        else {
-            drivetrain.update();
-            Pose pose = drivetrain.getPose();
-            Vector velocity = drivetrain.getVelocity();
+        currentZone = LaunchZone.getCurrentZone(pose);
 
-            currentZone = LaunchZone.getCurrentZone(pose);
+        solver.update(
+                pose.getX(), pose.getY(), pose.getHeading(),
+                velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel()
+        );
 
-            solver.update(
-                    pose.getX(), pose.getY(), pose.getHeading(),
-                    velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel()
-            );
-
-            turret.setTarget(solver.turretAngle);
-            shooter.setRPM(solver.launchRPM);
-            shooter.setLaunchAngle(solver.launchAngle);
-        }
+        turret.setTarget(solver.turretAngle);
+        shooter.setRPM(solver.launchRPM);
+        shooter.setLaunchAngle(solver.launchAngle);
 
         boolean inLaunchZone = currentZone != NONE;
         boolean feedsPending = handler.feedsPending();
 
-        shooter.run(inLaunchZone, feedsPending && !lifting);
-        turret.run(feedsPending || lifting);
+        shooter.run(inLaunchZone, feedsPending);
+        turret.run(feedsPending);
 
         boolean inTolerance = shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
                                 turret.inTolerance(Turret.TOLERANCE_FEEDING);
 
-        handler.run(!lifting && inLaunchZone && (forceFeed || (feed && inTolerance)));
-        lift.run();
+        handler.run(inLaunchZone && (forceFeed || (feed && inTolerance)));
     }
 
     public void printTo(Telemetry telemetry) {
@@ -95,7 +84,5 @@ public final class Robot {
         shooter.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         turret.printTo(telemetry);
-        telemetry.addLine("\n--------------------------------------\n");
-        lift.printTo(telemetry);
     }
 }

@@ -20,10 +20,6 @@ import java.util.ArrayList;
 public final class Handler {
 
     public static double
-            ANGLE_PRESSER_RETRACTED = 87,
-            ANGLE_PRESSER_EXTENDED = 211,
-            ANGLE_PRESSER_L_OFFSET = -37,
-
             THRESHOLD_FRONT_MM = 65, // start of ramp = ~115
             INTAKE_POWER_OMNI_CONTACT = 0.4,
 
