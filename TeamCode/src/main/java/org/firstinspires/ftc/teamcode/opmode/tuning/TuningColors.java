@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.control.gainmatrix.HSV;
-import org.firstinspires.ftc.teamcode.subsystem.Artifact;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.ColorSensor;
 
 @Config
@@ -39,16 +38,9 @@ public final class TuningColors extends LinearOpMode {
             HSV hsv1 = color1.getHSV();
             HSV hsv2 = color2.getHSV();
 
-            Artifact a1 = Artifact.fromHSV(hsv1);
-            Artifact a2 = Artifact.fromHSV(hsv2);
-            
-            telemetry.addData("OUTPUT", a1.or(a2));
-            telemetry.addLine();
-            telemetry.addData("Color 1", a1);
             telemetry.addData("Distance 1", distance1.getDistance(DistanceUnit.MM));
             hsv1.printTo(telemetry);
             telemetry.addLine();
-            telemetry.addData("Color 2", a2);
             telemetry.addData("Distance 2", distance2.getDistance(DistanceUnit.MM));
             hsv2.printTo(telemetry);
             telemetry.update();
