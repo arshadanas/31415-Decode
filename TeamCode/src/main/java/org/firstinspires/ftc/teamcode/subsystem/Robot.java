@@ -45,13 +45,11 @@ public final class Robot {
 
         Pose pose = drivetrain.getPose();
         Vector velocity = drivetrain.getVelocity();
+        double x = pose.getX(), y = pose.getY(), heading = pose.getHeading();
 
-        currentZone = LaunchZone.getCurrentZone(pose);
+        currentZone = LaunchZone.getCurrentZone(x, y, heading);
 
-        solver.update(
-                pose.getX(), pose.getY(), pose.getHeading(),
-                velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel()
-        );
+        solver.update(x, y, heading, velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel());
 
         turret.setTarget(solver.turretAngle);
         shooter.setRPM(solver.launchRPM);
