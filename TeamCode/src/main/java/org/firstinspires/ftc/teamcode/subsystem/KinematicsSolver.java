@@ -99,9 +99,7 @@ public final class KinematicsSolver {
         v_turret.set(s_turret).right().multiply(angVel).add(vx, vy);
         s_turret.add(x, y);
 
-        unitTurretToGoal.set(G);
-        unitTurretToGoal.subtract(s_turret);
-        unitTurretToGoal.normalize();
+        unitTurretToGoal.set(G).subtract(s_turret).normalize();
         turretAngle = -unitTurretToGoal.getAngleBetween(heading);
     }
 
@@ -110,16 +108,16 @@ public final class KinematicsSolver {
     }
 
     private void computeForwardKinematics() {
-        double cos_θ_launch = cos(θ_launch), sin_θ_launch = sin(θ_launch);
+        v0.set(1, 0).rotate(θ_launch);
 
-        s0.set(s_wheel).add(-c*sin_θ_launch, c*cos_θ_launch);
+        s0.set(v0).right().multiply(c).add(s_wheel);
 
         s_launch.set(unitTurretToGoal).rotate(α_launch).multiply(s0.x).add(s_turret);
         unitLaunchPtToGoal.set(G).subtract(s_launch).normalize();
-        v_relToGoal.set(
-                -v_turret.dot(unitLaunchPtToGoal),
-                -v_turret.dot(-unitLaunchPtToGoal.y, unitLaunchPtToGoal.x*1)
-        );
+        v_relToGoal.set(-v_turret.dot(unitLaunchPtToGoal), v_turret.dot(unitLaunchPtToGoal.left()));
+
+        v0.multiply(v_launch);
+        v0.x = sqrt(v0.x*v0.x - v_relToGoal.y*v_relToGoal.y) - v_relToGoal.x; 
 
         double m1 = (G.y - s_launch.y) / (G.x - s_launch.x);
         k.x = (m1 * s_launch.x - s_launch.y + b) / (m1 - m2);
@@ -127,11 +125,6 @@ public final class KinematicsSolver {
 
         s_goal.set(s_launch.distance(G) + s0.x, y_goal);
         s_rim.set(s_launch.distance(k) + s0.x, y_rim);
-
-        v0.set(
-                sqrt(v_launch*v_launch * cos_θ_launch*cos_θ_launch - v_relToGoal.y*v_relToGoal.y) - v_relToGoal.x,
-                v_launch * sin_θ_launch
-        );
 
         double t = (s_goal.x - s0.x) / v0.x;
         s_atGoal.set(s_goal.x, s0.y + (v0.y + a_G/2 * t) * t);
