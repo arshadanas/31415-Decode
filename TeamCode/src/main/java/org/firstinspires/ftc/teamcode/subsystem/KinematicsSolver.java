@@ -26,6 +26,7 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
  * @author Arshad Anas
  * @since 2025/09/18
  */
+@SuppressWarnings("NonAsciiCharacters")
 @Config
 public final class KinematicsSolver {
 
