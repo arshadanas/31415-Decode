@@ -115,7 +115,7 @@ public final class KinematicsSolver {
 
         s_launch.set(unitTurretToGoal).rotate(α_launch).multiply(s0.x).add(s_turret);
         unitLaunchPtToGoal.set(G).subtract(s_launch).normalize();
-        v_relToGoal.set(-v_turret.dot(unitLaunchPtToGoal), v_turret.dot(unitLaunchPtToGoal.left()));
+        v_relToGoal.set(v_turret.dot(unitLaunchPtToGoal), v_turret.dot(unitLaunchPtToGoal.right())).negate();
 
         v0.multiply(v_launch);
         v0.x = sqrt(v0.x*v0.x - v_relToGoal.y*v_relToGoal.y) - v_relToGoal.x; 
