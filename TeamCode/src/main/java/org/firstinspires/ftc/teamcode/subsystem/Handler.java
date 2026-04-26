@@ -24,7 +24,9 @@ public final class Handler {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
 
             TIME_FRONT_DIST_COOLDOWN = 0.1,
-            TIME_FEED = 0.35,
+            TIME_FEED = 0.25,
+            TIME_FEED_LESS_SUBSEQUENT = 0.1,
+            TIME_FEEDER_STOP = 0.15,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
             CACHE_THRESHOLD_FEEDER = 0.05;
@@ -45,9 +47,13 @@ public final class Handler {
     }
 
     private final ArrayList<Integer> feedingOrder = new ArrayList<>(4);
-    private final ElapsedTime timeSinceIntaked = new ElapsedTime(), loopTimer = new ElapsedTime();
+    private final ElapsedTime
+            timeSinceIntaked = new ElapsedTime(),
+            timeSinceFeederStopped = new ElapsedTime(),
+            loopTimer = new ElapsedTime();
     private double timeSpentFeeding;
     private boolean started;
+    private int first = -1;
 
     public static final boolean[] FULL = {true, true, true}, EMPTY = {false, false, false};
     private final boolean[] artifacts = EMPTY.clone();
@@ -120,7 +126,7 @@ public final class Handler {
         if (!backSlotIsFeedTarget || !started) {
             timeSpentFeeding = 0; // if slot moves, restart feeding count
             started = true;
-        } else if (feed && (timeSpentFeeding += loopTimer.seconds()) >= TIME_FEED) {
+        } else if (feedingOrder.size() == 1 || feed && (timeSpentFeeding += loopTimer.seconds()) >= TIME_FEED - (backSlot != first ? TIME_FEED_LESS_SUBSEQUENT : 0)) {
             artifacts[backSlot] = false;
             feedingOrder.remove(0);
             backSlotIsFeedTarget = false;
@@ -128,9 +134,14 @@ public final class Handler {
         }
         loopTimer.reset();
 
-        double feederPower =
-                manualFeederPower != 0 ? manualFeederPower :
-                feed && !feedingOrder.isEmpty() && (backSlotIsFeedTarget || backSlot == -1 || !artifacts[backSlot]) ? 1 : 0;
+        boolean feedsPending = !feedingOrder.isEmpty();
+        int feederPower = manualFeederPower != 0 ||
+                feed && feedsPending && (backSlotIsFeedTarget || backSlot == -1 || !artifacts[backSlot]) ? 1 : 0;
+
+        if (feederPower > 0)
+            timeSinceFeederStopped.reset();
+        else if (timeSinceFeederStopped.seconds() >= TIME_FEEDER_STOP && feedsPending)
+            first = feedingOrder.get(0);
 
         for (CachedDcMotor servo : feeder) {
             servo.threshold = CACHE_THRESHOLD_FEEDER;
@@ -155,7 +166,7 @@ public final class Handler {
     private void feedFastest() {
         feedingOrder.clear();
 
-        int first = Rotor.Zone.FEEDER.getNearestSlot(rotor.slot0Position, artifacts, true);
+        first = Rotor.Zone.FEEDER.getNearestSlot(rotor.slot0Position, artifacts, true);
         if (first == -1) // no Artifacts in the container
             return;
         
