@@ -24,8 +24,8 @@ public final class Handler {
             INTAKE_POWER_OMNI_CONTACT = 0.4,
 
             TIME_FRONT_DIST_COOLDOWN = 0.1,
-            TIME_FEED = 0.25,
-            TIME_FEED_LESS_SUBSEQUENT = 0.1,
+            TIME_FEED = 0.275,
+            TIME_FEED_LESS_SUBSEQUENT = 0.15,
             TIME_FEEDER_STOP = 0.15,
 
             CACHE_THRESHOLD_INTAKE = 0.05,
