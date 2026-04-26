@@ -52,7 +52,7 @@ public final class Robot {
         currentZone = LaunchZone.getCurrentZone(x, y, heading);
 
         solver.setRobotState(x, y, heading, velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel());
-        boolean valid = solver.calculateTarget_v_θ_α();
+        boolean validSolve = solver.calculateTarget_v_θ_α();
 
         turret.setTarget(solver.getTurretAngle());
         flywheel.setVelocity(solver.v_launch);
@@ -64,9 +64,7 @@ public final class Robot {
         flywheel.run(inLaunchZone, feedsPending);
         turret.run(feedsPending);
 
-        boolean inTolerance = valid &&
-                                flywheel.inTolerance(Flywheel.TOLERANCE_RPM_FEEDING) &&
-                                turret.inTolerance(Turret.TOLERANCE_FEEDING);
+        boolean inTolerance = validSolve && flywheel.inTolerance() && turret.inTolerance();
 
         handler.run(inLaunchZone && (forceFeed || (feed && inTolerance)));
     }

@@ -32,8 +32,7 @@ public final class Flywheel {
             RPM_ARMING = 2700,
             RPM_IDLE = 0,
 
-            TOLERANCE_RPM_FILTERING = -1,
-            TOLERANCE_RPM_FEEDING = 80, // TODO increase for faster feeding
+            RPM_TOLERANCE = 80, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_MOTORS = 0.001,
 
@@ -121,16 +120,12 @@ public final class Flywheel {
         return rpmSetpoint * 0.000120292276714 + 0.0393080566445;
     }
 
-    boolean inTolerance(double rpmTolerance) {
-        return abs(targetRPM - currentRPM) <= rpmTolerance;
+    boolean inTolerance() {
+        return abs(targetRPM - currentRPM) <= RPM_TOLERANCE;
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("SHOOTER",
-                inTolerance(TOLERANCE_RPM_FILTERING) ?  "RPM in filtering tolerance" :
-                inTolerance(TOLERANCE_RPM_FEEDING) ?    "RPM in feeding tolerance" :
-                                                        "RPM out of tolerance"
-        );
+        telemetry.addData("SHOOTER", inTolerance() ? "RPM in feeding tolerance" : "RPM out of tolerance");
         telemetry.addLine();
         telemetry.addData("Current vel (rpm)", currentRPM);
         telemetry.addData("Target vel (rpm)", targetRPM);

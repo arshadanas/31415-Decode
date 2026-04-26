@@ -95,8 +95,8 @@ public final class Turret {
 
     }
 
-    boolean inTolerance(double tolerance) {
-        return abs(normalizeRadians(target.x - current.x)) <= tolerance;
+    boolean inTolerance() {
+        return abs(normalizeRadians(target.x - current.x)) <= TOLERANCE_FEEDING;
     }
 
     void printTo(Telemetry telemetry) {
