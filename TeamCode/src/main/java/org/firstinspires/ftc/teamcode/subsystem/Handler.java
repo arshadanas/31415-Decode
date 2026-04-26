@@ -173,12 +173,12 @@ public final class Handler {
         int second = (first + 1) % 3, third = (first + 2) % 3;
         boolean hasSecond = artifacts[second], hasThird = artifacts[third];
 
-        if (!hasSecond && hasThird) {
+        if (!hasSecond) {
             int temp = second;
             second = third;
             third = temp;
 
-            hasSecond = true;
+            hasSecond = hasThird;
             hasThird = false;
         }
 
