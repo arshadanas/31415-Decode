@@ -32,7 +32,7 @@ public final class Flywheel {
             ARMING_SCALAR = 0.8,
             RPM_IDLE = 0,
 
-            RPM_TOLERANCE = 80, // TODO increase for faster feeding
+            RPM_TOLERANCE = 120, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_MOTORS = 0.001,
 
