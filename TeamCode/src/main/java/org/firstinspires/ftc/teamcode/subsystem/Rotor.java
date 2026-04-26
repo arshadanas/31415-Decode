@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.normalizeRadians;
-import static org.firstinspires.ftc.teamcode.control.Ranges.wrap;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -16,51 +14,96 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
 import org.firstinspires.ftc.teamcode.subsystem.utility.cachedhardware.CachedSimpleServo;
 import org.firstinspires.ftc.teamcode.subsystem.utility.sensor.AnalogSensor;
 
-import java.util.function.IntPredicate;
-
 @Config
 public final class Rotor {
 
     public static double
-            ROTOR_ENCODER_OFFSET = -1.5742869852988852,
-            ROTOR_OUTPUT_OFFSET = -1.7,
-            OFFSET_0_BACK = 3.45,
-            OFFSET_1_FRONT = -1.7,
-            OFFSET_1_BACK = 1.175,
-            OFFSET_2_FRONT = 2.35,
-            OFFSET_2_BACK = -1.125,
+            ENCODER_OFFSET = -1.5742869852988852,
+
+            OFFSET_0_FRONT = -0.12571301470111473,
+            OFFSET_0_BACK = 0.18269433170909233,
+            OFFSET_1_FRONT = 0.2686820876920806,
+            OFFSET_1_BACK = 0.0020894341022874574,
+            OFFSET_2_FRONT = 0.12989188290568965,
+            OFFSET_2_BACK = -0.20351546350451732,
 
             TIME_WRAPAROUND = 0.03,
 
-            TOLERANCE_INTAKE_SENSORS_DEG = 11.46, // too high => false positives, too low => false negatives (no-detect)
-            TOLERANCE_FEEDER_SENSORS_DEG = 8.6, // too high => false negatives (removals)
-            TOLERANCE_FEEDER_OMNIS_DEG = 30,
-            TOLERANCE_INTAKE_OMNI_DEG = 30;
+            TOLERANCE_FEEDER = 0.174533, // too high => false negatives (removals)
+            TOLERANCE_INTAKE_SENSOR = 0.2618, // too high => false positives, too low => false negatives (no-detect)
+            TOLERANCE_INTAKE_OMNI = 0.5236;
 
     private final CachedSimpleServo servo;
     private final AnalogSensor encoder;
 
-    private double lastRadians = getTargetRadians(0, Zone.INTAKE_SENSORS);
+    private double lastServoTarget;
     private final ElapsedTime wrapAroundTimer = new ElapsedTime();
-    private boolean wrapAround = true;
+    private boolean wrapAround = false;
+
+    double slot0Position, slot0Target;
+
+    private static double offsetRadians(double slot0Radians, int numSlotsCCW) {
+        return normalizeRadians(slot0Radians + numSlotsCCW * 2 * PI / 3.0);
+    }
+
+    Rotor(HardwareMap hardwareMap) {
+        servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
+        encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
+
+        // slot nearest to feeder because we preload with a slot aligned to the feeder
+        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
+        int nearestFeedSlot = Zone.FEEDER.getNearestSlot(slot0Position, Handler.FULL, true);
+        slot0Target = offsetRadians(Zone.FEEDER.radians, -nearestFeedSlot);
+        lastServoTarget = Zone.INTAKE_SENSOR.getServoTarget(nearestFeedSlot);
+    }
+
+    void run() {
+
+        slot0Position = normalizeRadians(encoder.getReading() + ENCODER_OFFSET);
+
+        if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
+            wrapAround = false;
+            servo.turnToAngle(lastServoTarget);
+        }
+    }
 
     /**
-     * Position of slot 0, in radians
+     * @param slot Slot you wish to move (0, 1 or 2)
      */
-    private double position = 0, target = 0;
+    public void moveSlot(int slot, Zone target) {
+        this.slot0Target = offsetRadians(target.radians, -slot);
 
-    /**
-     * Position of given slot, in radians
-     */
-    private double getPositionOf(int slot) {
-        return normalizeRadians(position + wrap(slot, 0, 3) * 2 * PI / 3.0);
+        double newServoTarget = target.getServoTarget(slot);
+        if (newServoTarget == lastServoTarget)
+            return;
+
+        double front0 = Zone.INTAKE_SENSOR.getServoTarget(0);
+        double front1 = Zone.INTAKE_SENSOR.getServoTarget(1);
+
+        wrapAround = lastServoTarget == front0 && newServoTarget == front1 ||
+                lastServoTarget == front1 && newServoTarget == front0;
+
+        lastServoTarget = newServoTarget;
+
+        if (wrapAround) {
+            servo.turnToAngle(-PI);
+            wrapAroundTimer.reset();
+        } else
+            servo.turnToAngle(lastServoTarget);
+    }
+
+    void printTo(Telemetry telemetry) {
+        telemetry.addLine("ROTOR:");
+        telemetry.addLine();
+        telemetry.addData("Slot 0 position (deg)", toDegrees(slot0Position));
+        telemetry.addData("Slot 0 target (deg)", toDegrees(slot0Target));
+        telemetry.addData("Error (deg)", toDegrees(normalizeRadians(slot0Target - slot0Position)));
     }
 
     public enum Zone {
-        INTAKE_SENSORS(0),
+        INTAKE_SENSOR(0),
         INTAKE_OMNI(0),
-        FEEDER_SENSORS(PI),
-        FEEDER_OMNIS(PI);
+        FEEDER(PI);
 
         private final double radians;
         Zone(double radians) {
@@ -69,113 +112,60 @@ public final class Rotor {
 
         private double getTolerance() {
             switch (this) {
-                case INTAKE_OMNI:       return toRadians(TOLERANCE_INTAKE_OMNI_DEG);
-                case FEEDER_SENSORS:    return toRadians(TOLERANCE_FEEDER_SENSORS_DEG);
-                case FEEDER_OMNIS:      return toRadians(TOLERANCE_FEEDER_OMNIS_DEG);
-                default:                return toRadians(TOLERANCE_INTAKE_SENSORS_DEG);
+                case INTAKE_SENSOR: return TOLERANCE_INTAKE_SENSOR;
+                case INTAKE_OMNI:   return TOLERANCE_INTAKE_OMNI;
+                case FEEDER:        return TOLERANCE_FEEDER;
             }
+            return 0;
         }
 
-    }
-
-    Rotor(HardwareMap hardwareMap) {
-        servo = new CachedSimpleServo(hardwareMap, "rotor 2", -PI, PI);
-        encoder = new AnalogSensor(hardwareMap, "rotor", 2 * PI);
-    }
-
-    void run() {
-
-        position = normalizeRadians(encoder.getReading() + ROTOR_ENCODER_OFFSET);
-
-        if (wrapAround && wrapAroundTimer.seconds() >= TIME_WRAPAROUND) {
-            wrapAround = false;
-            servo.turnToAngle(lastRadians);
+        private double getServoTarget(int slot) {
+            slot = Ranges.wrap(slot, 0, 3);
+            return normalizeRadians(offsetRadians(radians, -slot) + ENCODER_OFFSET + (
+                    slot == 0 ? radians == 0 ? OFFSET_0_FRONT : OFFSET_0_BACK :
+                    slot == 1 ? radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
+                                radians == 0 ? OFFSET_2_FRONT : OFFSET_2_BACK
+            ));
         }
-    }
 
-    /**
-     * @param slot Slot you wish to move (0, 1 or 2)
-     */
-    public void moveSlot(int slot, Zone target) {
-        slot = Ranges.wrap(slot, 0, 3);
-        this.target = normalizeRadians(target.radians - 2 * PI / 3 * slot);
+        /**
+         * @return Distance, in radians, between given slot and this zone's specific {@link #radians}
+         */
+        double distFrom(double slot0Reference, int slot) {
+            return normalizeRadians(this.radians - offsetRadians(slot0Reference, slot));
+        }
 
-        double newRadians = getTargetRadians(slot, target);
-        if (newRadians == lastRadians)
-            return;
+        boolean slotIsHere(double slot0Reference, int slot) {
+            return abs(distFrom(slot0Reference, slot)) <= this.getTolerance();
+        }
 
-        double front0 = getTargetRadians(0, Zone.INTAKE_SENSORS);
-        double front1 = getTargetRadians(1, Zone.INTAKE_SENSORS);
+        /**
+         * @return Filled slot in this {@link Zone}
+         */
+        int getFilledSlotHere(double slot0Reference, boolean[] artifacts) {
+            return
+                    artifacts[0] && slotIsHere(slot0Reference, 0) ? 0 :
+                    artifacts[1] && slotIsHere(slot0Reference, 1) ? 1 :
+                    artifacts[2] && slotIsHere(slot0Reference, 2) ? 2 :
+                                                                        -1;
+        }
 
-        wrapAround = lastRadians == front0 && newRadians == front1 ||
-                lastRadians == front1 && newRadians == front0;
+        /**
+         * @param getFilled true to get filled slots, false to get empty slots
+         * @return Slot closest to this {@link Zone} that is either filled or empty (per getFilled)
+         */
+        int getNearestSlot(double slot0Reference, boolean[] artifacts, boolean getFilled) {
+            double min = Double.MAX_VALUE;
+            int minInd = -1;
+            for (int i = 0; i < 3; i++) if (artifacts[i] == getFilled) {
+                double error = abs(distFrom(slot0Reference, i));
+                if (error < min) {
+                    min = error;
+                    minInd = i;
+                }
 
-        lastRadians = newRadians;
-
-        if (wrapAround) {
-            servo.turnToAngle(-PI);
-            wrapAroundTimer.reset();
-        } else
-            servo.turnToAngle(lastRadians);
-    }
-
-    private static double getTargetRadians(int slot, Zone target) {
-        return normalizeRadians(ROTOR_OUTPUT_OFFSET + (
-                slot == 0 ? target.radians == 0 ? 0 : OFFSET_0_BACK :
-                slot == 1 ? target.radians == 0 ? OFFSET_1_FRONT : OFFSET_1_BACK :
-                            target.radians == 0 ? OFFSET_2_FRONT : OFFSET_2_BACK
-        ));
-    }
-
-    /**
-     * @return The (index of the) slot currently at the given target, -1 if no slot at that position
-     */
-    int getSlotAt(Zone target) {
-        for (int i = 0; i < 3; i++)
-            if (atPosition(i, target))
-                return i;
-        return -1;
-    }
-
-    int slotGoingToFront() {
-        return wrap((int) -Math.round(target / (2 * PI / 3)), 0, 3);
-    }
-
-    /**
-     * @return  If the given slot is at the given target, within tolerance in either direction
-     */
-    boolean atPosition(int slot, Zone target) {
-        return abs(getError(slot, target)) <= target.getTolerance();
-    }
-
-    /**
-     * @return  Distance, in radians, between given slot's position and given target
-     */
-    double getError(int slot, Zone target) {
-        return normalizeRadians(target.radians - getPositionOf(slot));
-    }
-
-    /**
-     * @return Slot closest to the specified zone that satisfies the predicate. -1 if no such slot found
-     */
-    int getNearestSlot(IntPredicate predicate, Rotor.Zone zone) {
-        double min = Double.MAX_VALUE;
-        int minInd = -1;
-        for (int i = 0; i < 3; i++) if (predicate.test(i)) {
-            double error = abs(getError(i, zone));
-            if (error < min) {
-                min = error;
-                minInd = i;
             }
+            return minInd;
         }
-        return minInd;
-    }
-
-    void printTo(Telemetry telemetry) {
-        telemetry.addLine("ROTOR:");
-        telemetry.addLine();
-        telemetry.addData("Slot 0 position (deg)", toDegrees(position));
-        telemetry.addData("Slot 0 target (deg)", toDegrees(target));
-        telemetry.addData("Error (deg)", toDegrees(normalizeRadians(target - position)));
     }
 }

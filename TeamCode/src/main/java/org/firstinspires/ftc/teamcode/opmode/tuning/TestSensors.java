@@ -73,7 +73,7 @@ public final class TestSensors extends LinearOpMode {
             double turretRadQuad = normalizeRadians(turretQuadrature.getPosition() * turretRadPerTick);
             double turretRadPerSec = turretQuadrature.getCorrectedVelocity() * turretRadPerTick;
 
-            double rotorRad = normalizeRadians(rotorEncoder.getReading() + Rotor.ROTOR_ENCODER_OFFSET);
+            double rotorRad = normalizeRadians(rotorEncoder.getReading() + Rotor.ENCODER_OFFSET);
 
             double turretRadAbs = normalizeRadians(-turretAbsolute.getReading() + Turret.TURRET_ABSOLUTE_OFFSET);
 

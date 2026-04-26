@@ -45,6 +45,7 @@ public class AutoTurner {
 
     private final FIRLowPassFilter kDFilter = new FIRLowPassFilter(derivFilterGains);
     private final PIDController headingController = new PIDController(kDFilter);
+    private final State headingSetpoint = new State(), headingMeasurement = new State();
 
     private final VoltageSensor batteryVoltageSensor;
 
@@ -69,8 +70,8 @@ public class AutoTurner {
             if (useManualInput || turnSettlingTimer.seconds() <= TURN_SETTLING_TIME) {
                 setTargetHeading(heading);
             } else if (translationSettlingTimer.seconds() > TRANSLATION_SETTLING_TIME) {
-                headingController.setTarget(new State(normalizeRadians(targetHeading - heading) + heading));
-                double pidOutput = -headingController.calculate(new State(heading));
+                headingController.setTarget(headingSetpoint.set(normalizeRadians(targetHeading - heading) + heading));
+                double pidOutput = -headingController.calculate(headingMeasurement.set(heading));
                 turnCommand = pidOutput + (Math.signum(pidOutput) * kStatic * voltageScalar);
             }
         }

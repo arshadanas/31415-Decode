@@ -8,14 +8,10 @@ data class FullStateGains @JvmOverloads constructor(
     @JvmField var aGain: Double = 0.0,
     @JvmField var jGain: Double = 0.0,
 ) {
-
-
-    operator fun times(state: State): State {
-        return State(
-            state.x * pGain,
-            state.v * vGain,
-            state.a * aGain,
-            state.j * jGain,
-        )
+    fun dot(state: State): Double {
+        return state.x * pGain +
+            state.v * vGain +
+            state.a * aGain +
+            state.j * jGain
     }
 }

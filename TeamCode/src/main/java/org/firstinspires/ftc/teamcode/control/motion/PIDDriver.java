@@ -34,6 +34,14 @@ public final class PIDDriver {
             yController = new PIDController(),
             rotController = new PIDController();
 
+    private final State
+            xSetpoint = new State(),
+            ySetpoint = new State(),
+            rotSetpoint = new State(),
+            xMeasurement = new State(),
+            yMeasurement = new State(),
+            rotMeasurement = new State();
+
     public void reset() {
         xController.reset();
         yController.reset();
@@ -50,32 +58,30 @@ public final class PIDDriver {
         yController.setGains(xyGains);
         rotController.setGains(rotGains);
 
-        xController.setTarget(new State(target.x));
-        yController.setTarget(new State(target.y *1));
-        rotController.setTarget(new State(headingError + current.heading));
+        xController.setTarget(xSetpoint.set(target.x));
+        yController.setTarget(ySetpoint.set(target.y *1));
+        rotController.setTarget(rotSetpoint.set(headingError + current.heading));
 
-        double x = xController.calculate(new State(current.x));
-        double y = yController.calculate(new State(current.y *1));
-        double rot = rotController.calculate(new State(current.heading));
+        double x = xController.calculate(xMeasurement.set(current.x));
+        double y = yController.calculate(yMeasurement.set(current.y *1));
+        double rot = rotController.calculate(rotMeasurement.set(current.heading));
 
-        DriverOutput output = new DriverOutput();
-
-        output.drivePower = new EditablePose(
-                x,
-                y * STRAFE_MULTIPLIER,
-                -rot
+        return new DriverOutput(
+        new EditablePose(x, y * STRAFE_MULTIPLIER, -rot),
+        abs(xError) <= admissibleError.x &&
+                abs(yError) <= admissibleError.y &&
+                abs(headingError) <= admissibleError.heading
         );
-
-        output.withinError = abs(xError) <= admissibleError.x &&
-                            abs(yError) <= admissibleError.y &&
-                            abs(headingError) <= admissibleError.heading;
-
-        return output;
     }
 
     public static class DriverOutput {
 
-        public boolean withinError;
-        public EditablePose drivePower;
+        public DriverOutput(EditablePose drivePower, boolean withinError) {
+            this.drivePower = drivePower;
+            this.withinError = withinError;
+        }
+
+        public final boolean withinError;
+        public final EditablePose drivePower;
     }
 }

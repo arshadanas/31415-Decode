@@ -33,22 +33,22 @@ public final class TuneRotor extends LinearOpMode {
             rotor.run();
 
             if (gamepad1.dpadLeftWasPressed())
-                rotor.moveSlot(0, Rotor.Zone.FEEDER_SENSORS);
+                rotor.moveSlot(0, Rotor.Zone.FEEDER);
 
             else if (gamepad1.dpadUpWasPressed())
-                rotor.moveSlot(1, Rotor.Zone.FEEDER_SENSORS);
+                rotor.moveSlot(1, Rotor.Zone.FEEDER);
 
             else if (gamepad1.dpadRightWasPressed())
-                rotor.moveSlot(2, Rotor.Zone.FEEDER_SENSORS);
+                rotor.moveSlot(2, Rotor.Zone.FEEDER);
 
             else if (gamepad1.squareWasPressed())
-                rotor.moveSlot(0, Rotor.Zone.INTAKE_SENSORS);
+                rotor.moveSlot(0, Rotor.Zone.INTAKE_SENSOR);
 
             else if (gamepad1.triangleWasPressed())
-                rotor.moveSlot(1, Rotor.Zone.INTAKE_SENSORS);
+                rotor.moveSlot(1, Rotor.Zone.INTAKE_SENSOR);
 
             else if (gamepad1.circleWasPressed())
-                rotor.moveSlot(2, Rotor.Zone.INTAKE_SENSORS);
+                rotor.moveSlot(2, Rotor.Zone.INTAKE_SENSOR);
 
             rotor.printTo(telemetry);
 

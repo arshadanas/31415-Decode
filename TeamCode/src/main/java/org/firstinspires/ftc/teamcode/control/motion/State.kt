@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode.control.motion
 
-import org.firstinspires.ftc.teamcode.control.gainmatrix.FeedforwardGains
-import org.firstinspires.ftc.teamcode.control.gainmatrix.FullStateGains
-
 data class State
 
 @JvmOverloads
 constructor(
-    @JvmField val x: Double = 0.0,
-    @JvmField val v: Double = 0.0,
-    @JvmField val a: Double = 0.0,
-    @JvmField val j: Double = 0.0,
+    @JvmField var x: Double = 0.0,
+    @JvmField var v: Double = 0.0,
+    @JvmField var a: Double = 0.0,
+    @JvmField var j: Double = 0.0,
 ) {
 
     operator fun plus(other: State): State {
@@ -44,11 +41,40 @@ constructor(
         )
     }
 
-    /**
-     * Returns the sum of all the derivatives of this [State].
-     * Only to be used to get a control output.
-     */
-    fun sum(): Double {
-        return x + v + a + j
+    operator fun plusAssign(other: State) {
+        x += other.x
+        v += other.v
+        a += other.a
+        j += other.j
     }
+
+    operator fun minusAssign(other: State) {
+        x -= other.x
+        v -= other.v
+        a -= other.a
+        j -= other.j
+    }
+
+    fun negate() {
+        x = -x
+        v = -v
+        a = -a
+        j = -j
+    }
+
+    @JvmOverloads
+    fun set(
+        x: Double = this.x,
+        v: Double = this.v,
+        a: Double = this.a,
+        j: Double = this.j,
+    ): State {
+        this.x = x
+        this.v = v
+        this.a = a
+        this.j = j
+        return this
+    }
+
+    fun set(other: State): State = set(other.x, other.v, other.a, other.j)
 }

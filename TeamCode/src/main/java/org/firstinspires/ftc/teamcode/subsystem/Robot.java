@@ -2,115 +2,87 @@ package org.firstinspires.ftc.teamcode.subsystem;
 
 import static org.firstinspires.ftc.teamcode.subsystem.LaunchZone.NONE;
 
-import static java.lang.Math.PI;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.subsystem.utility.BulkReader;
-import org.firstinspires.ftc.teamcode.subsystem.utility.Profiler;
 
 @Config
 public final class Robot {
 
     public final MecanumDrivetrain drivetrain;
     public final Handler handler;
-    public final Shooter shooter;
+    public final Flywheel flywheel;
+    private final Hood hood;
     public final Turret turret;
-    public final Lift lift;
 
     private final BulkReader bulkReader;
-    private final AutoAim autoAim;
+    private final AirtimeSolver solver;
     private final ElapsedTime loopTimer = new ElapsedTime();
+
+    private LaunchZone currentZone;
 
     public Robot(HardwareMap hardwareMap, Pose startPose) {
         drivetrain = new MecanumDrivetrain(hardwareMap, startPose);
-        shooter = new Shooter(hardwareMap);
-        handler = new Handler(hardwareMap, shooter.boostRPM());
+        flywheel = new Flywheel(hardwareMap);
+        hood = new Hood(hardwareMap);
+        handler = new Handler(hardwareMap);
         turret = new Turret(hardwareMap);
-        lift = new Lift(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
-        autoAim = new AutoAim();
+        solver = new AirtimeSolver();
     }
 
     public void setAlliance(boolean isRedAlliance) {
-        autoAim.setAlliance(isRedAlliance);
+        solver.setAlliance(isRedAlliance);
     }
 
     public void run(boolean feed, boolean forceFeed) {
-        Profiler.start("Robot_bulkread");
         bulkReader.bulkRead();
-        Profiler.end("Robot_bulkread");
+        drivetrain.update();
 
-        boolean lifting = lift.gearSwitch.isActivated();
+        Pose pose = drivetrain.getPose();
+        Vector velocity = drivetrain.getVelocity();
+        double x = pose.getX(), y = pose.getY(), heading = pose.getHeading();
 
-        if (lifting)
-            turret.setTarget(PI);
-        else {
-            Profiler.start("dt");
-            drivetrain.update();
-            Profiler.end("dt");
+        currentZone = LaunchZone.getCurrentZone(x, y, heading);
 
-            Profiler.start("Auto aim calc");
-            autoAim.update(
-                    drivetrain.getPose(),
-                    drivetrain.getVelocity(),
-                    drivetrain.getAngularVel(),
-                    shooter.getCurrentRPM()
-            );
-            Profiler.end("Auto aim calc");
+        solver.update(x, y, heading, velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel());
 
-            turret.setTarget(autoAim.turretAngle);
-            shooter.setRPM(autoAim.launchRPM);
-            shooter.setLaunchAngle(autoAim.launchAngle);
-        }
+        turret.setTarget(solver.turretAngle);
+        flywheel.setRPM(solver.launchRPM);
+        hood.setLaunchAngle(solver.launchAngle);
 
-        boolean inLaunchZone = autoAim.currentZone != NONE;
+        boolean inLaunchZone = currentZone != NONE;
         boolean feedsPending = handler.feedsPending();
 
-        Profiler.start("shooter");
-        shooter.run(inLaunchZone, feedsPending && !lifting);
-        Profiler.end("shooter");
+        flywheel.run(inLaunchZone, feedsPending);
+        turret.run(feedsPending);
 
-        Profiler.start("turret");
-        turret.run(feedsPending || lifting);
-        Profiler.end("turret");
+        boolean inTolerance = flywheel.inTolerance(Flywheel.TOLERANCE_RPM_FEEDING) &&
+                                turret.inTolerance(Turret.TOLERANCE_FEEDING);
 
-        Profiler.start("handler");
-        handler.run(
-                !lifting && inLaunchZone && (
-                        forceFeed || (
-                                feed &&
-                                shooter.inTolerance(Shooter.TOLERANCE_RPM_FEEDING) &&
-                                turret.inTolerance(Turret.TOLERANCE_FEEDING)
-                        )
-                )
-        );
-        Profiler.end("handler");
-
-        Profiler.start("lift");
-        lift.run();
-        Profiler.end("lift");
+        handler.run(inLaunchZone && (forceFeed || (feed && inTolerance)));
     }
 
     public void printTo(Telemetry telemetry) {
         telemetry.addData("LOOP TIME (ms)", loopTimer.milliseconds());
         loopTimer.reset();
         telemetry.addLine("\n--------------------------------------\n");
-        autoAim.printTo(telemetry);
+        telemetry.addData("Current zone", currentZone);
+        telemetry.addLine();
+        solver.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         handler.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
-        shooter.printTo(telemetry);
+        flywheel.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
         turret.printTo(telemetry);
-        telemetry.addLine("\n--------------------------------------\n");
-        lift.printTo(telemetry);
     }
 }

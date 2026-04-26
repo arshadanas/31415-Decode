@@ -82,6 +82,9 @@ public final class SwerveModule {
     private final VoltageSensor batteryVoltageSensor;
 
     private final PIDController thetaController = new PIDController();
+    private final org.firstinspires.ftc.teamcode.control.motion.State
+            thetaSetpoint = new org.firstinspires.ftc.teamcode.control.motion.State(),
+            thetaMeasurement = new org.firstinspires.ftc.teamcode.control.motion.State();
 
     private final AnalogSensor thetaEncoder;
 
@@ -126,9 +129,9 @@ public final class SwerveModule {
         double thetaError = normalizeRadians(target.theta - current.theta);
         double thetaTarget = thetaError + current.theta;
 
-        thetaController.setTarget(new org.firstinspires.ftc.teamcode.control.motion.State(thetaTarget));
+        thetaController.setTarget(thetaSetpoint.set(thetaTarget));
 
-        double pidOutput = thetaController.calculate(new org.firstinspires.ftc.teamcode.control.motion.State(current.theta));
+        double pidOutput = thetaController.calculate(thetaMeasurement.set(current.theta));
         
         double staticFF = kS_SERVO * signum(pidOutput) * scalar;
 

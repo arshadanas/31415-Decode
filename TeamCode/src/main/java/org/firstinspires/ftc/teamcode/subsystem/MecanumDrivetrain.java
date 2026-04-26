@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import static org.firstinspires.ftc.teamcode.control.Ranges.clip;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import static java.lang.Math.atan2;
@@ -46,10 +45,6 @@ public final class MecanumDrivetrain {
      * @param useSlowMode drives robot at {@link #SLOW_FACTOR} of full speed
      */
     public void run(double strafeCommand, double forwardCommand, double turnCommand, boolean useSlowMode, boolean isRedAlliance) {
-
-        forwardCommand = clip(forwardCommand, -1, 1);
-        strafeCommand = clip(strafeCommand, -1, 1);
-        turnCommand = clip(turnCommand, -1, 1);
 
         if (useSlowMode) {
             forwardCommand *= SLOW_FACTOR;

@@ -37,6 +37,19 @@ public final class Ranges {
     }
 
     /**
+     * Map a value from one range to another
+     * @param x value to map from [fromLo, fromHi]
+     * @param fromLo lowest value in the source range
+     * @param fromHi highest value in the source range
+     * @param toLo lowest value in the output range
+     * @param toHi highest value in the output range
+     * @return the value in the range [toLo, toHi] that is the same percentage across the interval that x is across [fromLo, fromHi]
+     */
+    public static double lerp(double x, double fromLo, double fromHi, double toLo, double toHi) {
+        return toLo + (x - fromLo) * (toHi - toLo) / (fromHi - fromLo);
+    }
+
+    /**
      * Performs quadratic Lagrange interpolation to estimate the value at a given x.
      */
     public static double quadInterp(double x,
