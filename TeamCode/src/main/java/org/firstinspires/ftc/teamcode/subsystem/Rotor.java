@@ -29,8 +29,8 @@ public final class Rotor {
 
             TIME_WRAPAROUND = 0.03,
 
-            TOLERANCE_FEEDER = 0.15, // too high => false negatives (removals)
-            TOLERANCE_INTAKE_SENSOR = 0.2, // too high => false positives, too low => false negatives (no-detect)
+            TOLERANCE_FEEDER = 0.174533, // too high => false negatives (removals)
+            TOLERANCE_INTAKE_SENSOR = 0.2618, // too high => false positives, too low => false negatives (no-detect)
             TOLERANCE_INTAKE_OMNI = 0.5236;
 
     private final CachedSimpleServo servo;
