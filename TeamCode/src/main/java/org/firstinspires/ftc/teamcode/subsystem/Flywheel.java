@@ -115,10 +115,10 @@ public final class Flywheel {
     }
 
     /**
-     * <a href="https://www.desmos.com/calculator/mkchlqdnmb">Desmos curve fit</a>
+     * <a href="https://www.desmos.com/calculator/wcez9ivos3">Desmos curve fit</a>
      */
     private static double getFeedForward(double rpmSetpoint) {
-        return rpmSetpoint * 0.000119255617733 + 0.0482677650756;
+        return rpmSetpoint * 0.000120292276714 + 0.0393080566445;
     }
 
     boolean inTolerance(double rpmTolerance) {
