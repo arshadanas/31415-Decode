@@ -29,7 +29,7 @@ public final class Flywheel {
 
             MAX_VOLTAGE = 13,
 
-            RPM_ARMING = 2700,
+            ARMING_SCALAR = 0.8,
             RPM_IDLE = 0,
 
             RPM_TOLERANCE = 80, // TODO increase for faster feeding
@@ -45,7 +45,7 @@ public final class Flywheel {
     private final PIDController controller = new PIDController(derivFilter);
     private final State setpoint = new State(), measurement = new State();
 
-    private double currentRPM, targetRPM = RPM_ARMING, rawRPM, output;
+    private double currentRPM, targetRPM, rawRPM, output;
 
     void setRPM(double rpm) {
         this.targetRPM = rpm;
@@ -92,10 +92,8 @@ public final class Flywheel {
 
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
 
-        double rpmSetpoint =
-                !feedsPending ? RPM_IDLE :
-                !inLaunchZone ? RPM_ARMING :
-                                targetRPM;
+        double rpmSetpoint = !feedsPending ? RPM_IDLE :
+                targetRPM * (inLaunchZone ? 1 : ARMING_SCALAR);
 
         controller.setTarget(setpoint.set(rpmSetpoint));
         double pidf = controller.calculate(measurement.set(currentRPM)) // pid

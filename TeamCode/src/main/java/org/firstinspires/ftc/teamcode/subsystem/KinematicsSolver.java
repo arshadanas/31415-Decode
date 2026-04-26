@@ -30,8 +30,11 @@ import org.firstinspires.ftc.teamcode.control.Ranges;
 @Config
 public final class KinematicsSolver {
 
-    public static final Vector2 o_goal = new Vector2(5, -2.5);
-    public static double r_rimClearance = 0.75, admissibleVerticalErrorAtGoal = 1;
+    public static double
+            o_goal_x = 5,
+            o_goal_y = -2.5,
+            r_rimClearance = 0.75,
+            admissibleVerticalErrorAtGoal = 1;
 
     private static final double
             a_G = -386.0886,
@@ -84,7 +87,7 @@ public final class KinematicsSolver {
     public void setAlliance(boolean isRedAlliance) {
         double i = isRedAlliance ? 1 : -1;
 
-        G.set(Center).add((half_F - o_goal.x) * i, half_F + o_goal.y);
+        G.set(Center).add((half_F - o_goal_x) * i, half_F + o_goal_y);
 
         Vector2
                 A_rim = Center.sum(47.42197 * i, 70.04449),
