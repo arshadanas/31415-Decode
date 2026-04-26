@@ -22,6 +22,7 @@ public final class Robot {
 
     private final BulkReader bulkReader;
     private final KinematicsSolver solver;
+    private boolean validSolve;
     private final ElapsedTime loopTimer = new ElapsedTime();
 
     private LaunchZone currentZone;
@@ -52,7 +53,7 @@ public final class Robot {
         currentZone = LaunchZone.getCurrentZone(x, y, heading);
 
         solver.setRobotState(x, y, heading, velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel());
-        boolean validSolve = solver.calculateTarget_v_θ_α();
+        validSolve = solver.calculateTarget_v_θ_α();
 
         turret.setTarget(solver.getTurretAngle());
         flywheel.setVelocity(solver.v_launch);
@@ -75,6 +76,7 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         telemetry.addData("Current zone", currentZone);
         telemetry.addLine();
+        telemetry.addLine("Solve " + (validSolve ? "" : "in") + "valid");
         telemetry.addLine(solver.resultsToString());
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
