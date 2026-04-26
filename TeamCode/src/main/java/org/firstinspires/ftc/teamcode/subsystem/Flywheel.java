@@ -29,11 +29,10 @@ public final class Flywheel {
 
             MAX_VOLTAGE = 13,
 
-            RPM_ARMING = 2700,
+            ARMING_SCALAR = 0.8,
             RPM_IDLE = 0,
 
-            TOLERANCE_RPM_FILTERING = -1,
-            TOLERANCE_RPM_FEEDING = 80, // TODO increase for faster feeding
+            RPM_TOLERANCE = 120, // TODO increase for faster feeding
 
             CACHE_THRESHOLD_MOTORS = 0.001,
 
@@ -46,7 +45,7 @@ public final class Flywheel {
     private final PIDController controller = new PIDController(derivFilter);
     private final State setpoint = new State(), measurement = new State();
 
-    private double currentRPM, targetRPM = RPM_ARMING, rawRPM, output;
+    private double currentRPM, targetRPM, rawRPM, output;
 
     void setRPM(double rpm) {
         this.targetRPM = rpm;
@@ -93,10 +92,8 @@ public final class Flywheel {
 
         double voltageScalar = MAX_VOLTAGE / batteryVoltageSensor.getVoltage();
 
-        double rpmSetpoint =
-                !feedsPending ? RPM_IDLE :
-                !inLaunchZone ? RPM_ARMING :
-                                targetRPM;
+        double rpmSetpoint = !feedsPending ? RPM_IDLE :
+                targetRPM * (inLaunchZone ? 1 : ARMING_SCALAR);
 
         controller.setTarget(setpoint.set(rpmSetpoint));
         double pidf = controller.calculate(measurement.set(currentRPM)) // pid
@@ -121,16 +118,12 @@ public final class Flywheel {
         return rpmSetpoint * 0.000120292276714 + 0.0393080566445;
     }
 
-    boolean inTolerance(double rpmTolerance) {
-        return abs(targetRPM - currentRPM) <= rpmTolerance;
+    boolean inTolerance() {
+        return abs(targetRPM - currentRPM) <= RPM_TOLERANCE;
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("SHOOTER",
-                inTolerance(TOLERANCE_RPM_FILTERING) ?  "RPM in filtering tolerance" :
-                inTolerance(TOLERANCE_RPM_FEEDING) ?    "RPM in feeding tolerance" :
-                                                        "RPM out of tolerance"
-        );
+        telemetry.addData("SHOOTER", inTolerance() ? "RPM in feeding tolerance" : "RPM out of tolerance");
         telemetry.addLine();
         telemetry.addData("Current vel (rpm)", currentRPM);
         telemetry.addData("Target vel (rpm)", targetRPM);

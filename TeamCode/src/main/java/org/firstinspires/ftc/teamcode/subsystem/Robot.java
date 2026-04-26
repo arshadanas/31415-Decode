@@ -21,7 +21,8 @@ public final class Robot {
     public final Turret turret;
 
     private final BulkReader bulkReader;
-    private final AirtimeSolver solver;
+    private final KinematicsSolver solver;
+    private boolean validSolve;
     private final ElapsedTime loopTimer = new ElapsedTime();
 
     private LaunchZone currentZone;
@@ -34,7 +35,7 @@ public final class Robot {
         turret = new Turret(hardwareMap);
 
         bulkReader = new BulkReader(hardwareMap);
-        solver = new AirtimeSolver();
+        solver = new KinematicsSolver();
     }
 
     public void setAlliance(boolean isRedAlliance) {
@@ -51,11 +52,12 @@ public final class Robot {
 
         currentZone = LaunchZone.getCurrentZone(x, y, heading);
 
-        solver.update(x, y, heading, velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel());
+        solver.setRobotState(x, y, heading, velocity.getXComponent(), velocity.getYComponent(), drivetrain.getAngularVel());
+        validSolve = solver.calculateTarget_v_θ_α();
 
-        turret.setTarget(solver.turretAngle);
-        flywheel.setRPM(solver.launchRPM);
-        hood.setLaunchAngle(solver.launchAngle);
+        turret.setTarget(solver.getTurretAngle());
+        flywheel.setVelocity(solver.v_launch);
+        hood.setLaunchAngle(solver.θ_launch);
 
         boolean inLaunchZone = currentZone != NONE;
         boolean feedsPending = handler.feedsPending();
@@ -63,8 +65,7 @@ public final class Robot {
         flywheel.run(inLaunchZone, feedsPending);
         turret.run(feedsPending);
 
-        boolean inTolerance = flywheel.inTolerance(Flywheel.TOLERANCE_RPM_FEEDING) &&
-                                turret.inTolerance(Turret.TOLERANCE_FEEDING);
+        boolean inTolerance = validSolve && flywheel.inTolerance() && turret.inTolerance();
 
         handler.run(inLaunchZone && (forceFeed || (feed && inTolerance)));
     }
@@ -75,7 +76,8 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         telemetry.addData("Current zone", currentZone);
         telemetry.addLine();
-        solver.printTo(telemetry);
+        telemetry.addLine("Solve " + (validSolve ? "" : "in") + "valid");
+        telemetry.addLine(solver.resultsToString());
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
         telemetry.addLine("\n--------------------------------------\n");
