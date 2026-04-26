@@ -76,7 +76,7 @@ public final class Robot {
         telemetry.addLine("\n--------------------------------------\n");
         telemetry.addData("Current zone", currentZone);
         telemetry.addLine();
-        telemetry.addLine("Solve " + (validSolve ? "" : "in") + "valid");
+        telemetry.addLine((validSolve ? "Valid" : "INVALID") + " solve");
         telemetry.addLine(solver.resultsToString());
         telemetry.addLine("\n--------------------------------------\n");
         drivetrain.printTo(telemetry);
