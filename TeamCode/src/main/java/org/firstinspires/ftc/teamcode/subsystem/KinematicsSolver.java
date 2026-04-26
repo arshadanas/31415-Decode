@@ -117,7 +117,7 @@ public final class KinematicsSolver {
         s0.set(v0).right().multiply(c).add(s_wheel);
 
         s_launch.set(unitTurretToGoal).rotate(α_launch).multiply(s0.x).add(s_turret);
-        unitLaunchPtToGoal.set(G).subtract(s_launch).normalize();
+        double distToGoal = unitLaunchPtToGoal.set(G).subtract(s_launch).normalize();
         v_relToGoal.set(v_turret.dot(unitLaunchPtToGoal), v_turret.dot(unitLaunchPtToGoal.right())).negate();
 
         v0.multiply(v_launch);
@@ -127,7 +127,7 @@ public final class KinematicsSolver {
         k.x = (m1 * s_launch.x - s_launch.y + b) / (m1 - m2);
         k.y = m2 * k.x + b;
 
-        s_goal.set(s_launch.distance(G) + s0.x, y_goal);
+        s_goal.set(distToGoal + s0.x, y_goal);
         s_rim.set(s_launch.distance(k) + s0.x, y_rim);
 
         double t = (s_goal.x - s0.x) / v0.x;
