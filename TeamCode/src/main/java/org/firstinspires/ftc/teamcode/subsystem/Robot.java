@@ -71,8 +71,9 @@ public final class Robot {
     }
 
     public void printTo(Telemetry telemetry) {
-        telemetry.addData("LOOP TIME (ms)", loopTimer.milliseconds());
-        loopTimer.reset();
+        double s = loopTimer.seconds(); loopTimer.reset();
+        telemetry.addData("Loop time (ms)", 1000*s);
+        telemetry.addData("Loop rate (hz)", 1/s);
         telemetry.addLine("\n--------------------------------------\n");
         telemetry.addData("Current zone", currentZone);
         telemetry.addLine();

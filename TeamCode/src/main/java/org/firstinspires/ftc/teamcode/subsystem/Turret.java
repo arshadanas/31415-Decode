@@ -100,7 +100,7 @@ public final class Turret {
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addLine("TURRET");
+        telemetry.addData("TURRET", inTolerance() ? "Within tolerance" : "Out of tolerance");
         telemetry.addLine();
         telemetry.addData("Position (deg)", toDegrees(current.x));
         telemetry.addData("Target (deg)", toDegrees(target.x));

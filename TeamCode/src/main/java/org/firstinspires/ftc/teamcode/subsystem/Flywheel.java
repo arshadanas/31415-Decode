@@ -123,7 +123,7 @@ public final class Flywheel {
     }
 
     void printTo(Telemetry telemetry) {
-        telemetry.addData("SHOOTER", inTolerance() ? "RPM in feeding tolerance" : "RPM out of tolerance");
+        telemetry.addData("SHOOTER", inTolerance() ? "RPM within tolerance" : "RPM out of tolerance");
         telemetry.addLine();
         telemetry.addData("Current vel (rpm)", currentRPM);
         telemetry.addData("Target vel (rpm)", targetRPM);
