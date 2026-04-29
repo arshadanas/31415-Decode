@@ -116,7 +116,7 @@ public final class Tele extends LinearOpMode {
         while (opModeIsActive()) {
 
             // Read sensors + gamepads:
-            robot.run(gamepad1.square, gamepad1.dpad_down);
+            robot.run(!gamepad1.square, gamepad1.dpad_down);
 
             if (gamepad1.left_bumper) {
 
