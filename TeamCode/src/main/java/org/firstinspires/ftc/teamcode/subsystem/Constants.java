@@ -10,6 +10,5 @@ public final class Constants {
             SIZE_FIELD = 141.5,
             SIZE_TILE = SIZE_FIELD/6,
             SIZE_TILE_DIAG = SIZE_TILE * sqrt(2),
-            SIZE_TAB = 0.8,
-            TURRET_FORWARD_OFFSET = -1.86759;
+            SIZE_TAB = 0.8;
 }

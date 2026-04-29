@@ -38,30 +38,10 @@ public final class Ranges {
 
     /**
      * Map a value from one range to another
-     * @param x value to map from [fromLo, fromHi]
-     * @param fromLo lowest value in the source range
-     * @param fromHi highest value in the source range
-     * @param toLo lowest value in the output range
-     * @param toHi highest value in the output range
-     * @return the value in the range [toLo, toHi] that is the same percentage across the interval that x is across [fromLo, fromHi]
+     * @param x value in the source range [fromLo, fromHi]
+     * @return the corresponding value in the output range [toLo, toHi]
      */
     public static double lerp(double x, double fromLo, double fromHi, double toLo, double toHi) {
         return toLo + (x - fromLo) * (toHi - toLo) / (fromHi - fromLo);
-    }
-
-    /**
-     * Performs quadratic Lagrange interpolation to estimate the value at a given x.
-     */
-    public static double quadInterp(double x,
-                                     double x0, double y0,
-                                     double x1, double y1,
-                                     double x2, double y2) {
-
-        // Calculate the Lagrange basis polynomials L0(x), L1(x), and L2(x)
-        double L0 = ((x - x1) * (x - x2)) / ((x0 - x1) * (x0 - x2));
-        double L1 = ((x - x0) * (x - x2)) / ((x1 - x0) * (x1 - x2));
-        double L2 = ((x - x0) * (x - x1)) / ((x2 - x0) * (x2 - x1));
-
-        return (L0 * y0) + (L1 * y1) + (L2 * y2);
     }
 }
