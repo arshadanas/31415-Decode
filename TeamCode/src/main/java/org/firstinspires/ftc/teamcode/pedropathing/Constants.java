@@ -31,7 +31,7 @@ public class Constants {
     ;
 
     public static FollowerConstants followerConstants = new FollowerConstants()
-            .mass(16.782904)
+            .mass(13.6078)
             .forwardZeroPowerAcceleration(-29.66287519)
             .lateralZeroPowerAcceleration(-59.382531949)
             .translationalPIDFCoefficients(new PIDFCoefficients(0.25, 0, 0.025, 0))
